@@ -1,0 +1,284 @@
+<decision-table52>
+	<tableName>Entitlements</tableName>
+	<rowNumberCol>
+		<hideColumn>false</hideColumn>
+		<width>50</width>
+	</rowNumberCol>
+	<descriptionCol>
+		<hideColumn>false</hideColumn>
+		<width>279</width>
+	</descriptionCol>
+	<metadataCols />
+	<attributeCols />
+	<conditionPatterns>
+		<org.drools.workbench.models.guided.dtable.shared.model.BRLConditionColumn>
+			<hideColumn>false</hideColumn>
+			<width>-1</width>
+			<header>Fee Transaction</header>
+			<constraintValueType>1</constraintValueType>
+			<parameters />
+			<definition>
+				<org.drools.workbench.models.datamodel.rule.FreeFormLine>
+					<text>BankAdjustment( transactionFee != null &amp;&amp;
+						transactionFee )
+					</text>
+				</org.drools.workbench.models.datamodel.rule.FreeFormLine>
+			</definition>
+			<childColumns>
+				<org.drools.workbench.models.guided.dtable.shared.model.BRLConditionVariableColumn>
+					<hideColumn>false</hideColumn>
+					<width>102</width>
+					<header>Fee Transaction</header>
+					<constraintValueType>1</constraintValueType>
+					<fieldType>Boolean</fieldType>
+					<parameters />
+					<varName></varName>
+				</org.drools.workbench.models.guided.dtable.shared.model.BRLConditionVariableColumn>
+			</childColumns>
+		</org.drools.workbench.models.guided.dtable.shared.model.BRLConditionColumn>
+		<org.drools.workbench.models.guided.dtable.shared.model.BRLConditionColumn>
+			<hideColumn>false</hideColumn>
+			<width>-1</width>
+			<header>Agent Area</header>
+			<constraintValueType>1</constraintValueType>
+			<parameters />
+			<definition>
+				<org.drools.workbench.models.datamodel.rule.FreeFormLine>
+					<text>BankAdjustment( agentAreas.contains( &quot;@{Agent
+						Area}&quot; ) )</text>
+				</org.drools.workbench.models.datamodel.rule.FreeFormLine>
+			</definition>
+			<childColumns>
+				<org.drools.workbench.models.guided.dtable.shared.model.BRLConditionVariableColumn>
+					<hideColumn>false</hideColumn>
+					<width>118</width>
+					<header>Agent Area</header>
+					<constraintValueType>1</constraintValueType>
+					<fieldType>Object</fieldType>
+					<parameters />
+					<varName>Agent Area</varName>
+				</org.drools.workbench.models.guided.dtable.shared.model.BRLConditionVariableColumn>
+			</childColumns>
+		</org.drools.workbench.models.guided.dtable.shared.model.BRLConditionColumn>
+		<org.drools.workbench.models.guided.dtable.shared.model.BRLConditionColumn>
+			<hideColumn>false</hideColumn>
+			<width>-1</width>
+			<header>Agent Role</header>
+			<constraintValueType>1</constraintValueType>
+			<parameters />
+			<definition>
+				<org.drools.workbench.models.datamodel.rule.FreeFormLine>
+					<text>$adjustment : BankAdjustment( agentRoles.contains(
+						&quot;@{Agent Role}&quot; ) )</text>
+				</org.drools.workbench.models.datamodel.rule.FreeFormLine>
+			</definition>
+			<childColumns>
+				<org.drools.workbench.models.guided.dtable.shared.model.BRLConditionVariableColumn>
+					<hideColumn>false</hideColumn>
+					<width>147</width>
+					<header>Agent Role</header>
+					<constraintValueType>1</constraintValueType>
+					<fieldType>Object</fieldType>
+					<parameters />
+					<varName>Agent Role</varName>
+				</org.drools.workbench.models.guided.dtable.shared.model.BRLConditionVariableColumn>
+			</childColumns>
+		</org.drools.workbench.models.guided.dtable.shared.model.BRLConditionColumn>
+		<org.drools.workbench.models.guided.dtable.shared.model.BRLConditionColumn>
+			<hideColumn>false</hideColumn>
+			<width>-1</width>
+			<header>Partner Name</header>
+			<constraintValueType>1</constraintValueType>
+			<parameters />
+			<definition>
+				<org.drools.workbench.models.datamodel.rule.FreeFormLine>
+					<text>BankAdjustment( partnerName == &quot;@{Partner Name}&quot; )
+					</text>
+				</org.drools.workbench.models.datamodel.rule.FreeFormLine>
+			</definition>
+			<childColumns>
+				<org.drools.workbench.models.guided.dtable.shared.model.BRLConditionVariableColumn>
+					<hideColumn>false</hideColumn>
+					<width>133</width>
+					<header>Partner Name</header>
+					<constraintValueType>1</constraintValueType>
+					<fieldType>Object</fieldType>
+					<parameters />
+					<varName>Partner Name</varName>
+				</org.drools.workbench.models.guided.dtable.shared.model.BRLConditionVariableColumn>
+			</childColumns>
+		</org.drools.workbench.models.guided.dtable.shared.model.BRLConditionColumn>
+	</conditionPatterns>
+	<actionCols>
+		<org.drools.workbench.models.guided.dtable.shared.model.BRLActionColumn>
+			<hideColumn>false</hideColumn>
+			<width>-1</width>
+			<header>Agent can override</header>
+			<definition>
+				<org.drools.workbench.models.datamodel.rule.FreeFormLine>
+					<text>$adjustment.setAgentOverride( true );</text>
+				</org.drools.workbench.models.datamodel.rule.FreeFormLine>
+			</definition>
+			<childColumns>
+				<org.drools.workbench.models.guided.dtable.shared.model.BRLActionVariableColumn>
+					<hideColumn>false</hideColumn>
+					<width>128</width>
+					<header>Agent can override</header>
+					<varName></varName>
+					<fieldType>Boolean</fieldType>
+				</org.drools.workbench.models.guided.dtable.shared.model.BRLActionVariableColumn>
+			</childColumns>
+		</org.drools.workbench.models.guided.dtable.shared.model.BRLActionColumn>
+		<org.drools.workbench.models.guided.dtable.shared.model.BRLActionColumn>
+			<hideColumn>false</hideColumn>
+			<width>-1</width>
+			<header>Eligible Entitlement</header>
+			<definition>
+				<org.drools.workbench.models.datamodel.rule.FreeFormLine>
+					<text>$adjustment.setEligibleEntitlement( true );</text>
+				</org.drools.workbench.models.datamodel.rule.FreeFormLine>
+			</definition>
+			<childColumns>
+				<org.drools.workbench.models.guided.dtable.shared.model.BRLActionVariableColumn>
+					<hideColumn>false</hideColumn>
+					<width>130</width>
+					<header>Eligible Entitlement</header>
+					<varName></varName>
+					<fieldType>Boolean</fieldType>
+				</org.drools.workbench.models.guided.dtable.shared.model.BRLActionVariableColumn>
+			</childColumns>
+		</org.drools.workbench.models.guided.dtable.shared.model.BRLActionColumn>
+	</actionCols>
+	<auditLog>
+		<filter
+			class="org.drools.guvnor.client.modeldriven.dt52.auditlog.DecisionTableAuditLogFilter">
+			<acceptedTypes>
+				<entry>
+					<string>INSERT_ROW</string>
+					<boolean>false</boolean>
+				</entry>
+				<entry>
+					<string>INSERT_COLUMN</string>
+					<boolean>false</boolean>
+				</entry>
+				<entry>
+					<string>DELETE_ROW</string>
+					<boolean>false</boolean>
+				</entry>
+				<entry>
+					<string>DELETE_COLUMN</string>
+					<boolean>false</boolean>
+				</entry>
+				<entry>
+					<string>UPDATE_COLUMN</string>
+					<boolean>false</boolean>
+				</entry>
+			</acceptedTypes>
+		</filter>
+		<entries />
+	</auditLog>
+	<imports>
+		<imports>
+			<org.kie.soup.project.datamodel.imports.Import>
+				<type>org.computate.bancaire.enus.adjustment.BankAdjustment</type>
+			</org.kie.soup.project.datamodel.imports.Import>
+		</imports>
+	</imports>
+	<packageName>org.computate.banque.enus.rules</packageName>
+	<tableFormat>EXTENDED_ENTRY</tableFormat>
+	<hitPolicy>NONE</hitPolicy>
+	<data>
+		<list>
+			<value>
+				<valueNumeric class="int">1</valueNumeric>
+				<valueString></valueString>
+				<dataType>NUMERIC_INTEGER</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueString>Scrooge and Marley Operations Executive</valueString>
+				<dataType>STRING</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueBoolean>true</valueBoolean>
+				<valueString></valueString>
+				<dataType>BOOLEAN</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueString>Operations</valueString>
+				<dataType>STRING</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueString>Operations Executive</valueString>
+				<dataType>STRING</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueString>Scrooge and Marley</valueString>
+				<dataType>STRING</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueBoolean>true</valueBoolean>
+				<valueString></valueString>
+				<dataType>BOOLEAN</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueBoolean>true</valueBoolean>
+				<valueString></valueString>
+				<dataType>BOOLEAN</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+		</list>
+		<list>
+			<value>
+				<valueNumeric class="int">2</valueNumeric>
+				<valueString></valueString>
+				<dataType>NUMERIC_INTEGER</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueString>Scrooge and Marley Customer Service</valueString>
+				<dataType>STRING</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueBoolean>true</valueBoolean>
+				<valueString></valueString>
+				<dataType>BOOLEAN</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueString>Customer Service</valueString>
+				<dataType>STRING</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueString>Customer Service Base</valueString>
+				<dataType>STRING</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueString>Scrooge and Marley</valueString>
+				<dataType>STRING</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueBoolean>false</valueBoolean>
+				<valueString></valueString>
+				<dataType>BOOLEAN</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+			<value>
+				<valueBoolean>false</valueBoolean>
+				<valueString></valueString>
+				<dataType>BOOLEAN</dataType>
+				<isOtherwise>false</isOtherwise>
+			</value>
+		</list>
+	</data>
+</decision-table52>
