@@ -1,4 +1,4 @@
-package org.computate.bancaire.frfr.transaction;
+package org.computate.bancaire.frfr.transaction;  
 
 import java.math.BigDecimal;
 import java.text.Normalizer;

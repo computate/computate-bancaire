@@ -6,6 +6,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import java.text.NumberFormat;
+import java.lang.Exception;
 import java.util.Objects;
 import io.vertx.core.json.JsonArray;
 import org.apache.solr.common.SolrDocument;
@@ -40,7 +41,7 @@ public abstract class SearchResultGen<DEV> extends Object {
 	 * <br/>
 	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
 	 **/
-	protected abstract void _siteRequest_(Wrap<SiteRequestEnUS> c);
+	protected abstract void _siteRequest_(Wrap<SiteRequestEnUS> c) throws Exception, Exception;
 
 	public SiteRequestEnUS getSiteRequest_() {
 		return siteRequest_;
@@ -50,7 +51,7 @@ public abstract class SearchResultGen<DEV> extends Object {
 		this.siteRequest_ = siteRequest_;
 		this.siteRequest_Wrap.alreadyInitialized = true;
 	}
-	protected SearchResult siteRequest_Init() {
+	protected SearchResult siteRequest_Init() throws Exception {
 		if(!siteRequest_Wrap.alreadyInitialized) {
 			_siteRequest_(siteRequest_Wrap);
 			if(siteRequest_ == null)
@@ -77,7 +78,7 @@ public abstract class SearchResultGen<DEV> extends Object {
 	 * <br/>
 	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
 	 **/
-	protected abstract void _solrDocument(Wrap<SolrDocument> c);
+	protected abstract void _solrDocument(Wrap<SolrDocument> c) throws Exception, Exception;
 
 	public SolrDocument getSolrDocument() {
 		return solrDocument;
@@ -87,7 +88,7 @@ public abstract class SearchResultGen<DEV> extends Object {
 		this.solrDocument = solrDocument;
 		this.solrDocumentWrap.alreadyInitialized = true;
 	}
-	protected SearchResult solrDocumentInit() {
+	protected SearchResult solrDocumentInit() throws Exception {
 		if(!solrDocumentWrap.alreadyInitialized) {
 			_solrDocument(solrDocumentWrap);
 			if(solrDocument == null)
@@ -114,7 +115,7 @@ public abstract class SearchResultGen<DEV> extends Object {
 	 * <br/>
 	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
 	 **/
-	protected abstract void _resultIndex(Wrap<Long> c);
+	protected abstract void _resultIndex(Wrap<Long> c) throws Exception, Exception;
 
 	public Long getResultIndex() {
 		return resultIndex;
@@ -130,7 +131,7 @@ public abstract class SearchResultGen<DEV> extends Object {
 		this.resultIndexWrap.alreadyInitialized = true;
 		return (SearchResult)this;
 	}
-	protected SearchResult resultIndexInit() {
+	protected SearchResult resultIndexInit() throws Exception {
 		if(!resultIndexWrap.alreadyInitialized) {
 			_resultIndex(resultIndexWrap);
 			if(resultIndex == null)
@@ -170,7 +171,7 @@ public abstract class SearchResultGen<DEV> extends Object {
 
 	protected boolean alreadyInitializedSearchResult = false;
 
-	public SearchResult initDeepSearchResult(SiteRequestEnUS siteRequest_) {
+	public SearchResult initDeepSearchResult(SiteRequestEnUS siteRequest_) throws Exception {
 		setSiteRequest_(siteRequest_);
 		if(!alreadyInitializedSearchResult) {
 			alreadyInitializedSearchResult = true;
@@ -179,17 +180,17 @@ public abstract class SearchResultGen<DEV> extends Object {
 		return (SearchResult)this;
 	}
 
-	public void initDeepSearchResult() {
+	public void initDeepSearchResult() throws Exception {
 		initSearchResult();
 	}
 
-	public void initSearchResult() {
+	public void initSearchResult() throws Exception {
 		siteRequest_Init();
 		solrDocumentInit();
 		resultIndexInit();
 	}
 
-	public void initDeepForClass(SiteRequestEnUS siteRequest_) {
+	public void initDeepForClass(SiteRequestEnUS siteRequest_) throws Exception {
 		initDeepSearchResult(siteRequest_);
 	}
 
@@ -239,7 +240,7 @@ public abstract class SearchResultGen<DEV> extends Object {
 	// attribute //
 	///////////////
 
-	public boolean attributeForClass(String var, Object val) {
+	public boolean attributeForClass(String var, Object val) throws Exception {
 		String[] vars = StringUtils.split(var, ".");
 		Object o = null;
 		for(String v : vars) {
@@ -264,7 +265,7 @@ public abstract class SearchResultGen<DEV> extends Object {
 	// define //
 	/////////////
 
-	public boolean defineForClass(String var, String val) {
+	public boolean defineForClass(String var, String val) throws Exception {
 		String[] vars = StringUtils.split(var, ".");
 		Object o = null;
 		if(val != null) {

@@ -1,4 +1,4 @@
-package org.computate.bancaire.frfr.utilisateur;              
+package org.computate.bancaire.frfr.utilisateur;               
 
 import org.computate.bancaire.frfr.cluster.Cluster;
 import org.computate.bancaire.frfr.couverture.Couverture;
@@ -38,17 +38,14 @@ import org.computate.bancaire.frfr.couverture.Couverture;
  * UnNom.frFR: un utilisateur du site
  * UnNom.enUS: a site user
  * NomPluriel.frFR: utilisateurs du site
- * Couleur: green
+ * Couleur: gray
  * IconeGroupe: regular
- * IconeNom: book
+ * IconeNom: user-cog
  */     
 public class UtilisateurSite extends UtilisateurSiteGen<Cluster> {    
 
 	/**  
 	 * Var.enUS: userId
-	 * Indexe: true
-	 * Stocke: true
-	 * HtmlLigne: 2
 	 * Description.frFR: L'identifiant Keycloak pour cet utilisateur. 
 	 * NomAffichage.frFR: utilisateur ID
 	 * NomAffichage.enUS: user ID
@@ -149,6 +146,11 @@ public class UtilisateurSite extends UtilisateurSiteGen<Cluster> {
 	 * description.frFR: Le nom de famille pour cet utilisateur. 
 	 * Indexe: true
 	 * Stocke: true
+	 * Definir: true
+	 * HtmlLigne: 3
+	 * HtmlCellule: 1
+	 * NomAffichage.frFR: recevoir des courriels
+	 * NomAffichage.enUS: receive email
 	 */  
 	protected void _utilisateurRecevoirCourriels(Couverture<Boolean> c) {
 		c.o(false);
@@ -159,7 +161,9 @@ public class UtilisateurSite extends UtilisateurSiteGen<Cluster> {
 	 * Var.enUS: seeArchived
 	 * Indexe: true
 	 * Stocke: true
-	 * HtmlLigne: 2
+	 * Definir: true
+	 * HtmlLigne: 3
+	 * HtmlCellule: 2
 	 * NomAffichage.frFR: voir archivé
 	 * NomAffichage.enUS: see archived
 	 * Description.frFR: Filter the search results in the application to show archived records. 
@@ -174,7 +178,9 @@ public class UtilisateurSite extends UtilisateurSiteGen<Cluster> {
 	 * Var.enUS: seeDeleted
 	 * Indexe: true
 	 * Stocke: true
-	 * HtmlLigne: 2
+	 * Definir: true
+	 * HtmlLigne: 3
+	 * HtmlCellule: 3
 	 * NomAffichage.frFR: voir supprimé
 	 * NomAffichage.enUS: see deleted
 	 * Description.frFR: Filter the search results in the application to show deleted records. 

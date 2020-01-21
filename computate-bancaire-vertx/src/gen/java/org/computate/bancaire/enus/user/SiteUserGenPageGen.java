@@ -15,6 +15,8 @@ import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 
 /**	
  * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.user.SiteUserGenPage&fq=classeEtendGen_indexed_boolean:true">Trouver la classe  dans Solr</a>
@@ -55,6 +57,8 @@ public abstract class SiteUserGenPageGen<DEV> extends ClusterPage {
 			if(listSiteUser == null)
 				setListSiteUser(listSiteUserWrap.o);
 		}
+		if(listSiteUser != null)
+			listSiteUser.initDeepForClass(null);
 		listSiteUserWrap.alreadyInitialized(true);
 		return (SiteUserGenPage)this;
 	}
@@ -92,6 +96,8 @@ public abstract class SiteUserGenPageGen<DEV> extends ClusterPage {
 			if(siteUser == null)
 				setSiteUser(siteUserWrap.o);
 		}
+		if(siteUser != null)
+			siteUser.initDeepForClass(null);
 		siteUserWrap.alreadyInitialized(true);
 		return (SiteUserGenPage)this;
 	}
@@ -111,8 +117,8 @@ public abstract class SiteUserGenPageGen<DEV> extends ClusterPage {
 	}
 
 	public void initDeepSiteUserGenPage() {
-		super.initDeepClusterPage(siteRequest_);
 		initSiteUserGenPage();
+		super.initDeepClusterPage(siteRequest_);
 	}
 
 	public void initSiteUserGenPage() {
@@ -208,8 +214,9 @@ public abstract class SiteUserGenPageGen<DEV> extends ClusterPage {
 	// htmlScripts //
 	/////////////////
 
-	public void htmlScripts() {
+	@Override public void htmlScripts() {
 		htmlScriptsSiteUserGenPage();
+		super.htmlScripts();
 	}
 
 	public void htmlScriptsSiteUserGenPage() {
@@ -219,8 +226,9 @@ public abstract class SiteUserGenPageGen<DEV> extends ClusterPage {
 	// htmlScript //
 	////////////////
 
-	public void htmlScript() {
+	@Override public void htmlScript() {
 		htmlScriptSiteUserGenPage();
+		super.htmlScript();
 	}
 
 	public void htmlScriptSiteUserGenPage() {
@@ -230,11 +238,72 @@ public abstract class SiteUserGenPageGen<DEV> extends ClusterPage {
 	// htmlBody //
 	//////////////
 
-	public void htmlBody() {
+	@Override public void htmlBody() {
 		htmlBodySiteUserGenPage();
+		super.htmlBody();
 	}
 
 	public void htmlBodySiteUserGenPage() {
+	}
+
+	//////////
+	// html //
+	//////////
+
+	@Override public void html() {
+		htmlSiteUserGenPage();
+		super.html();
+	}
+
+	public void htmlSiteUserGenPage() {
+	}
+
+	//////////////
+	// htmlMeta //
+	//////////////
+
+	@Override public void htmlMeta() {
+		htmlMetaSiteUserGenPage();
+		super.htmlMeta();
+	}
+
+	public void htmlMetaSiteUserGenPage() {
+	}
+
+	////////////////
+	// htmlStyles //
+	////////////////
+
+	@Override public void htmlStyles() {
+		htmlStylesSiteUserGenPage();
+		super.htmlStyles();
+	}
+
+	public void htmlStylesSiteUserGenPage() {
+	}
+
+	///////////////
+	// htmlStyle //
+	///////////////
+
+	@Override public void htmlStyle() {
+		htmlStyleSiteUserGenPage();
+		super.htmlStyle();
+	}
+
+	public void htmlStyleSiteUserGenPage() {
+	}
+
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestSiteUserGenPage() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		SiteUserGenPage original = (SiteUserGenPage)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
+			super.patchRequestClusterPage();
+		}
 	}
 
 	//////////////

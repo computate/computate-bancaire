@@ -13,6 +13,8 @@ import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 
 /**	
  * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.transaction.TransactionPage&fq=classeEtendGen_indexed_boolean:true">Trouver la classe  dans Solr</a>
@@ -35,8 +37,8 @@ public abstract class TransactionPageGen<DEV> extends TransactionGenPage {
 	}
 
 	public void initDeepTransactionPage() {
-		super.initDeepTransactionGenPage(siteRequest_);
 		initTransactionPage();
+		super.initDeepTransactionGenPage(siteRequest_);
 	}
 
 	public void initTransactionPage() {
@@ -204,6 +206,18 @@ public abstract class TransactionPageGen<DEV> extends TransactionGenPage {
 	}
 
 	public void htmlStyleTransactionPage() {
+	}
+
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestTransactionPage() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		TransactionPage original = (TransactionPage)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
+			super.patchRequestTransactionGenPage();
+		}
 	}
 
 	//////////////

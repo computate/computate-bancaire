@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.cluster;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import java.util.Date;
 import java.time.ZonedDateTime;
 import java.time.LocalDateTime;
@@ -31,11 +32,13 @@ import java.util.Objects;
 import io.vertx.core.json.JsonArray;
 import org.apache.solr.common.SolrDocument;
 import java.util.List;
+import java.time.temporal.ChronoUnit;
 import org.computate.bancaire.frfr.couverture.Couverture;
 import java.time.format.DateTimeFormatter;
 import org.apache.solr.client.solrj.SolrQuery;
 import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
 import java.lang.Object;
 import io.vertx.ext.sql.SQLClient;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -43,7 +46,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**	
- * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.cluster.Cluster&fq=classeEtendGen_indexed_boolean:true">Trouver la classe classCanonicalNames dans Solr</a>
+ * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.cluster.Cluster&fq=classeEtendGen_indexed_boolean:true">Trouver la classe pageH1 dans Solr</a>
  * <br/>
  **/
 public abstract class ClusterGen<DEV> extends Object {
@@ -67,7 +70,7 @@ public abstract class ClusterGen<DEV> extends Object {
 	public static final String Cluster_DeNom = "de cluster";
 	public static final String Cluster_NomAdjectifSingulier = "cluster";
 	public static final String Cluster_NomAdjectifPluriel = "clusters";
-	public static final String Cluster_Couleur = "green";
+	public static final String Cluster_Couleur = "gray";
 	public static final String Cluster_IconeGroupe = "regular";
 	public static final String Cluster_IconeNom = "fort-awesome";
 
@@ -223,45 +226,30 @@ public abstract class ClusterGen<DEV> extends Object {
 		return pk == null ? "" : StringEscapeUtils.escapeHtml4(strPk());
 	}
 
-	public void htmPk(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCluster", strPk(), "Pk\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCluster", strPk(), "Pk() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setPk\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichagePk()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"pk\"");
-							r.s(" value=\"", htmPk(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmPk());
+	public void inputPk(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+	}
+
+	public void htmPk(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+		{ s.e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ s.e("div").a("class", "w3-padding ").f();
+					{ s.e("div").a("class", "w3-card ").f();
+						{ s.e("div").a("class", "w3-cell-row w3-gray ").f();
+							s.e("label").a("class", "").f().sx("clé primaire").g("label");
+						} s.g("div");
+						{ s.e("div").a("class", "w3-cell-row  ").f();
+							{ s.e("div").a("class", "w3-cell ").f();
+								{ s.e("div").a("class", "w3-rest ").f();
+									s.e("span").f().sx(strPk()).g("span");
+								} s.g("div");
+							} s.g("div");
+						} s.g("div");
+					} s.g("div");
+				} s.g("div");
 			}
-			r.l("</div>");
-		}
+		} s.g("div");
 	}
 
 	////////
@@ -325,47 +313,6 @@ public abstract class ClusterGen<DEV> extends Object {
 		return id == null ? "" : StringEscapeUtils.escapeHtml4(strId());
 	}
 
-	public void htmId(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCluster", strPk(), "Id\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCluster", strPk(), "Id() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setId\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageId()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"id\"");
-							r.s(" value=\"", htmId(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmId());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////
 	// cree //
 	//////////
@@ -394,18 +341,18 @@ public abstract class ClusterGen<DEV> extends Object {
 		this.creeCouverture.dejaInitialise = true;
 	}
 	public Cluster setCree(Instant o) {
-		this.cree = ZonedDateTime.from(o);
+		this.cree = ZonedDateTime.from(o).truncatedTo(ChronoUnit.MILLIS);
 		this.creeCouverture.dejaInitialise = true;
 		return (Cluster)this;
 	}
 	/** Example: 2011-12-03T10:15:30+01:00 **/
 	public Cluster setCree(String o) {
-		this.cree = ZonedDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		this.cree = ZonedDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.of(requeteSite_.getConfigSite_().getSiteZone()))).truncatedTo(ChronoUnit.MILLIS);
 		this.creeCouverture.dejaInitialise = true;
 		return (Cluster)this;
 	}
 	public Cluster setCree(Date o) {
-		this.cree = ZonedDateTime.ofInstant(o.toInstant(), ZoneId.of(requeteSite_.getConfigSite_().getSiteZone()));
+		this.cree = ZonedDateTime.ofInstant(o.toInstant(), ZoneId.of(requeteSite_.getConfigSite_().getSiteZone())).truncatedTo(ChronoUnit.MILLIS);
 		this.creeCouverture.dejaInitialise = true;
 		return (Cluster)this;
 	}
@@ -424,7 +371,7 @@ public abstract class ClusterGen<DEV> extends Object {
 	}
 
 	public String strCree() {
-		return cree == null ? "" : cree.format(DateTimeFormatter.ofPattern("EEE d MMM yyyy H'h'mm:ss.SSS zz VV", Locale.FRANCE));
+		return cree == null ? "" : cree.format(DateTimeFormatter.ofPattern("EEE d MMM yyyy H'h'mm:ss zz", Locale.FRANCE));
 	}
 
 	public String jsonCree() {
@@ -443,45 +390,30 @@ public abstract class ClusterGen<DEV> extends Object {
 		return cree == null ? "" : StringEscapeUtils.escapeHtml4(strCree());
 	}
 
-	public void htmCree(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCluster", strPk(), "Cree\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCluster", strPk(), "Cree() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCree\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCree()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"cree\"");
-							r.s(" value=\"", htmCree(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCree());
+	public void inputCree(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+	}
+
+	public void htmCree(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+		{ s.e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ s.e("div").a("class", "w3-padding ").f();
+					{ s.e("div").a("class", "w3-card ").f();
+						{ s.e("div").a("class", "w3-cell-row w3-gray ").f();
+							s.e("label").a("class", "").f().sx("crée").g("label");
+						} s.g("div");
+						{ s.e("div").a("class", "w3-cell-row  ").f();
+							{ s.e("div").a("class", "w3-cell ").f();
+								{ s.e("div").a("class", "w3-rest ").f();
+									s.e("span").f().sx(strCree()).g("span");
+								} s.g("div");
+							} s.g("div");
+						} s.g("div");
+					} s.g("div");
+				} s.g("div");
 			}
-			r.l("</div>");
-		}
+		} s.g("div");
 	}
 
 	/////////////
@@ -512,18 +444,18 @@ public abstract class ClusterGen<DEV> extends Object {
 		this.modifieCouverture.dejaInitialise = true;
 	}
 	public Cluster setModifie(Instant o) {
-		this.modifie = ZonedDateTime.from(o);
+		this.modifie = ZonedDateTime.from(o).truncatedTo(ChronoUnit.MILLIS);
 		this.modifieCouverture.dejaInitialise = true;
 		return (Cluster)this;
 	}
 	/** Example: 2011-12-03T10:15:30+01:00 **/
 	public Cluster setModifie(String o) {
-		this.modifie = ZonedDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		this.modifie = ZonedDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.of(requeteSite_.getConfigSite_().getSiteZone()))).truncatedTo(ChronoUnit.MILLIS);
 		this.modifieCouverture.dejaInitialise = true;
 		return (Cluster)this;
 	}
 	public Cluster setModifie(Date o) {
-		this.modifie = ZonedDateTime.ofInstant(o.toInstant(), ZoneId.of(requeteSite_.getConfigSite_().getSiteZone()));
+		this.modifie = ZonedDateTime.ofInstant(o.toInstant(), ZoneId.of(requeteSite_.getConfigSite_().getSiteZone())).truncatedTo(ChronoUnit.MILLIS);
 		this.modifieCouverture.dejaInitialise = true;
 		return (Cluster)this;
 	}
@@ -542,7 +474,7 @@ public abstract class ClusterGen<DEV> extends Object {
 	}
 
 	public String strModifie() {
-		return modifie == null ? "" : modifie.format(DateTimeFormatter.ofPattern("EEE d MMM yyyy H'h'mm:ss.SSS zz VV", Locale.FRANCE));
+		return modifie == null ? "" : modifie.format(DateTimeFormatter.ofPattern("EEE d MMM yyyy H'h'mm:ss zz", Locale.FRANCE));
 	}
 
 	public String jsonModifie() {
@@ -561,45 +493,30 @@ public abstract class ClusterGen<DEV> extends Object {
 		return modifie == null ? "" : StringEscapeUtils.escapeHtml4(strModifie());
 	}
 
-	public void htmModifie(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCluster", strPk(), "Modifie\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCluster", strPk(), "Modifie() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setModifie\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageModifie()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"modifie\"");
-							r.s(" value=\"", htmModifie(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmModifie());
+	public void inputModifie(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+	}
+
+	public void htmModifie(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+		{ s.e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ s.e("div").a("class", "w3-padding ").f();
+					{ s.e("div").a("class", "w3-card ").f();
+						{ s.e("div").a("class", "w3-cell-row w3-gray ").f();
+							s.e("label").a("class", "").f().sx("modifié").g("label");
+						} s.g("div");
+						{ s.e("div").a("class", "w3-cell-row  ").f();
+							{ s.e("div").a("class", "w3-cell ").f();
+								{ s.e("div").a("class", "w3-rest ").f();
+									s.e("span").f().sx(strModifie()).g("span");
+								} s.g("div");
+							} s.g("div");
+						} s.g("div");
+					} s.g("div");
+				} s.g("div");
 			}
-			r.l("</div>");
-		}
+		} s.g("div");
 	}
 
 	/////////////
@@ -668,45 +585,48 @@ public abstract class ClusterGen<DEV> extends Object {
 		return archive == null ? "" : StringEscapeUtils.escapeHtml4(strArchive());
 	}
 
-	public void htmArchive(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCluster", strPk(), "Archive\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCluster", strPk(), "Archive() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setArchive\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageArchive()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"archive\"");
-							r.s(" value=\"", htmArchive(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputArchive(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+		s.e("input")
+			.a("type", "checkbox")
+			.a("id", classeApiMethodeMethode, "_archive")
+			.a("value", "true");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				s.a("class", "setArchive inputCluster", pk, "Archive w3-input w3-border ");
+				s.a("name", "setArchive");
 			} else {
-				r.s(htmArchive());
+				s.a("class", "valeurArchive inputCluster", pk, "Archive w3-input w3-border ");
+				s.a("name", "archive");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				s.a("onchange", "patchClusterVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setArchive', $(this).prop('checked'), function() { ajouterLueur($('#", classeApiMethodeMethode, "_archive')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_archive')); }); ");
+			}
+			;
+			if(getArchive() != null && getArchive())
+				s.a("checked", "checked");
+		s.fg();
+
+	}
+
+	public void htmArchive(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+		{ s.e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ s.e("div").a("class", "w3-padding ").f();
+				{ s.e("div").a("id", "suggereClusterArchive").f();
+					{ s.e("div").a("class", "w3-card ").f();
+						{ s.e("div").a("class", "w3-cell-row w3-gray ").f();
+							s.e("label").a("for", classeApiMethodeMethode, "_archive").a("class", "").f().sx("archivé").g("label");
+						} s.g("div");
+						{ s.e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ s.e("div").a("class", "w3-cell ").f();
+
+								inputArchive(classeApiMethodeMethode);
+							} s.g("div");
+						} s.g("div");
+					} s.g("div");
+				} s.g("div");
+			} s.g("div");
+		} s.g("div");
 	}
 
 	//////////////
@@ -775,45 +695,48 @@ public abstract class ClusterGen<DEV> extends Object {
 		return supprime == null ? "" : StringEscapeUtils.escapeHtml4(strSupprime());
 	}
 
-	public void htmSupprime(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCluster", strPk(), "Supprime\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCluster", strPk(), "Supprime() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setSupprime\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageSupprime()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"supprime\"");
-							r.s(" value=\"", htmSupprime(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputSupprime(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+		s.e("input")
+			.a("type", "checkbox")
+			.a("id", classeApiMethodeMethode, "_supprime")
+			.a("value", "true");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				s.a("class", "setSupprime inputCluster", pk, "Supprime w3-input w3-border ");
+				s.a("name", "setSupprime");
 			} else {
-				r.s(htmSupprime());
+				s.a("class", "valeurSupprime inputCluster", pk, "Supprime w3-input w3-border ");
+				s.a("name", "supprime");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				s.a("onchange", "patchClusterVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setSupprime', $(this).prop('checked'), function() { ajouterLueur($('#", classeApiMethodeMethode, "_supprime')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_supprime')); }); ");
+			}
+			;
+			if(getSupprime() != null && getSupprime())
+				s.a("checked", "checked");
+		s.fg();
+
+	}
+
+	public void htmSupprime(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+		{ s.e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ s.e("div").a("class", "w3-padding ").f();
+				{ s.e("div").a("id", "suggereClusterSupprime").f();
+					{ s.e("div").a("class", "w3-card ").f();
+						{ s.e("div").a("class", "w3-cell-row w3-gray ").f();
+							s.e("label").a("for", classeApiMethodeMethode, "_supprime").a("class", "").f().sx("supprimé").g("label");
+						} s.g("div");
+						{ s.e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ s.e("div").a("class", "w3-cell ").f();
+
+								inputSupprime(classeApiMethodeMethode);
+							} s.g("div");
+						} s.g("div");
+					} s.g("div");
+				} s.g("div");
+			} s.g("div");
+		} s.g("div");
 	}
 
 	////////////////////////
@@ -877,47 +800,6 @@ public abstract class ClusterGen<DEV> extends Object {
 		return classeNomCanonique == null ? "" : StringEscapeUtils.escapeHtml4(strClasseNomCanonique());
 	}
 
-	public void htmClasseNomCanonique(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCluster", strPk(), "ClasseNomCanonique\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCluster", strPk(), "ClasseNomCanonique() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setClasseNomCanonique\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageClasseNomCanonique()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"classeNomCanonique\"");
-							r.s(" value=\"", htmClasseNomCanonique(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmClasseNomCanonique());
-			}
-			r.l("</div>");
-		}
-	}
-
 	/////////////////////
 	// classeNomSimple //
 	/////////////////////
@@ -977,47 +859,6 @@ public abstract class ClusterGen<DEV> extends Object {
 
 	public String htmClasseNomSimple() {
 		return classeNomSimple == null ? "" : StringEscapeUtils.escapeHtml4(strClasseNomSimple());
-	}
-
-	public void htmClasseNomSimple(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCluster", strPk(), "ClasseNomSimple\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCluster", strPk(), "ClasseNomSimple() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setClasseNomSimple\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageClasseNomSimple()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"classeNomSimple\"");
-							r.s(" value=\"", htmClasseNomSimple(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmClasseNomSimple());
-			}
-			r.l("</div>");
-		}
 	}
 
 	//////////////////////////
@@ -1098,45 +939,518 @@ public abstract class ClusterGen<DEV> extends Object {
 		return classeNomsCanoniques == null ? "" : StringEscapeUtils.escapeHtml4(strClasseNomsCanoniques());
 	}
 
-	public void htmClasseNomsCanoniques(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCluster", strPk(), "ClasseNomsCanoniques\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCluster", strPk(), "ClasseNomsCanoniques() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setClasseNomsCanoniques\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageClasseNomsCanoniques()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"classeNomsCanoniques\"");
-							r.s(" value=\"", htmClasseNomsCanoniques(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmClasseNomsCanoniques());
-			}
-			r.l("</div>");
+	///////////////
+	// sessionId //
+	///////////////
+
+	/**	L'entité « sessionId »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected String sessionId;
+	@JsonIgnore
+	public Couverture<String> sessionIdCouverture = new Couverture<String>().p(this).c(String.class).var("sessionId").o(sessionId);
+
+	/**	<br/>L'entité « sessionId »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.cluster.Cluster&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:sessionId">Trouver l'entité sessionId dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _sessionId(Couverture<String> c);
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+		this.sessionIdCouverture.dejaInitialise = true;
+	}
+	protected Cluster sessionIdInit() {
+		if(!sessionIdCouverture.dejaInitialise) {
+			_sessionId(sessionIdCouverture);
+			if(sessionId == null)
+				setSessionId(sessionIdCouverture.o);
 		}
+		sessionIdCouverture.dejaInitialise(true);
+		return (Cluster)this;
+	}
+
+	public String solrSessionId() {
+		return sessionId;
+	}
+
+	public String strSessionId() {
+		return sessionId == null ? "" : sessionId;
+	}
+
+	public String jsonSessionId() {
+		return sessionId == null ? "" : sessionId;
+	}
+
+	public String nomAffichageSessionId() {
+		return null;
+	}
+
+	public String htmTooltipSessionId() {
+		return null;
+	}
+
+	public String htmSessionId() {
+		return sessionId == null ? "" : StringEscapeUtils.escapeHtml4(strSessionId());
+	}
+
+	////////////////
+	// objetTitre //
+	////////////////
+
+	/**	L'entité « objetTitre »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected String objetTitre;
+	@JsonIgnore
+	public Couverture<String> objetTitreCouverture = new Couverture<String>().p(this).c(String.class).var("objetTitre").o(objetTitre);
+
+	/**	<br/>L'entité « objetTitre »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.cluster.Cluster&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:objetTitre">Trouver l'entité objetTitre dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _objetTitre(Couverture<String> c);
+
+	public String getObjetTitre() {
+		return objetTitre;
+	}
+
+	public void setObjetTitre(String objetTitre) {
+		this.objetTitre = objetTitre;
+		this.objetTitreCouverture.dejaInitialise = true;
+	}
+	protected Cluster objetTitreInit() {
+		if(!objetTitreCouverture.dejaInitialise) {
+			_objetTitre(objetTitreCouverture);
+			if(objetTitre == null)
+				setObjetTitre(objetTitreCouverture.o);
+		}
+		objetTitreCouverture.dejaInitialise(true);
+		return (Cluster)this;
+	}
+
+	public String solrObjetTitre() {
+		return objetTitre;
+	}
+
+	public String strObjetTitre() {
+		return objetTitre == null ? "" : objetTitre;
+	}
+
+	public String jsonObjetTitre() {
+		return objetTitre == null ? "" : objetTitre;
+	}
+
+	public String nomAffichageObjetTitre() {
+		return null;
+	}
+
+	public String htmTooltipObjetTitre() {
+		return null;
+	}
+
+	public String htmObjetTitre() {
+		return objetTitre == null ? "" : StringEscapeUtils.escapeHtml4(strObjetTitre());
+	}
+
+	/////////////
+	// objetId //
+	/////////////
+
+	/**	L'entité « objetId »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected String objetId;
+	@JsonIgnore
+	public Couverture<String> objetIdCouverture = new Couverture<String>().p(this).c(String.class).var("objetId").o(objetId);
+
+	/**	<br/>L'entité « objetId »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.cluster.Cluster&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:objetId">Trouver l'entité objetId dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _objetId(Couverture<String> c);
+
+	public String getObjetId() {
+		return objetId;
+	}
+
+	public void setObjetId(String objetId) {
+		this.objetId = objetId;
+		this.objetIdCouverture.dejaInitialise = true;
+	}
+	protected Cluster objetIdInit() {
+		if(!objetIdCouverture.dejaInitialise) {
+			_objetId(objetIdCouverture);
+			if(objetId == null)
+				setObjetId(objetIdCouverture.o);
+		}
+		objetIdCouverture.dejaInitialise(true);
+		return (Cluster)this;
+	}
+
+	public String solrObjetId() {
+		return objetId;
+	}
+
+	public String strObjetId() {
+		return objetId == null ? "" : objetId;
+	}
+
+	public String jsonObjetId() {
+		return objetId == null ? "" : objetId;
+	}
+
+	public String nomAffichageObjetId() {
+		return "ID";
+	}
+
+	public String htmTooltipObjetId() {
+		return null;
+	}
+
+	public String htmObjetId() {
+		return objetId == null ? "" : StringEscapeUtils.escapeHtml4(strObjetId());
+	}
+
+	public void inputObjetId(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+	}
+
+	public void htmObjetId(String classeApiMethodeMethode) {
+		Cluster s = (Cluster)this;
+		{ s.e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ s.e("div").a("class", "w3-padding ").f();
+					{ s.e("div").a("class", "w3-card ").f();
+						{ s.e("div").a("class", "w3-cell-row w3-gray ").f();
+							s.e("label").a("class", "").f().sx("ID").g("label");
+						} s.g("div");
+						{ s.e("div").a("class", "w3-cell-row  ").f();
+							{ s.e("div").a("class", "w3-cell ").f();
+								{ s.e("div").a("class", "w3-rest ").f();
+									s.e("span").f().sx(strObjetId()).g("span");
+								} s.g("div");
+							} s.g("div");
+						} s.g("div");
+					} s.g("div");
+				} s.g("div");
+			}
+		} s.g("div");
+	}
+
+	/////////////////
+	// objetNomVar //
+	/////////////////
+
+	/**	L'entité « objetNomVar »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected String objetNomVar;
+	@JsonIgnore
+	public Couverture<String> objetNomVarCouverture = new Couverture<String>().p(this).c(String.class).var("objetNomVar").o(objetNomVar);
+
+	/**	<br/>L'entité « objetNomVar »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.cluster.Cluster&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:objetNomVar">Trouver l'entité objetNomVar dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _objetNomVar(Couverture<String> c);
+
+	public String getObjetNomVar() {
+		return objetNomVar;
+	}
+
+	public void setObjetNomVar(String objetNomVar) {
+		this.objetNomVar = objetNomVar;
+		this.objetNomVarCouverture.dejaInitialise = true;
+	}
+	protected Cluster objetNomVarInit() {
+		if(!objetNomVarCouverture.dejaInitialise) {
+			_objetNomVar(objetNomVarCouverture);
+			if(objetNomVar == null)
+				setObjetNomVar(objetNomVarCouverture.o);
+		}
+		objetNomVarCouverture.dejaInitialise(true);
+		return (Cluster)this;
+	}
+
+	public String solrObjetNomVar() {
+		return objetNomVar;
+	}
+
+	public String strObjetNomVar() {
+		return objetNomVar == null ? "" : objetNomVar;
+	}
+
+	public String jsonObjetNomVar() {
+		return objetNomVar == null ? "" : objetNomVar;
+	}
+
+	public String nomAffichageObjetNomVar() {
+		return null;
+	}
+
+	public String htmTooltipObjetNomVar() {
+		return null;
+	}
+
+	public String htmObjetNomVar() {
+		return objetNomVar == null ? "" : StringEscapeUtils.escapeHtml4(strObjetNomVar());
+	}
+
+	//////////////////
+	// objetSuggere //
+	//////////////////
+
+	/**	L'entité « objetSuggere »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected String objetSuggere;
+	@JsonIgnore
+	public Couverture<String> objetSuggereCouverture = new Couverture<String>().p(this).c(String.class).var("objetSuggere").o(objetSuggere);
+
+	/**	<br/>L'entité « objetSuggere »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.cluster.Cluster&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:objetSuggere">Trouver l'entité objetSuggere dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _objetSuggere(Couverture<String> c);
+
+	public String getObjetSuggere() {
+		return objetSuggere;
+	}
+
+	public void setObjetSuggere(String objetSuggere) {
+		this.objetSuggere = objetSuggere;
+		this.objetSuggereCouverture.dejaInitialise = true;
+	}
+	protected Cluster objetSuggereInit() {
+		if(!objetSuggereCouverture.dejaInitialise) {
+			_objetSuggere(objetSuggereCouverture);
+			if(objetSuggere == null)
+				setObjetSuggere(objetSuggereCouverture.o);
+		}
+		objetSuggereCouverture.dejaInitialise(true);
+		return (Cluster)this;
+	}
+
+	public String solrObjetSuggere() {
+		return objetSuggere;
+	}
+
+	public String strObjetSuggere() {
+		return objetSuggere == null ? "" : objetSuggere;
+	}
+
+	public String jsonObjetSuggere() {
+		return objetSuggere == null ? "" : objetSuggere;
+	}
+
+	public String nomAffichageObjetSuggere() {
+		return null;
+	}
+
+	public String htmTooltipObjetSuggere() {
+		return null;
+	}
+
+	public String htmObjetSuggere() {
+		return objetSuggere == null ? "" : StringEscapeUtils.escapeHtml4(strObjetSuggere());
+	}
+
+	///////////////
+	// pageUrlId //
+	///////////////
+
+	/**	L'entité « pageUrlId »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected String pageUrlId;
+	@JsonIgnore
+	public Couverture<String> pageUrlIdCouverture = new Couverture<String>().p(this).c(String.class).var("pageUrlId").o(pageUrlId);
+
+	/**	<br/>L'entité « pageUrlId »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.cluster.Cluster&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:pageUrlId">Trouver l'entité pageUrlId dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _pageUrlId(Couverture<String> c);
+
+	public String getPageUrlId() {
+		return pageUrlId;
+	}
+
+	public void setPageUrlId(String pageUrlId) {
+		this.pageUrlId = pageUrlId;
+		this.pageUrlIdCouverture.dejaInitialise = true;
+	}
+	protected Cluster pageUrlIdInit() {
+		if(!pageUrlIdCouverture.dejaInitialise) {
+			_pageUrlId(pageUrlIdCouverture);
+			if(pageUrlId == null)
+				setPageUrlId(pageUrlIdCouverture.o);
+		}
+		pageUrlIdCouverture.dejaInitialise(true);
+		return (Cluster)this;
+	}
+
+	public String solrPageUrlId() {
+		return pageUrlId;
+	}
+
+	public String strPageUrlId() {
+		return pageUrlId == null ? "" : pageUrlId;
+	}
+
+	public String jsonPageUrlId() {
+		return pageUrlId == null ? "" : pageUrlId;
+	}
+
+	public String nomAffichagePageUrlId() {
+		return null;
+	}
+
+	public String htmTooltipPageUrlId() {
+		return null;
+	}
+
+	public String htmPageUrlId() {
+		return pageUrlId == null ? "" : StringEscapeUtils.escapeHtml4(strPageUrlId());
+	}
+
+	///////////////
+	// pageUrlPk //
+	///////////////
+
+	/**	L'entité « pageUrlPk »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected String pageUrlPk;
+	@JsonIgnore
+	public Couverture<String> pageUrlPkCouverture = new Couverture<String>().p(this).c(String.class).var("pageUrlPk").o(pageUrlPk);
+
+	/**	<br/>L'entité « pageUrlPk »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.cluster.Cluster&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:pageUrlPk">Trouver l'entité pageUrlPk dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _pageUrlPk(Couverture<String> c);
+
+	public String getPageUrlPk() {
+		return pageUrlPk;
+	}
+
+	public void setPageUrlPk(String pageUrlPk) {
+		this.pageUrlPk = pageUrlPk;
+		this.pageUrlPkCouverture.dejaInitialise = true;
+	}
+	protected Cluster pageUrlPkInit() {
+		if(!pageUrlPkCouverture.dejaInitialise) {
+			_pageUrlPk(pageUrlPkCouverture);
+			if(pageUrlPk == null)
+				setPageUrlPk(pageUrlPkCouverture.o);
+		}
+		pageUrlPkCouverture.dejaInitialise(true);
+		return (Cluster)this;
+	}
+
+	public String solrPageUrlPk() {
+		return pageUrlPk;
+	}
+
+	public String strPageUrlPk() {
+		return pageUrlPk == null ? "" : pageUrlPk;
+	}
+
+	public String jsonPageUrlPk() {
+		return pageUrlPk == null ? "" : pageUrlPk;
+	}
+
+	public String nomAffichagePageUrlPk() {
+		return null;
+	}
+
+	public String htmTooltipPageUrlPk() {
+		return null;
+	}
+
+	public String htmPageUrlPk() {
+		return pageUrlPk == null ? "" : StringEscapeUtils.escapeHtml4(strPageUrlPk());
+	}
+
+	////////////
+	// pageH1 //
+	////////////
+
+	/**	L'entité « pageH1 »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected String pageH1;
+	@JsonIgnore
+	public Couverture<String> pageH1Couverture = new Couverture<String>().p(this).c(String.class).var("pageH1").o(pageH1);
+
+	/**	<br/>L'entité « pageH1 »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.cluster.Cluster&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:pageH1">Trouver l'entité pageH1 dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _pageH1(Couverture<String> c);
+
+	public String getPageH1() {
+		return pageH1;
+	}
+
+	public void setPageH1(String pageH1) {
+		this.pageH1 = pageH1;
+		this.pageH1Couverture.dejaInitialise = true;
+	}
+	protected Cluster pageH1Init() {
+		if(!pageH1Couverture.dejaInitialise) {
+			_pageH1(pageH1Couverture);
+			if(pageH1 == null)
+				setPageH1(pageH1Couverture.o);
+		}
+		pageH1Couverture.dejaInitialise(true);
+		return (Cluster)this;
+	}
+
+	public String solrPageH1() {
+		return pageH1;
+	}
+
+	public String strPageH1() {
+		return pageH1 == null ? "" : pageH1;
+	}
+
+	public String jsonPageH1() {
+		return pageH1 == null ? "" : pageH1;
+	}
+
+	public String nomAffichagePageH1() {
+		return null;
+	}
+
+	public String htmTooltipPageH1() {
+		return null;
+	}
+
+	public String htmPageH1() {
+		return pageH1 == null ? "" : StringEscapeUtils.escapeHtml4(strPageH1());
 	}
 
 	//////////////
@@ -1170,6 +1484,14 @@ public abstract class ClusterGen<DEV> extends Object {
 		classeNomCanoniqueInit();
 		classeNomSimpleInit();
 		classeNomsCanoniquesInit();
+		sessionIdInit();
+		objetTitreInit();
+		objetIdInit();
+		objetNomVarInit();
+		objetSuggereInit();
+		pageUrlIdInit();
+		pageUrlPkInit();
+		pageH1Init();
 	}
 
 	public void initLoinPourClasse(RequeteSiteFrFR requeteSite_) {
@@ -1229,6 +1551,22 @@ public abstract class ClusterGen<DEV> extends Object {
 				return oCluster.classeNomSimple;
 			case "classeNomsCanoniques":
 				return oCluster.classeNomsCanoniques;
+			case "sessionId":
+				return oCluster.sessionId;
+			case "objetTitre":
+				return oCluster.objetTitre;
+			case "objetId":
+				return oCluster.objetId;
+			case "objetNomVar":
+				return oCluster.objetNomVar;
+			case "objetSuggere":
+				return oCluster.objetSuggere;
+			case "pageUrlId":
+				return oCluster.pageUrlId;
+			case "pageUrlPk":
+				return oCluster.pageUrlPk;
+			case "pageH1":
+				return oCluster.pageH1;
 			default:
 				return null;
 		}
@@ -1366,6 +1704,41 @@ public abstract class ClusterGen<DEV> extends Object {
 				if(classeNomsCanoniques != null)
 					oCluster.classeNomsCanoniques.addAll(classeNomsCanoniques);
 			}
+
+			if(sauvegardesCluster.contains("sessionId")) {
+				String sessionId = (String)solrDocument.get("sessionId_stored_string");
+				if(sessionId != null)
+					oCluster.setSessionId(sessionId);
+			}
+
+			if(sauvegardesCluster.contains("objetTitre")) {
+				String objetTitre = (String)solrDocument.get("objetTitre_stored_string");
+				if(objetTitre != null)
+					oCluster.setObjetTitre(objetTitre);
+			}
+
+			if(sauvegardesCluster.contains("objetId")) {
+				String objetId = (String)solrDocument.get("objetId_stored_string");
+				if(objetId != null)
+					oCluster.setObjetId(objetId);
+			}
+
+			if(sauvegardesCluster.contains("objetSuggere")) {
+				String objetSuggere = (String)solrDocument.get("objetSuggere_suggested");
+				oCluster.setObjetSuggere(objetSuggere);
+			}
+
+			if(sauvegardesCluster.contains("pageUrlId")) {
+				String pageUrlId = (String)solrDocument.get("pageUrlId_stored_string");
+				if(pageUrlId != null)
+					oCluster.setPageUrlId(pageUrlId);
+			}
+
+			if(sauvegardesCluster.contains("pageUrlPk")) {
+				String pageUrlPk = (String)solrDocument.get("pageUrlPk_stored_string");
+				if(pageUrlPk != null)
+					oCluster.setPageUrlPk(pageUrlPk);
+			}
 		}
 	}
 
@@ -1412,7 +1785,7 @@ public abstract class ClusterGen<DEV> extends Object {
 			SolrInputDocument document = new SolrInputDocument();
 			indexerCluster(document);
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -1424,7 +1797,7 @@ public abstract class ClusterGen<DEV> extends Object {
 			indexerCluster(document);
 			SolrClient clientSolr = requeteSite_.getSiteContexte_().getClientSolr();
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -1474,6 +1847,29 @@ public abstract class ClusterGen<DEV> extends Object {
 				document.addField("classeNomsCanoniques_stored_strings", o);
 			}
 		}
+		if(sessionId != null) {
+			document.addField("sessionId_indexed_string", sessionId);
+			document.addField("sessionId_stored_string", sessionId);
+		}
+		if(objetTitre != null) {
+			document.addField("objetTitre_indexed_string", objetTitre);
+			document.addField("objetTitre_stored_string", objetTitre);
+		}
+		if(objetId != null) {
+			document.addField("objetId_indexed_string", objetId);
+			document.addField("objetId_stored_string", objetId);
+		}
+		if(objetSuggere != null) {
+			document.addField("objetSuggere_suggested", objetSuggere);
+		}
+		if(pageUrlId != null) {
+			document.addField("pageUrlId_indexed_string", pageUrlId);
+			document.addField("pageUrlId_stored_string", pageUrlId);
+		}
+		if(pageUrlPk != null) {
+			document.addField("pageUrlPk_indexed_string", pageUrlPk);
+			document.addField("pageUrlPk_stored_string", pageUrlPk);
+		}
 	}
 
 	public void desindexerCluster() {
@@ -1487,9 +1883,64 @@ public abstract class ClusterGen<DEV> extends Object {
 			initLoinCluster(requeteSite);
 			SolrClient clientSolr = siteContexte.getClientSolr();
 			clientSolr.deleteById(id.toString());
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
+		}
+	}
+
+	public static String varIndexeCluster(String entiteVar) {
+		switch(entiteVar) {
+			case "pk":
+				return "pk_indexed_long";
+			case "id":
+				return "id_indexed_string";
+			case "cree":
+				return "cree_indexed_date";
+			case "modifie":
+				return "modifie_indexed_date";
+			case "archive":
+				return "archive_indexed_boolean";
+			case "supprime":
+				return "supprime_indexed_boolean";
+			case "classeNomCanonique":
+				return "classeNomCanonique_indexed_string";
+			case "classeNomSimple":
+				return "classeNomSimple_indexed_string";
+			case "classeNomsCanoniques":
+				return "classeNomsCanoniques_indexed_strings";
+			case "sessionId":
+				return "sessionId_indexed_string";
+			case "objetTitre":
+				return "objetTitre_indexed_string";
+			case "objetId":
+				return "objetId_indexed_string";
+			case "objetSuggere":
+				return "objetSuggere_indexed_string";
+			case "pageUrlId":
+				return "pageUrlId_indexed_string";
+			case "pageUrlPk":
+				return "pageUrlPk_indexed_string";
+			default:
+				throw new RuntimeException(String.format("\"%s\" n'est pas une entité indexé. ", entiteVar));
+		}
+	}
+
+	public static String varRechercheCluster(String entiteVar) {
+		switch(entiteVar) {
+			case "objetSuggere":
+				return "objetSuggere_suggested";
+			default:
+				throw new RuntimeException(String.format("\"%s\" n'est pas une entité indexé. ", entiteVar));
+		}
+	}
+
+	public static String varSuggereCluster(String entiteVar) {
+		switch(entiteVar) {
+			case "objetSuggere":
+				return "objetSuggere_suggested";
+			default:
+				throw new RuntimeException(String.format("\"%s\" n'est pas une entité indexé. ", entiteVar));
 		}
 	}
 
@@ -1537,6 +1988,48 @@ public abstract class ClusterGen<DEV> extends Object {
 		List<String> classeNomsCanoniques = (List<String>)solrDocument.get("classeNomsCanoniques_stored_strings");
 		if(classeNomsCanoniques != null)
 			oCluster.classeNomsCanoniques.addAll(classeNomsCanoniques);
+
+		String sessionId = (String)solrDocument.get("sessionId_stored_string");
+		if(sessionId != null)
+			oCluster.setSessionId(sessionId);
+
+		String objetTitre = (String)solrDocument.get("objetTitre_stored_string");
+		if(objetTitre != null)
+			oCluster.setObjetTitre(objetTitre);
+
+		String objetId = (String)solrDocument.get("objetId_stored_string");
+		if(objetId != null)
+			oCluster.setObjetId(objetId);
+
+		String objetSuggere = (String)solrDocument.get("objetSuggere_suggested");
+		oCluster.setObjetSuggere(objetSuggere);
+
+		String pageUrlId = (String)solrDocument.get("pageUrlId_stored_string");
+		if(pageUrlId != null)
+			oCluster.setPageUrlId(pageUrlId);
+
+		String pageUrlPk = (String)solrDocument.get("pageUrlPk_stored_string");
+		if(pageUrlPk != null)
+			oCluster.setPageUrlPk(pageUrlPk);
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchCluster() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		Cluster original = (Cluster)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
+			if(!Objects.equals(cree, original.getCree()))
+				requetePatch.addVars("cree");
+			if(!Objects.equals(modifie, original.getModifie()))
+				requetePatch.addVars("modifie");
+			if(!Objects.equals(archive, original.getArchive()))
+				requetePatch.addVars("archive");
+			if(!Objects.equals(supprime, original.getSupprime()))
+				requetePatch.addVars("supprime");
+		}
 	}
 
 	//////////////

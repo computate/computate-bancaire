@@ -1,5 +1,6 @@
 package org.computate.bancaire.enus.page;
 
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 import java.util.Date;
 import java.time.ZonedDateTime;
 import java.time.LocalDateTime;
@@ -23,9 +24,11 @@ import java.util.Objects;
 import io.vertx.core.json.JsonArray;
 import org.apache.solr.common.SolrDocument;
 import java.util.List;
+import java.time.temporal.ChronoUnit;
 import org.computate.bancaire.enus.wrap.Wrap;
 import java.time.format.DateTimeFormatter;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
 import java.lang.Object;
 
 /**	
@@ -1720,18 +1723,18 @@ public abstract class PageLayoutGen<DEV> extends Object {
 		this.pageCreatedWrap.alreadyInitialized = true;
 	}
 	public PageLayout setPageCreated(Instant o) {
-		this.pageCreated = LocalDateTime.from(o);
+		this.pageCreated = LocalDateTime.from(o).truncatedTo(ChronoUnit.MILLIS);
 		this.pageCreatedWrap.alreadyInitialized = true;
 		return (PageLayout)this;
 	}
 	/** Example: 2011-12-03T10:15:30+01:00 **/
 	public PageLayout setPageCreated(String o) {
-		this.pageCreated = LocalDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		this.pageCreated = LocalDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME).truncatedTo(ChronoUnit.MILLIS);
 		this.pageCreatedWrap.alreadyInitialized = true;
 		return (PageLayout)this;
 	}
 	public PageLayout setPageCreated(Date o) {
-		this.pageCreated = LocalDateTime.ofInstant(o.toInstant(), ZoneId.of(siteRequest_.getSiteConfig_().getSiteZone()));
+		this.pageCreated = LocalDateTime.ofInstant(o.toInstant(), ZoneId.of(siteRequest_.getSiteConfig_().getSiteZone())).truncatedTo(ChronoUnit.MILLIS);
 		this.pageCreatedWrap.alreadyInitialized = true;
 		return (PageLayout)this;
 	}
@@ -1750,7 +1753,7 @@ public abstract class PageLayoutGen<DEV> extends Object {
 	}
 
 	public String strPageCreated() {
-		return pageCreated == null ? "" : pageCreated.format(DateTimeFormatter.ofPattern("EEE MMM d yyyy h:mm:ss.SSS a zz VV", Locale.US));
+		return pageCreated == null ? "" : pageCreated.format(DateTimeFormatter.ofPattern("EEE MMM d, yyyy h:mm:ss a zz", Locale.US));
 	}
 
 	public String jsonPageCreated() {
@@ -1797,18 +1800,18 @@ public abstract class PageLayoutGen<DEV> extends Object {
 		this.pageModifiedWrap.alreadyInitialized = true;
 	}
 	public PageLayout setPageModified(Instant o) {
-		this.pageModified = LocalDateTime.from(o);
+		this.pageModified = LocalDateTime.from(o).truncatedTo(ChronoUnit.MILLIS);
 		this.pageModifiedWrap.alreadyInitialized = true;
 		return (PageLayout)this;
 	}
 	/** Example: 2011-12-03T10:15:30+01:00 **/
 	public PageLayout setPageModified(String o) {
-		this.pageModified = LocalDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		this.pageModified = LocalDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME).truncatedTo(ChronoUnit.MILLIS);
 		this.pageModifiedWrap.alreadyInitialized = true;
 		return (PageLayout)this;
 	}
 	public PageLayout setPageModified(Date o) {
-		this.pageModified = LocalDateTime.ofInstant(o.toInstant(), ZoneId.of(siteRequest_.getSiteConfig_().getSiteZone()));
+		this.pageModified = LocalDateTime.ofInstant(o.toInstant(), ZoneId.of(siteRequest_.getSiteConfig_().getSiteZone())).truncatedTo(ChronoUnit.MILLIS);
 		this.pageModifiedWrap.alreadyInitialized = true;
 		return (PageLayout)this;
 	}
@@ -1827,7 +1830,7 @@ public abstract class PageLayoutGen<DEV> extends Object {
 	}
 
 	public String strPageModified() {
-		return pageModified == null ? "" : pageModified.format(DateTimeFormatter.ofPattern("EEE MMM d yyyy h:mm:ss.SSS a zz VV", Locale.US));
+		return pageModified == null ? "" : pageModified.format(DateTimeFormatter.ofPattern("EEE MMM d, yyyy h:mm:ss a zz", Locale.US));
 	}
 
 	public String jsonPageModified() {
@@ -2510,6 +2513,17 @@ public abstract class PageLayoutGen<DEV> extends Object {
 	}
 
 	public void htmlBodyPageLayout() {
+	}
+
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestPageLayout() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		PageLayout original = (PageLayout)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
+		}
 	}
 
 	//////////////

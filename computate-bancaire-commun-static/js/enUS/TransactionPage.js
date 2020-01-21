@@ -1,8 +1,18 @@
 
 // POST //
 
-function postBankTransaction($formValues) {
+async function postBankTransaction($formValues, success, error) {
 	var vals = {};
+	if(success == null) {
+		success = function( data, textStatus, jQxhr ) {
+			addGlow($formValues.next('button'));
+		};
+	}
+	if(error == null) {
+		error = function( jqXhr, textStatus, errorThrown ) {
+			addError($formValues.next('button'));
+		};
+	}
 
 	var valuePk = $formValues.find('.valuePk').val();
 	if(valuePk != null && valuePk !== '')
@@ -16,9 +26,21 @@ function postBankTransaction($formValues) {
 	if(valueModified != null && valueModified !== '')
 		vals['modified'] = valueModified;
 
+	var valueObjectId = $formValues.find('.valueObjectId').val();
+	if(valueObjectId != null && valueObjectId !== '')
+		vals['objectId'] = valueObjectId;
+
 	var valueTransactionId = $formValues.find('.valueTransactionId').val();
 	if(valueTransactionId != null && valueTransactionId !== '')
 		vals['transactionId'] = valueTransactionId;
+
+	var valueArchived = $formValues.find('.valueArchived').prop('checked');
+	if(valueArchived != null && valueArchived !== '')
+		vals['archived'] = valueArchived;
+
+	var valueDeleted = $formValues.find('.valueDeleted').prop('checked');
+	if(valueDeleted != null && valueDeleted !== '')
+		vals['deleted'] = valueDeleted;
 
 	var valueAccountKey = $formValues.find('.valueAccountKey').val();
 	if(valueAccountKey != null && valueAccountKey !== '')
@@ -77,7 +99,7 @@ function postBankTransactionVals(vals, success, error) {
 
 // PATCH //
 
-function patchBankTransaction($formFilters, $formValues, success, error) {
+async function patchBankTransaction($formFilters, $formValues, success, error) {
 	var filters = patchBankTransactionFilters($formFilters);
 
 	var vals = {};
@@ -115,6 +137,17 @@ function patchBankTransaction($formFilters, $formValues, success, error) {
 	if(removeModified != null && removeModified !== '')
 		vals['removeModified'] = removeModified;
 
+	var removeObjectId = $formFilters.find('.removeObjectId').val() === 'true';
+	var setObjectId = removeObjectId ? null : $formValues.find('.setObjectId').val();
+	if(removeObjectId || setObjectId != null && setObjectId !== '')
+		vals['setObjectId'] = setObjectId;
+	var addObjectId = $formValues.find('.addObjectId').val();
+	if(addObjectId != null && addObjectId !== '')
+		vals['addObjectId'] = addObjectId;
+	var removeObjectId = $formValues.find('.removeObjectId').val();
+	if(removeObjectId != null && removeObjectId !== '')
+		vals['removeObjectId'] = removeObjectId;
+
 	var removeTransactionId = $formFilters.find('.removeTransactionId').val() === 'true';
 	var setTransactionId = removeTransactionId ? null : $formValues.find('.setTransactionId').val();
 	if(removeTransactionId || setTransactionId != null && setTransactionId !== '')
@@ -125,6 +158,28 @@ function patchBankTransaction($formFilters, $formValues, success, error) {
 	var removeTransactionId = $formValues.find('.removeTransactionId').val();
 	if(removeTransactionId != null && removeTransactionId !== '')
 		vals['removeTransactionId'] = removeTransactionId;
+
+	var removeArchived = $formFilters.find('.removeArchived').val() === 'true';
+	var setArchived = removeArchived ? null : $formValues.find('.setArchived').prop('checked');
+	if(removeArchived || setArchived != null && setArchived !== '')
+		vals['setArchived'] = setArchived;
+	var addArchived = $formValues.find('.addArchived').prop('checked');
+	if(addArchived != null && addArchived !== '')
+		vals['addArchived'] = addArchived;
+	var removeArchived = $formValues.find('.removeArchived').prop('checked');
+	if(removeArchived != null && removeArchived !== '')
+		vals['removeArchived'] = removeArchived;
+
+	var removeDeleted = $formFilters.find('.removeDeleted').val() === 'true';
+	var setDeleted = removeDeleted ? null : $formValues.find('.setDeleted').prop('checked');
+	if(removeDeleted || setDeleted != null && setDeleted !== '')
+		vals['setDeleted'] = setDeleted;
+	var addDeleted = $formValues.find('.addDeleted').prop('checked');
+	if(addDeleted != null && addDeleted !== '')
+		vals['addDeleted'] = addDeleted;
+	var removeDeleted = $formValues.find('.removeDeleted').prop('checked');
+	if(removeDeleted != null && removeDeleted !== '')
+		vals['removeDeleted'] = removeDeleted;
 
 	var removeAccountKey = $formFilters.find('.removeAccountKey').val() === 'true';
 	var setAccountKey = removeAccountKey ? null : $formValues.find('.setAccountKey').val();
@@ -232,9 +287,21 @@ function patchBankTransactionFilters($formFilters) {
 	if(filterModified != null && filterModified !== '')
 		filters.push({ name: 'fq', value: 'modified:' + filterModified });
 
+	var filterObjectId = $formFilters.find('.valueObjectId').val();
+	if(filterObjectId != null && filterObjectId !== '')
+		filters.push({ name: 'fq', value: 'objectId:' + filterObjectId });
+
 	var filterTransactionId = $formFilters.find('.valueTransactionId').val();
 	if(filterTransactionId != null && filterTransactionId !== '')
 		filters.push({ name: 'fq', value: 'transactionId:' + filterTransactionId });
+
+	var filterArchived = $formFilters.find('.valueArchived').prop('checked');
+	if(filterArchived != null && filterArchived === true)
+		filters.push({ name: 'fq', value: 'archived:' + filterArchived });
+
+	var filterDeleted = $formFilters.find('.valueDeleted').prop('checked');
+	if(filterDeleted != null && filterDeleted === true)
+		filters.push({ name: 'fq', value: 'deleted:' + filterDeleted });
 
 	var filterAccountKey = $formFilters.find('.valueAccountKey').val();
 	if(filterAccountKey != null && filterAccountKey !== '')
@@ -268,14 +335,6 @@ function patchBankTransactionFilters($formFilters) {
 	if(filterId != null && filterId !== '')
 		filters.push({ name: 'fq', value: 'id:' + filterId });
 
-	var filterArchived = $formFilters.find('.valueArchived').prop('checked');
-	if(filterArchived != null && filterArchived === true)
-		filters.push({ name: 'fq', value: 'archived:' + filterArchived });
-
-	var filterDeleted = $formFilters.find('.valueDeleted').prop('checked');
-	if(filterDeleted != null && filterDeleted === true)
-		filters.push({ name: 'fq', value: 'deleted:' + filterDeleted });
-
 	var filterClassCanonicalName = $formFilters.find('.valueClassCanonicalName').val();
 	if(filterClassCanonicalName != null && filterClassCanonicalName !== '')
 		filters.push({ name: 'fq', value: 'classCanonicalName:' + filterClassCanonicalName });
@@ -287,6 +346,18 @@ function patchBankTransactionFilters($formFilters) {
 	var filterClassCanonicalNames = $formFilters.find('.valueClassCanonicalNames').val();
 	if(filterClassCanonicalNames != null && filterClassCanonicalNames !== '')
 		filters.push({ name: 'fq', value: 'classCanonicalNames:' + filterClassCanonicalNames });
+
+	var filterObjectTitle = $formFilters.find('.valueObjectTitle').val();
+	if(filterObjectTitle != null && filterObjectTitle !== '')
+		filters.push({ name: 'fq', value: 'objectTitle:' + filterObjectTitle });
+
+	var filterObjectSuggest = $formFilters.find('.valueObjectSuggest').val();
+	if(filterObjectSuggest != null && filterObjectSuggest !== '')
+		filters.push({ name: 'q', value: 'objectSuggest:' + filterObjectSuggest });
+
+	var filterPageUrl = $formFilters.find('.valuePageUrl').val();
+	if(filterPageUrl != null && filterPageUrl !== '')
+		filters.push({ name: 'fq', value: 'pageUrl:' + filterPageUrl });
 
 	var filterTransactionKey = $formFilters.find('.valueTransactionKey').val();
 	if(filterTransactionKey != null && filterTransactionKey !== '')
@@ -342,7 +413,7 @@ function patchBankTransactionVals(filters, vals, success, error) {
 
 // GET //
 
-function getBankTransaction(pk) {
+async function getBankTransaction(pk) {
 	$.ajax({
 		url: '/api/transaction/' + id
 		, dataType: 'json'
@@ -355,7 +426,7 @@ function getBankTransaction(pk) {
 
 // DELETE //
 
-function deleteBankTransaction(pk) {
+async function deleteBankTransaction(pk) {
 	$.ajax({
 		url: '/api/transaction/' + id
 		, dataType: 'json'
@@ -369,7 +440,7 @@ function deleteBankTransaction(pk) {
 
 // Search //
 
-function searchBankTransaction($formFilters, success, error) {
+async function searchBankTransaction($formFilters, success, error) {
 	var filters = searchBankTransactionFilters($formFilters);
 	if(success == null)
 		success = function( data, textStatus, jQxhr ) {};
@@ -394,9 +465,21 @@ function searchBankTransactionFilters($formFilters) {
 	if(filterModified != null && filterModified !== '')
 		filters.push({ name: 'fq', value: 'modified:' + filterModified });
 
+	var filterObjectId = $formFilters.find('.valueObjectId').val();
+	if(filterObjectId != null && filterObjectId !== '')
+		filters.push({ name: 'fq', value: 'objectId:' + filterObjectId });
+
 	var filterTransactionId = $formFilters.find('.valueTransactionId').val();
 	if(filterTransactionId != null && filterTransactionId !== '')
 		filters.push({ name: 'fq', value: 'transactionId:' + filterTransactionId });
+
+	var filterArchived = $formFilters.find('.valueArchived').prop('checked');
+	if(filterArchived != null && filterArchived === true)
+		filters.push({ name: 'fq', value: 'archived:' + filterArchived });
+
+	var filterDeleted = $formFilters.find('.valueDeleted').prop('checked');
+	if(filterDeleted != null && filterDeleted === true)
+		filters.push({ name: 'fq', value: 'deleted:' + filterDeleted });
 
 	var filterAccountKey = $formFilters.find('.valueAccountKey').val();
 	if(filterAccountKey != null && filterAccountKey !== '')
@@ -430,14 +513,6 @@ function searchBankTransactionFilters($formFilters) {
 	if(filterId != null && filterId !== '')
 		filters.push({ name: 'fq', value: 'id:' + filterId });
 
-	var filterArchived = $formFilters.find('.valueArchived').prop('checked');
-	if(filterArchived != null && filterArchived === true)
-		filters.push({ name: 'fq', value: 'archived:' + filterArchived });
-
-	var filterDeleted = $formFilters.find('.valueDeleted').prop('checked');
-	if(filterDeleted != null && filterDeleted === true)
-		filters.push({ name: 'fq', value: 'deleted:' + filterDeleted });
-
 	var filterClassCanonicalName = $formFilters.find('.valueClassCanonicalName').val();
 	if(filterClassCanonicalName != null && filterClassCanonicalName !== '')
 		filters.push({ name: 'fq', value: 'classCanonicalName:' + filterClassCanonicalName });
@@ -449,6 +524,18 @@ function searchBankTransactionFilters($formFilters) {
 	var filterClassCanonicalNames = $formFilters.find('.valueClassCanonicalNames').val();
 	if(filterClassCanonicalNames != null && filterClassCanonicalNames !== '')
 		filters.push({ name: 'fq', value: 'classCanonicalNames:' + filterClassCanonicalNames });
+
+	var filterObjectTitle = $formFilters.find('.valueObjectTitle').val();
+	if(filterObjectTitle != null && filterObjectTitle !== '')
+		filters.push({ name: 'fq', value: 'objectTitle:' + filterObjectTitle });
+
+	var filterObjectSuggest = $formFilters.find('.valueObjectSuggest').val();
+	if(filterObjectSuggest != null && filterObjectSuggest !== '')
+		filters.push({ name: 'q', value: 'objectSuggest:' + filterObjectSuggest });
+
+	var filterPageUrl = $formFilters.find('.valuePageUrl').val();
+	if(filterPageUrl != null && filterPageUrl !== '')
+		filters.push({ name: 'fq', value: 'pageUrl:' + filterPageUrl });
 
 	var filterTransactionKey = $formFilters.find('.valueTransactionKey').val();
 	if(filterTransactionKey != null && filterTransactionKey !== '')
@@ -495,22 +582,39 @@ function searchBankTransactionVals(filters, success, error) {
 	});
 }
 
-function suggestBankTransactionAccountKey($formFilters, $list) {
+function suggestBankTransactionObjectSuggest($formFilters, $list) {
+	success = function( data, textStatus, jQxhr ) {
+		$list.empty();
+		$.each(data['list'], function(i, o) {
+			var $i = $('<i>').attr('class', 'fad fa-cash-register w3-padding-small ');
+			var $span = $('<span>').attr('class', '').text(o['transactionCompleteName']);
+			var $li = $('<li>');
+			var $a = $('<a>').attr('href', o['']);
+			$a.append($i);
+			$a.append($span);
+			$li.append($a);
+			$list.append($li);
+		});
+	};
+	error = function( jqXhr, textStatus, errorThrown ) {};
+	searchBankTransactionVals($formFilters, success, error);
+}
+
+function suggestBankTransactionAccountKey(filters, $list, pk = null) {
 	success = function( data, textStatus, jQxhr ) {
 		$list.empty();
 		$.each(data['list'], function(i, o) {
 			var $i = $('<i>').attr('class', 'fa fa-money-check w3-padding-small ');
 			var $span = $('<span>').attr('class', '').text(o['accountCompleteName']);
-			var $a = $('<a>').attr('href', o['pageUrl']);
+			var $a = $('<span>');
 			$a.append($i);
 			$a.append($span);
-			var pk = parseInt($('#BankTransactionForm :input[name="pk"]').val());
 			var val = o['yearKeys'];
 			var checked = Array.isArray(val) ? val.includes(pk) : val == pk;
 			var $input = $('<input>');
 			$input.attr('id', 'GET_accountKey_' + pk + '_yearKeys_' + o['pk']);
 			$input.attr('class', 'w3-check ');
-			$input.attr('onchange', "var $input = $('#GET_accountKey_" + pk + "_yearKeys_" + o['pk'] + "'); patchBankTransactionVals([{ name: 'fq', value: 'pk:" + pk + "' }], { [($input.prop('checked') ? 'set' : 'remove') + 'AccountKey']: \"" + o['pk'] + "\" }, function() { patchBankAccountVals([{ name: 'fq', value: 'pk:" + o['pk'] + "' }], {}, function() { addGlow($input); }, function() { addError($input); } ); } ); ");
+			$input.attr('onchange', "var $input = $('#GET_accountKey_" + pk + "_yearKeys_" + o['pk'] + "'); patchBankTransactionVals([{ name: 'fq', value: 'pk:" + pk + "' }], { [($input.prop('checked') ? 'set' : 'remove') + 'AccountKey']: \"" + o['pk'] + "\" } ); ");
 			$input.attr('onclick', 'removeGlow($(this)); ');
 			$input.attr('type', 'checkbox');
 			if(checked)
@@ -520,9 +624,12 @@ function suggestBankTransactionAccountKey($formFilters, $list) {
 			$li.append($a);
 			$list.append($li);
 		});
+		var focusId = $('#BankTransactionForm :input[name="focusId"]').val();
+		if(focusId)
+			$('#' + focusId).parent().next().find('input').focus();
 	};
 	error = function( jqXhr, textStatus, errorThrown ) {};
-	searchBankAccount($formFilters, success, error);
+	searchBankAccountVals(filters, success, error);
 }
 
 function suggestBankTransactionObjectSuggest($formFilters, $list) {
@@ -532,7 +639,7 @@ function suggestBankTransactionObjectSuggest($formFilters, $list) {
 			var $i = $('<i>').attr('class', 'fad fa-cash-register w3-padding-small ');
 			var $span = $('<span>').attr('class', '').text(o['transactionCompleteName']);
 			var $li = $('<li>');
-			var $a = $('<a>').attr('href', o['pageUrl']);
+			var $a = $('<a>').attr('href', o['']);
 			$a.append($i);
 			$a.append($span);
 			$li.append($a);
@@ -541,4 +648,118 @@ function suggestBankTransactionObjectSuggest($formFilters, $list) {
 	};
 	error = function( jqXhr, textStatus, errorThrown ) {};
 	searchBankTransactionVals($formFilters, success, error);
+}
+
+async function websocketBankTransaction(success) {
+	window.eventBus.onopen = function () {
+
+		window.eventBus.registerHandler('websocketBankTransaction', function (error, message) {
+			var json = JSON.parse(message['body']);
+			var id = json['id'];
+			var pk = json['pk'];
+			var pks = json['pks'];
+			var empty = json['empty'];
+			if(!empty) {
+				var numFound = json['numFound'];
+				var numPATCH = json['numPATCH'];
+				var percent = Math.floor( numPATCH / numFound * 100 ) + '%';
+				var $box = $('<div>').attr('class', 'w3-display-topright w3-quarter box-' + id + ' ').attr('id', 'box-' + id);
+				var $margin = $('<div>').attr('class', 'w3-margin ').attr('id', 'margin-' + id);
+				var $card = $('<div>').attr('class', 'w3-card ').attr('id', 'card-' + id);
+				var $header = $('<div>').attr('class', 'w3-container fa-yellow ').attr('id', 'header-' + id);
+				var $i = $('<i>').attr('class', 'fad fa-cash-register w3-margin-right ').attr('id', 'icon-' + id);
+				var $headerSpan = $('<span>').attr('class', '').text('modify transactions');
+				var $x = $('<span>').attr('class', 'w3-button w3-display-topright ').attr('onclick', '$("#card-' + id + '").hide(); ').attr('id', 'x-' + id);
+				var $body = $('<div>').attr('class', 'w3-container w3-padding ').attr('id', 'text-' + id);
+				var $bar = $('<div>').attr('class', 'w3-light-gray ').attr('id', 'bar-' + id);
+				var $progress = $('<div>').attr('class', 'w3-yellow ').attr('style', 'height: 24px; width: ' + percent + '; ').attr('id', 'progress-' + id).text(numPATCH + '/' + numFound);
+				$card.append($header);
+				$header.append($i);
+				$header.append($headerSpan);
+				$header.append($x);
+				$body.append($bar);
+				$bar.append($progress);
+				$card.append($body);
+				$box.append($margin);
+				$margin.append($card);
+				$('.box-' + id).remove();
+				if(numPATCH < numFound)
+				$('.w3-content').append($box);
+				if(success)
+					success(json);
+			}
+		});
+
+		window.eventBus.registerHandler('websocketBankAccount', function (error, message) {
+			$('#Page_accountKey').trigger('oninput');
+		});
+	}
+}
+async function websocketBankTransactionInner(patchRequest) {
+	var pk = patchRequest['pk'];
+	var pks = patchRequest['pks'];
+	var classes = patchRequest['classes'];
+	var vars = patchRequest['vars'];
+	var empty = patchRequest['empty'];
+
+	if(pk != null) {
+		searchBankTransactionVals([ {name: 'fq', value: 'pk:' + pk} ], function( data, textStatus, jQxhr ) {
+			var o = data['list'][0];
+			if(vars.includes('created')) {
+				$('.inputBankTransaction' + pk + 'Created').val(o['created']);
+				$('.varBankTransaction' + pk + 'Created').text(o['created']);
+			}
+			if(vars.includes('modified')) {
+				$('.inputBankTransaction' + pk + 'Modified').val(o['modified']);
+				$('.varBankTransaction' + pk + 'Modified').text(o['modified']);
+			}
+			if(vars.includes('archived')) {
+				$('.inputBankTransaction' + pk + 'Archived').val(o['archived']);
+				$('.varBankTransaction' + pk + 'Archived').text(o['archived']);
+			}
+			if(vars.includes('deleted')) {
+				$('.inputBankTransaction' + pk + 'Deleted').val(o['deleted']);
+				$('.varBankTransaction' + pk + 'Deleted').text(o['deleted']);
+			}
+			if(vars.includes('accountKey')) {
+				$('.inputBankTransaction' + pk + 'AccountKey').val(o['accountKey']);
+				$('.varBankTransaction' + pk + 'AccountKey').text(o['accountKey']);
+			}
+			if(vars.includes('transactionCode')) {
+				$('.inputBankTransaction' + pk + 'TransactionCode').val(o['transactionCode']);
+				$('.varBankTransaction' + pk + 'TransactionCode').text(o['transactionCode']);
+			}
+			if(vars.includes('transactionFee')) {
+				$('.inputBankTransaction' + pk + 'TransactionFee').val(o['transactionFee']);
+				$('.varBankTransaction' + pk + 'TransactionFee').text(o['transactionFee']);
+			}
+			if(vars.includes('transactionDisplayName')) {
+				$('.inputBankTransaction' + pk + 'TransactionDisplayName').val(o['transactionDisplayName']);
+				$('.varBankTransaction' + pk + 'TransactionDisplayName').text(o['transactionDisplayName']);
+			}
+			if(vars.includes('transactionReferenceId')) {
+				$('.inputBankTransaction' + pk + 'TransactionReferenceId').val(o['transactionReferenceId']);
+				$('.varBankTransaction' + pk + 'TransactionReferenceId').text(o['transactionReferenceId']);
+			}
+			if(vars.includes('transactionAmount')) {
+				$('.inputBankTransaction' + pk + 'TransactionAmount').val(o['transactionAmount']);
+				$('.varBankTransaction' + pk + 'TransactionAmount').text(o['transactionAmount']);
+			}
+			if(vars.includes('transactionDateTime')) {
+				$('.inputBankTransaction' + pk + 'TransactionDateTime').val(o['transactionDateTime']);
+				$('.varBankTransaction' + pk + 'TransactionDateTime').text(o['transactionDateTime']);
+			}
+		});
+	}
+
+	if(!empty) {
+		if(pks) {
+			for(i=0; i < pks.length; i++) {
+				var pk2 = pks[i];
+				var c = classes[i];
+				await window['patch' + c + 'Vals']( [ {name: 'fq', value: 'pk:' + pk2} ], {});
+			}
+		}
+		await patchBankTransactionVals( [ {name: 'fq', value: 'pk:' + pk} ], {});
+	}
 }

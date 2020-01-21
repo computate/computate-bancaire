@@ -1,9 +1,12 @@
 package org.computate.bancaire.enus.cluster;
 
+import java.text.Normalizer;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.writer.AllWriter;
 import org.computate.bancaire.enus.page.PageLayout;
@@ -52,7 +55,88 @@ public class Cluster extends ClusterGen<Object> {
 	}
 
 	protected void _classCanonicalNames(List<String> l) { 
+		Class<?> cl = getClass();
+		if(!cl.equals(Cluster.class))
+			l.add(cl.getCanonicalName());
 		l.add(Cluster.class.getCanonicalName());
+	}
+
+	protected void _sessionId(Wrap<String> c) {
+		c.o(siteRequest_.getSessionId());
+	}
+
+	protected void _objectTitle(Wrap<String> c) {
+	}
+
+	protected void _objectId(Wrap<String> c) {
+		if(objectTitle != null) {
+			c.o(toId(objectTitle));
+		}
+		else if(pk != null){
+			c.o(pk.toString());
+		}
+	}
+
+	public String toId(String s) {
+		if(s != null) {
+			s = Normalizer.normalize(s, Normalizer.Form.NFD);
+			s = StringUtils.lowerCase(s);
+			s = StringUtils.trim(s);
+			s = StringUtils.replacePattern(s, "\\s{1,}", "-");
+			s = StringUtils.replacePattern(s, "[^\\w-]", "");
+			s = StringUtils.replacePattern(s, "-{2,}", "-");
+		}
+
+		return s;
+	}
+
+	protected void _objectNameVar(Wrap<String> c) {
+		if(objectId != null) {
+			Class<?> cl = getClass();
+
+			try {
+				String o = toId((String)FieldUtils.getField(cl, cl.getSimpleName() + "_NomVar").get(this));
+				c.o(o);
+			} catch (Exception e) {
+				ExceptionUtils.rethrow(e);
+			}
+		}
+	}
+
+	protected void _objectSuggest(Wrap<String> c) { 
+		StringBuilder b = new StringBuilder();
+		if(pk != null)
+			b.append(" ").append(pk);
+		if(objectNameVar != null)
+			b.append(" ").append(objectNameVar);
+		if(objectId != null)
+			b.append(" ").append(objectId);
+		if(objectTitle != null)
+			b.append(" ").append(objectTitle);
+		c.o(b.toString());
+	}
+
+	protected void _pageUrlId(Wrap<String> c) {
+		if(objectId != null) {
+			String o = siteRequest_.getSiteConfig_().getSiteBaseUrl() + "/" + objectNameVar + "/" + objectId;
+			c.o(o);
+		}
+	}
+
+	protected void _pageUrlPk(Wrap<String> c) {
+		if(pk != null) {
+			String o = siteRequest_.getSiteConfig_().getSiteBaseUrl() + "/" + objectNameVar + "/" + pk;
+			c.o(o);
+		}
+	}
+
+	protected void _pageH1(Wrap<String> c) {
+		try {
+			Class<?> cl = getClass();
+			c.o((String)FieldUtils.getField(cl, cl.getSimpleName() + "_NomSingulier").get(this) + ": " + objectTitle);
+		} catch (Exception e) {
+			ExceptionUtils.rethrow(e);
+		}
 	}
 
 	public Cluster e(String localName) {
@@ -204,10 +288,10 @@ public class Cluster extends ClusterGen<Object> {
 		String tabs = String.join("", Collections.nCopies(siteRequest_.getXmlStack().size(), "\t"));
 		String tabsEscaped = String.join("", Collections.nCopies(siteRequest_.getXmlStack().size(), "\\t"));
 
-		if(!eNoWrap && !tabsEscaped.isEmpty()) {
+		if(!eNoWrap || localNameParent == null)
 			w.l();
+		if(!eNoWrap && !tabsEscaped.isEmpty())
 			w.s(tabs);
-		}
 		w.s("</");
 		w.s(localName);
 		w.s(">");

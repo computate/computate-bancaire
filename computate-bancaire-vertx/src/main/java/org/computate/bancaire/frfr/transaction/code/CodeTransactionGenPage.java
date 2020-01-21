@@ -29,6 +29,7 @@ import java.util.List;
 
 /**
  * Traduire: false
+ * NomCanonique.enUS: org.computate.bancaire.enus.transaction.code.CodeTransactionGenPage
  **/
 public class CodeTransactionGenPage extends CodeTransactionGenPageGen<ClusterPage> {
 
@@ -92,606 +93,87 @@ public class CodeTransactionGenPage extends CodeTransactionGenPageGen<ClusterPag
 
 	@Override public void htmlScriptCodeTransactionGenPage() {
 		l("$(document).ready(function() {");
+		tl(1, "window.eventBus = new EventBus('/eventbus');");
+		tl(1, "var pk = ", requeteSite_.getRequetePk(), ";");
+		tl(1, "websocketCodeTransaction(websocketCodeTransactionInner);");
 		l("});");
 	}
 
 	public void htmlFormPageCodeTransaction(CodeTransaction o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("class", "").f().sx("clé primaire").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strPk()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("class", "").f().sx("crée").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strCree()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("class", "").f().sx("modifié").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strModifie()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("class", "").f().sx("ID").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strCodeTransactionId()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
+			o.htmPk("Page");
+			o.htmCree("Page");
+			o.htmModifie("Page");
+			o.htmObjetId("Page");
+			o.htmCodeTransactionId("Page");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formCodeTransactionTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereCodeTransactionTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-								e("label").a("for", "Page_transactionCode").a("class", "").f().sx("code de transaction").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "code de transaction")
-										.a("class", "setTransactionCode w3-input w3-border ")
-										.a("name", "setTransactionCode")
-										.a("id", "Page_transactionCode")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchCodeTransactionVal([{ name: 'fq', value: 'pk:' + $('#CodeTransactionForm :input[name=\"pk\"]').val() }], 'setTransactionCode', $(this).val(), function() { ajouterLueur($('#Page_transactionCode')); }, function() { ajouterErreur($('#Page_transactionCode')); }); ")
-										.a("value", o.strTransactionCode())
-									.fg();
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
-									.a("onclick", "enleverLueur($('#Page_transactionCode')); $('#Page_transactionCode').val(null); patchCodeTransactionVal([{ name: 'fq', value: 'pk:' + $('#CodeTransactionForm :input[name=\"pk\"]').val() }], 'setTransactionCode', null, function() { ajouterLueur($('#Page_transactionCode')); }, function() { ajouterErreur($('#Page_transactionCode')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formCodeTransactionCodeTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereCodeTransactionCodeTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-								e("label").a("for", "Page_codeTransactionNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "nom d'affichage")
-										.a("class", "setCodeTransactionNomAffichage w3-input w3-border ")
-										.a("name", "setCodeTransactionNomAffichage")
-										.a("id", "Page_codeTransactionNomAffichage")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchCodeTransactionVal([{ name: 'fq', value: 'pk:' + $('#CodeTransactionForm :input[name=\"pk\"]').val() }], 'setCodeTransactionNomAffichage', $(this).val(), function() { ajouterLueur($('#Page_codeTransactionNomAffichage')); }, function() { ajouterErreur($('#Page_codeTransactionNomAffichage')); }); ")
-										.a("value", o.strCodeTransactionNomAffichage())
-									.fg();
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
-									.a("onclick", "enleverLueur($('#Page_codeTransactionNomAffichage')); $('#Page_codeTransactionNomAffichage').val(null); patchCodeTransactionVal([{ name: 'fq', value: 'pk:' + $('#CodeTransactionForm :input[name=\"pk\"]').val() }], 'setCodeTransactionNomAffichage', null, function() { ajouterLueur($('#Page_codeTransactionNomAffichage')); }, function() { ajouterErreur($('#Page_codeTransactionNomAffichage')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
+			o.htmArchive("Page");
+			o.htmSupprime("Page");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmTransactionCode("Page");
+			o.htmCodeTransactionNomAffichage("Page");
 		} g("div");
 	}
 
 	public void htmlFormPOSTCodeTransaction(CodeTransaction o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("ID").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCodeTransactionId()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("POST");
+			o.htmCree("POST");
+			o.htmModifie("POST");
+			o.htmObjetId("POST");
+			o.htmCodeTransactionId("POST");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCodeTransactionTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCodeTransactionTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "POST_transactionCode").a("class", "").f().sx("code de transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "code de transaction")
-									.a("class", "valeurTransactionCode w3-input w3-border ")
-									.a("name", "transactionCode")
-									.a("id", "POST_transactionCode")
-									.a("value", o.strTransactionCode())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCodeTransactionCodeTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCodeTransactionCodeTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "POST_codeTransactionNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "nom d'affichage")
-									.a("class", "valeurCodeTransactionNomAffichage w3-input w3-border ")
-									.a("name", "codeTransactionNomAffichage")
-									.a("id", "POST_codeTransactionNomAffichage")
-									.a("value", o.strCodeTransactionNomAffichage())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmArchive("POST");
+			o.htmSupprime("POST");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmTransactionCode("POST");
+			o.htmCodeTransactionNomAffichage("POST");
 		} g("div");
 	}
 
 	public void htmlFormPATCHCodeTransaction(CodeTransaction o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("ID").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCodeTransactionId()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("PATCH");
+			o.htmCree("PATCH");
+			o.htmModifie("PATCH");
+			o.htmObjetId("PATCH");
+			o.htmCodeTransactionId("PATCH");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCodeTransactionTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCodeTransactionTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "PATCH_transactionCode").a("class", "").f().sx("code de transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "code de transaction")
-									.a("class", "setTransactionCode w3-input w3-border ")
-									.a("name", "setTransactionCode")
-									.a("id", "PATCH_transactionCode")
-									.a("value", o.strTransactionCode())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCodeTransactionCodeTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCodeTransactionCodeTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "PATCH_codeTransactionNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "nom d'affichage")
-									.a("class", "setCodeTransactionNomAffichage w3-input w3-border ")
-									.a("name", "setCodeTransactionNomAffichage")
-									.a("id", "PATCH_codeTransactionNomAffichage")
-									.a("value", o.strCodeTransactionNomAffichage())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmArchive("PATCH");
+			o.htmSupprime("PATCH");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCodeTransactionNomComplet()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmTransactionCode("PATCH");
+			o.htmCodeTransactionNomAffichage("PATCH");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmCodeTransactionNomComplet("PATCH");
 		} g("div");
 	}
 
 	public void htmlFormRechercheCodeTransaction(CodeTransaction o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("ID").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCodeTransactionId()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("Recherche");
+			o.htmCree("Recherche");
+			o.htmModifie("Recherche");
+			o.htmObjetId("Recherche");
+			o.htmCodeTransactionId("Recherche");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCodeTransactionTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCodeTransactionTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "Recherche_transactionCode").a("class", "").f().sx("code de transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "code de transaction")
-									.a("class", "valeurTransactionCode w3-input w3-border ")
-									.a("name", "transactionCode")
-									.a("id", "Recherche_transactionCode")
-									.a("value", o.strTransactionCode())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCodeTransactionCodeTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCodeTransactionCodeTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "Recherche_codeTransactionNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "nom d'affichage")
-									.a("class", "valeurCodeTransactionNomAffichage w3-input w3-border ")
-									.a("name", "codeTransactionNomAffichage")
-									.a("id", "Recherche_codeTransactionNomAffichage")
-									.a("value", o.strCodeTransactionNomAffichage())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmArchive("Recherche");
+			o.htmSupprime("Recherche");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCodeTransactionNomComplet()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmTransactionCode("Recherche");
+			o.htmCodeTransactionNomAffichage("Recherche");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmCodeTransactionNomComplet("Recherche");
 		} g("div");
 	}
 
@@ -745,16 +227,59 @@ public class CodeTransactionGenPage extends CodeTransactionGenPageGen<ClusterPag
 			}
 		} else {
 
-			{ e("h1").f();
-				if(contexteIconeClassesCss != null)
-					e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
-				e("span").a("class", " ").f().sx("code de transactions").g("span");
-			} g("h1");
-			e("div").a("class", "w3-padding-16 w3-card-4 w3-light-grey ").f();
+				{ e("h1").f();
+					{ e("a").a("href", "/code-transaction").a("class", "w3-bar-item w3-btn w3-center w3-block w3-yellow w3-hover-yellow ").f();
+						if(contexteIconeClassesCss != null)
+							e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
+						e("span").a("class", " ").f().sx(pageH1).g("span");
+					} g("a");
+				} g("h1");
+			e("div").a("class", "").f();
+				{ e("div").f();
+					Long num = listeCodeTransaction.getQueryResponse().getResults().getNumFound();
+					String query = StringUtils.replace(listeCodeTransaction.getQuery(), "_suggested", "");
+					Integer rows1 = listeCodeTransaction.getRows();
+					Integer start1 = listeCodeTransaction.getStart();
+					Integer start2 = start1 - rows1;
+					Integer start3 = start1 + rows1;
+					Integer rows2 = rows1 / 2;
+					Integer rows3 = rows1 * 2;
+					start2 = start2 < 0 ? 0 : start2;
+
+					if(start1 == 0) {
+						e("i").a("class", "fas fa-arrow-square-left w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/code-transaction?q=", query, "&start=", start2, "&rows=", rows1).f();
+							e("i").a("class", "fas fa-arrow-square-left ").f().g("i");
+						} g("a");
+					}
+
+					if(rows1 <= 1) {
+						e("i").a("class", "fas fa-minus-square w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/code-transaction?q=", query, "&start=", start1, "&rows=", rows2).f();
+							e("i").a("class", "fas fa-minus-square ").f().g("i");
+						} g("a");
+					}
+
+					{ e("a").a("href", "/code-transaction?q=", query, "&start=", start1, "&rows=", rows3).f();
+						e("i").a("class", "fas fa-plus-square ").f().g("i");
+					} g("a");
+
+					if(start3 >= num) {
+						e("i").a("class", "fas fa-arrow-square-right w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/code-transaction?q=", query, "&start=", start3, "&rows=", rows1).f();
+							e("i").a("class", "fas fa-arrow-square-right ").f().g("i");
+						} g("a");
+					}
+						e("span").f().sx((start1 + 1), " - ", (start1 + rows1), " de ", num).g("span");
+				} g("div");
 			{ e("table").a("class", "w3-table w3-bordered w3-striped w3-border w3-hoverable ").f();
-				{ e("thead").f();
+				{ e("thead").a("class", "w3-yellow w3-hover-yellow ").f();
 					{ e("tr").f();
 						e("th").f().sx("").g("th");
+						e("th").f().sx("crée").g("th");
 					} g("tr");
 				} g("thead");
 				{ e("tbody").f();
@@ -769,7 +294,14 @@ public class CodeTransactionGenPage extends CodeTransactionGenPageGen<ClusterPag
 								{ e("a").a("href", uri).f();
 									e("i").a("class", "fad fa-code-commit w3-padding-small ").f().g("i");
 									{ e("span").f();
-										sx(o.getCodeTransactionNomComplet());
+										sx(o.strCodeTransactionNomComplet());
+									} g("span");
+								} g("a");
+							} g("td");
+							{ e("td").f();
+								{ e("a").a("href", uri).f();
+									{ e("span").f();
+										sx(o.strCree());
 									} g("span");
 								} g("a");
 							} g("td");
@@ -792,6 +324,10 @@ public class CodeTransactionGenPage extends CodeTransactionGenPageGen<ClusterPag
 						.a("type", "hidden")
 						.a("value", o.getPk())
 						.fg();
+						e("input")
+						.a("name", "focusId")
+						.a("type", "hidden")
+						.fg();
 					} g("form");
 					htmlFormPageCodeTransaction(o);
 				}
@@ -800,13 +336,20 @@ public class CodeTransactionGenPage extends CodeTransactionGenPageGen<ClusterPag
 
 		}
 		htmlBodyFormsCodeTransactionGenPage();
-		htmlSuggereCodeTransactionGenPage();
+		htmlSuggereCodeTransactionGenPage(this, null);
 		g("div");
 	}
 
 	public void htmlBodyFormsCodeTransactionGenPage() {
-		e("div").f();
+		e("div").a("class", "w3-margin-top ").f();
 
+		{ e("button")
+			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
+				.a("id", "rechargerCeCodeTransactionGenPage")
+				.a("onclick", "patchCodeTransactionVals( [ {name: 'fq', value: 'pk:' + " + requeteSite_.getRequetePk() + " } ], {}, function() { ajouterLueur($('#rechargerCeCodeTransactionGenPage')); }, function() { ajouterErreur($('#rechargerCeCodeTransactionGenPage')); }); return false; ").f();
+				e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
+			sx("recharger ce code de transaction");
+		} g("button");
 
 		e("button")
 			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
@@ -817,15 +360,16 @@ public class CodeTransactionGenPage extends CodeTransactionGenPageGen<ClusterPag
 			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
 				{ e("header").a("class", "w3-container w3-yellow ").f();
 					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#postCodeTransactionModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Créer un code de transaction").g("h2");
+					e("h2").a("class", "w3-padding ").f().sx("Créer un code de transaction").g("h2");
 				} g("header");
 				{ e("div").a("class", "w3-container ").f();
 					CodeTransaction o = new CodeTransaction();
+					o.setRequeteSite_(requeteSite_);
 
 					// Form POST
-					{ e("form").a("action", "").a("id", "postCodeTransactionForm").a("onsubmit", "event.preventDefault(); return false; ").f();
+					{ e("div").a("id", "postCodeTransactionForm").f();
 						htmlFormPOSTCodeTransaction(o);
-					} g("form");
+					} g("div");
 					e("button")
 						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
 						.a("onclick", "postCodeTransaction($('#postCodeTransactionForm')); ")
@@ -846,10 +390,11 @@ public class CodeTransactionGenPage extends CodeTransactionGenPageGen<ClusterPag
 			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
 				{ e("header").a("class", "w3-container w3-yellow ").f();
 					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#patchCodeTransactionModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Modifier des code de transactions").g("h2");
+					e("h2").a("class", "w3-padding ").f().sx("Modifier des code de transactions").g("h2");
 				} g("header");
 				{ e("div").a("class", "w3-container ").f();
 					CodeTransaction o = new CodeTransaction();
+					o.setRequeteSite_(requeteSite_);
 
 					// FormulaireFiltres PATCH
 					{ e("form").a("action", "").a("id", "patchCodeTransactionFormulaireFiltres").a("onsubmit", "event.preventDefault(); return false; ").f();
@@ -877,34 +422,37 @@ public class CodeTransactionGenPage extends CodeTransactionGenPageGen<ClusterPag
 		} g("div");
 
 
-		e("button")
-			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
-			.a("onclick", "$('#deleteCodeTransactionModale').show(); ")
-			.f().sx("Supprimer des code de transactions")
-		.g("button");
-		{ e("div").a("id", "deleteCodeTransactionModale").a("class", "w3-modal ").f();
-			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
-				{ e("header").a("class", "w3-container w3-yellow ").f();
-					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#deleteCodeTransactionModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Supprimer des code de transactions").g("h2");
-				} g("header");
-				{ e("div").a("class", "w3-container ").f();
-					CodeTransaction o = new CodeTransaction();
+		if(listeCodeTransaction != null && listeCodeTransaction.size() == 1) {
+			e("button")
+				.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
+				.a("onclick", "$('#deleteCodeTransactionModale').show(); ")
+				.f().sx("Supprimer des code de transactions")
+			.g("button");
+			{ e("div").a("id", "deleteCodeTransactionModale").a("class", "w3-modal ").f();
+				{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
+					{ e("header").a("class", "w3-container w3-yellow ").f();
+						e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#deleteCodeTransactionModale').hide(); ").f().sx("×").g("span");
+						e("h2").a("class", "w3-padding ").f().sx("Supprimer des code de transactions").g("h2");
+					} g("header");
+					{ e("div").a("class", "w3-container ").f();
+						CodeTransaction o = new CodeTransaction();
+						o.setRequeteSite_(requeteSite_);
 
-					// Form DELETE
-					{ e("form").a("action", "").a("id", "deleteCodeTransactionForm").a("onsubmit", "event.preventDefault(); return false; ").f();
-						htmlFormPATCHCodeTransaction(o);
-					} g("form");
-					e("button")
-						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
-						.a("onclick", "deleteCodeTransaction(); ")
-						.f().sx("Supprimer des code de transactions")
-					.g("button");
+						// Form DELETE
+						{ e("div").a("id", "deleteCodeTransactionForm").f();
+							htmlFormPATCHCodeTransaction(o);
+						} g("div");
+						e("button")
+							.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
+							.a("onclick", "deleteCodeTransaction(", o.getPk(), "); ")
+							.f().sx("Supprimer des code de transactions")
+						.g("button");
 
+					} g("div");
 				} g("div");
 			} g("div");
-		} g("div");
 
+		}
 		g("div");
 	}
 
@@ -945,54 +493,54 @@ public class CodeTransactionGenPage extends CodeTransactionGenPageGen<ClusterPag
 	 * r: "suggereListCodeTransaction"
 	 * r.enUS: "suggestListTransactionCode"
 	**/
-	public void htmlSuggereCodeTransactionGenPage() {
-		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("href", "/code-transaction").a("class", "").f();
-					e("i").a("class", "fad fa-code-commit w3-padding-small ").f().g("i");
-					sx("voir tous les code de transactions");
-				} g("a");
-			} g("div");
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("id", "rechargerCodeTransactionGenPage").a("href", "/code-transaction").a("class", "").a("onclick", "patchCodeTransactionVals([], {}, function() { ajouterLueur($('#rechargerCodeTransactionGenPage')); }, function() { ajouterErreur($('#rechargerCodeTransactionGenPage')); }); return false; ").f();
-					e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
-					sx("recharger tous les code de transactions");
-				} g("a");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("span").f();
-					sx("rechercher code de transactions : ");
-				} g("span");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("div").a("class", "w3-cell-row ").f();
+	public static void htmlSuggereCodeTransactionGenPage(MiseEnPage p, String id) {
+		{ p.e("div").a("class", "w3-cell-row ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("a").a("href", "/code-transaction").a("class", "").f();
+					p.e("i").a("class", "fad fa-code-commit w3-padding-small ").f().g("i");
+					p.sx("voir tous les code de transactions");
+				} p.g("a");
+			} p.g("div");
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("a").a("id", "rechargerTousCodeTransactionGenPage", id).a("href", "/code-transaction").a("class", "").a("onclick", "patchCodeTransactionVals([], {}, function() { ajouterLueur($('#rechargerTousCodeTransactionGenPage", id, "')); }, function() { ajouterErreur($('#rechargerTousCodeTransactionGenPage", id, "')); }); return false; ").f();
+					p.e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
+					p.sx("recharger tous les code de transactions");
+				} p.g("a");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("span").f();
+					p.sx("rechercher code de transactions : ");
+				} p.g("span");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("div").a("class", "w3-cell-row ").f();
 
-					e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
-					{ e("form").a("action", "").a("id", "suggereFormCodeTransaction").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
+					p.e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
+					{ p.e("form").a("action", "").a("id", "suggereFormCodeTransaction", id).a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); window.location.href='/code-transaction?q=objetSuggere:' + encodeURIComponent($('#suggereCodeTransaction", id, "').val()); return false; ").f();
+						p.e("input")
 							.a("type", "text")
 							.a("placeholder", "rechercher code de transactions")
 							.a("class", "suggereCodeTransaction w3-input w3-border w3-cell w3-cell-middle ")
 							.a("name", "suggereCodeTransaction")
-							.a("id", "suggereCodeTransaction")
+							.a("id", "suggereCodeTransaction", id)
 							.a("autocomplete", "off")
-							.a("oninput", "suggereCodeTransactionObjetSuggere( [ { 'name': 'q', 'value': 'objetSuggere:' + $(this).val() } ], $('#suggereListCodeTransaction')); ")
+							.a("oninput", "suggereCodeTransactionObjetSuggere( [ { 'name': 'q', 'value': 'objetSuggere:' + $(this).val() } ], $('#suggereListCodeTransaction", id, "'), ", p.getRequeteSite_().getRequetePk(), "); ")
 							.fg();
 
-					} g("form");
-				} g("div");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-				{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "suggereListCodeTransaction").f();
-				} g("ul");
-			} g("div");
-		} g("div");
+					} p.g("form");
+				} p.g("div");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+				{ p.e("ul").a("class", "w3-ul w3-hoverable ").a("id", "suggereListCodeTransaction", id).f();
+				} p.g("ul");
+			} p.g("div");
+		} p.g("div");
 	}
 
 }

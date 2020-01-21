@@ -4,7 +4,9 @@ import org.computate.bancaire.enus.config.SiteConfig;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import org.computate.bancaire.enus.contexte.SiteContextEnUS;
 import org.computate.bancaire.enus.user.SiteUser;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 import org.computate.bancaire.enus.search.SearchResult;
+import io.vertx.core.WorkerExecutor;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -69,6 +71,7 @@ import java.util.stream.Stream;
 import java.net.URLDecoder;
 import java.time.ZonedDateTime;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.commons.collections.CollectionUtils;
 import org.computate.bancaire.enus.search.SearchList;
 import org.computate.bancaire.enus.writer.AllWriter;
 
@@ -99,6 +102,11 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 				if(a.succeeded()) {
 					createPOSTTransactionCode(siteRequest, b -> {
 						if(b.succeeded()) {
+						PatchRequest patchRequest = new PatchRequest();
+							patchRequest.setRows(1);
+							patchRequest.setNumFound(1L);
+							patchRequest.initDeepPatchRequest(siteRequest);
+							siteRequest.setPatchRequest_(patchRequest);
 							TransactionCode transactionCode = b.result();
 							sqlPOSTTransactionCode(transactionCode, c -> {
 								if(c.succeeded()) {
@@ -115,6 +123,7 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 																		if(a.succeeded()) {
 																			sqlConnection.close(i -> {
 																				if(a.succeeded()) {
+																					siteRequest.getVertx().eventBus().publish("websocketTransactionCode", JsonObject.mapFrom(patchRequest).toString());
 																					eventHandler.handle(Future.succeededFuture(g.result()));
 																				} else {
 																					errorTransactionCode(siteRequest, eventHandler, i);
@@ -222,7 +231,7 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 	public void response200POSTTransactionCode(TransactionCode o, Handler<AsyncResult<OperationResponse>> eventHandler) {
 		try {
 			SiteRequestEnUS siteRequest = o.getSiteRequest_();
-			JsonObject json = new JsonObject();
+			JsonObject json = JsonObject.mapFrom(o);
 			eventHandler.handle(Future.succeededFuture(OperationResponse.completedWithJson(json)));
 		} catch(Exception e) {
 			eventHandler.handle(Future.failedFuture(e));
@@ -239,42 +248,81 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 				if(a.succeeded()) {
 					userTransactionCode(siteRequest, b -> {
 						if(b.succeeded()) {
-							aSearchTransactionCode(siteRequest, false, true, null, c -> {
+							SQLConnection sqlConnection = siteRequest.getSqlConnection();
+							sqlConnection.close(c -> {
 								if(c.succeeded()) {
-									SearchList<TransactionCode> listTransactionCode = c.result();
-									SimpleOrderedMap facets = (SimpleOrderedMap)listTransactionCode.getQueryResponse().getResponse().get("facets");
-									Date date = (Date)facets.get("max_modified");
-									String dateStr;
-									if(date == null)
-										dateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(ZonedDateTime.now().toInstant(), ZoneId.of("UTC")).minusNanos(1000));
-									else
-										dateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC")));
-									listPATCHTransactionCode(listTransactionCode, dateStr, d -> {
+									aSearchTransactionCode(siteRequest, false, true, null, d -> {
 										if(d.succeeded()) {
-											SQLConnection sqlConnection = siteRequest.getSqlConnection();
-											if(sqlConnection == null) {
-												eventHandler.handle(Future.succeededFuture(d.result()));
-											} else {
-												sqlConnection.commit(e -> {
-													if(e.succeeded()) {
-														sqlConnection.close(f -> {
-															if(f.succeeded()) {
-																eventHandler.handle(Future.succeededFuture(d.result()));
-															} else {
-																errorTransactionCode(siteRequest, eventHandler, f);
-															}
-														});
-													} else {
-														eventHandler.handle(Future.succeededFuture(d.result()));
-													}
-												});
+											SearchList<TransactionCode> listTransactionCode = d.result();
+											SimpleOrderedMap facets = (SimpleOrderedMap)Optional.ofNullable(listTransactionCode.getQueryResponse()).map(QueryResponse::getResponse).map(r -> r.get("facets")).orElse(null);
+											Date date = null;
+											if(facets != null)
+												date = (Date)facets.get("max_modified");
+											String dt;
+											if(date == null)
+												dt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(ZonedDateTime.now().toInstant(), ZoneId.of("UTC")).minusNanos(1000));
+											else
+												dt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC")));
+											listTransactionCode.addFilterQuery(String.format("modified_indexed_date:[* TO %s]", dt));
+
+											PatchRequest patchRequest = new PatchRequest();
+											patchRequest.setRows(listTransactionCode.getRows());
+											patchRequest.setNumFound(Optional.ofNullable(listTransactionCode.getQueryResponse()).map(QueryResponse::getResults).map(SolrDocumentList::getNumFound).orElse(new Long(listTransactionCode.size())));
+											patchRequest.initDeepPatchRequest(siteRequest);
+											siteRequest.setPatchRequest_(patchRequest);
+											if(listTransactionCode.size() == 1) {
+												TransactionCode o = listTransactionCode.get(0);
+												patchRequest.setPk(o.getPk());
+												patchRequest.setOriginal(o);
+												patchRequestTransactionCode(o);
 											}
+											WorkerExecutor workerExecutor = siteContext.getWorkerExecutor();
+											workerExecutor.executeBlocking(
+												blockingCodeHandler -> {
+													sqlTransactionCode(siteRequest, e -> {
+														if(e.succeeded()) {
+															try {
+																listPATCHTransactionCode(patchRequest, listTransactionCode, dt, f -> {
+																	if(f.succeeded()) {
+																		SQLConnection sqlConnection2 = siteRequest.getSqlConnection();
+																		if(sqlConnection2 == null) {
+																			blockingCodeHandler.handle(Future.succeededFuture(f.result()));
+																		} else {
+																			sqlConnection2.commit(g -> {
+																				if(f.succeeded()) {
+																					sqlConnection2.close(h -> {
+																						if(g.succeeded()) {
+																							blockingCodeHandler.handle(Future.succeededFuture(h.result()));
+																						} else {
+																							blockingCodeHandler.handle(Future.failedFuture(h.cause()));
+																						}
+																					});
+																				} else {
+																					blockingCodeHandler.handle(Future.failedFuture(g.cause()));
+																				}
+																			});
+																		}
+																	} else {
+																		blockingCodeHandler.handle(Future.failedFuture(f.cause()));
+																	}
+																});
+															} catch(Exception ex) {
+																blockingCodeHandler.handle(Future.failedFuture(ex));
+															}
+														} else {
+															blockingCodeHandler.handle(Future.failedFuture(e.cause()));
+														}
+													});
+												}, resultHandler -> {
+												}
+											);
+											response200PATCHTransactionCode(patchRequest, eventHandler);
 										} else {
-											errorTransactionCode(siteRequest, eventHandler, d);
+											errorTransactionCode(siteRequest, eventHandler, c);
 										}
 									});
 								} else {
-									errorTransactionCode(siteRequest, eventHandler, c);
+									errorTransactionCode(siteRequest, eventHandler, b);
 								}
 							});
 						} else {
@@ -290,7 +338,7 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 		}
 	}
 
-	public void listPATCHTransactionCode(SearchList<TransactionCode> listTransactionCode, String dt, Handler<AsyncResult<OperationResponse>> eventHandler) {
+	public void listPATCHTransactionCode(PatchRequest patchRequest, SearchList<TransactionCode> listTransactionCode, String dt, Handler<AsyncResult<OperationResponse>> eventHandler) {
 		List<Future> futures = new ArrayList<>();
 		SiteRequestEnUS siteRequest = listTransactionCode.getSiteRequest_();
 		listTransactionCode.getList().forEach(o -> {
@@ -305,15 +353,25 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 		});
 		CompositeFuture.all(futures).setHandler( a -> {
 			if(a.succeeded()) {
+				patchRequest.setNumPATCH(patchRequest.getNumPATCH() + listTransactionCode.size());
 				if(listTransactionCode.next(dt)) {
-					listPATCHTransactionCode(listTransactionCode, dt, eventHandler);
+					siteRequest.getVertx().eventBus().publish("websocketTransactionCode", JsonObject.mapFrom(patchRequest).toString());
+					listPATCHTransactionCode(patchRequest, listTransactionCode, dt, eventHandler);
 				} else {
-					response200PATCHTransactionCode(listTransactionCode, eventHandler);
+					response200PATCHTransactionCode(patchRequest, eventHandler);
 				}
 			} else {
 				errorTransactionCode(listTransactionCode.getSiteRequest_(), eventHandler, a);
 			}
 		});
+	}
+
+	public void patchRequestTransactionCode(TransactionCode o) {
+		PatchRequest patchRequest = o.getSiteRequest_().getPatchRequest_();
+		if(patchRequest != null) {
+			List<Long> pks = patchRequest.getPks();
+			List<String> classes = patchRequest.getClasses();
+		}
 	}
 
 	public Future<TransactionCode> futurePATCHTransactionCode(TransactionCode o,  Handler<AsyncResult<OperationResponse>> eventHandler) {
@@ -328,6 +386,8 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 								if(c.succeeded()) {
 									indexTransactionCode(transactionCode, d -> {
 										if(d.succeeded()) {
+											patchRequestTransactionCode(transactionCode);
+											transactionCode.patchRequestTransactionCode();
 											future.complete(o);
 											eventHandler.handle(Future.succeededFuture(d.result()));
 										} else {
@@ -368,61 +428,61 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 			for(String methodName : methodNames) {
 				switch(methodName) {
 					case "setCreated":
-						o2.setCreated(requestJson.getString(methodName));
-						if(o2.getCreated() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "created"));
 						} else {
+							o2.setCreated(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("created", o2.jsonCreated(), pk));
 						}
 						break;
 					case "setModified":
-						o2.setModified(requestJson.getString(methodName));
-						if(o2.getModified() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "modified"));
 						} else {
+							o2.setModified(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("modified", o2.jsonModified(), pk));
 						}
 						break;
 					case "setArchived":
-						o2.setArchived(requestJson.getBoolean(methodName));
-						if(o2.getArchived() == null) {
+						if(requestJson.getBoolean(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "archived"));
 						} else {
+							o2.setArchived(requestJson.getBoolean(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("archived", o2.jsonArchived(), pk));
 						}
 						break;
 					case "setDeleted":
-						o2.setDeleted(requestJson.getBoolean(methodName));
-						if(o2.getDeleted() == null) {
+						if(requestJson.getBoolean(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "deleted"));
 						} else {
+							o2.setDeleted(requestJson.getBoolean(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("deleted", o2.jsonDeleted(), pk));
 						}
 						break;
 					case "setTransactionCode":
-						o2.setTransactionCode(requestJson.getString(methodName));
-						if(o2.getTransactionCode() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "transactionCode"));
 						} else {
+							o2.setTransactionCode(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("transactionCode", o2.jsonTransactionCode(), pk));
 						}
 						break;
 					case "setTransactionCodeDisplayName":
-						o2.setTransactionCodeDisplayName(requestJson.getString(methodName));
-						if(o2.getTransactionCodeDisplayName() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "transactionCodeDisplayName"));
 						} else {
+							o2.setTransactionCodeDisplayName(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("transactionCodeDisplayName", o2.jsonTransactionCodeDisplayName(), pk));
 						}
@@ -448,10 +508,10 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 		}
 	}
 
-	public void response200PATCHTransactionCode(SearchList<TransactionCode> listTransactionCode, Handler<AsyncResult<OperationResponse>> eventHandler) {
+	public void response200PATCHTransactionCode(PatchRequest patchRequest, Handler<AsyncResult<OperationResponse>> eventHandler) {
 		try {
-			SiteRequestEnUS siteRequest = listTransactionCode.getSiteRequest_();
-			JsonObject json = new JsonObject();
+			SiteRequestEnUS siteRequest = patchRequest.getSiteRequest_();
+			JsonObject json = JsonObject.mapFrom(patchRequest);
 			eventHandler.handle(Future.succeededFuture(OperationResponse.completedWithJson(json)));
 		} catch(Exception e) {
 			eventHandler.handle(Future.failedFuture(e));
@@ -711,73 +771,22 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 			AllWriter w = AllWriter.create(listTransactionCode.getSiteRequest_(), buffer);
 			CodeTransactionPage page = new CodeTransactionPage();
 			SolrDocument pageSolrDocument = new SolrDocument();
+			CaseInsensitiveHeaders requestHeaders = new CaseInsensitiveHeaders();
+			siteRequest.setRequestHeaders(requestHeaders);
 
 			pageSolrDocument.setField("pageUri_frFR_stored_string", "/transaction-code");
 			page.setPageSolrDocument(pageSolrDocument);
 			page.setW(w);
+			if(listTransactionCode.size() == 1)
+				siteRequest.setRequestPk(listTransactionCode.get(0).getPk());
+			siteRequest.setW(w);
 			page.setListTransactionCode(listTransactionCode);
+			page.setSiteRequest_(siteRequest);
 			page.initDeepCodeTransactionPage(siteRequest);
 			page.html();
-			eventHandler.handle(Future.succeededFuture(new OperationResponse(200, "OK", buffer, new CaseInsensitiveHeaders())));
+			eventHandler.handle(Future.succeededFuture(new OperationResponse(200, "OK", buffer, requestHeaders)));
 		} catch(Exception e) {
 			eventHandler.handle(Future.failedFuture(e));
-		}
-	}
-
-	public String varIndexedTransactionCode(String entityVar) {
-		switch(entityVar) {
-			case "pk":
-				return "pk_indexed_long";
-			case "id":
-				return "id_indexed_string";
-			case "created":
-				return "created_indexed_date";
-			case "modified":
-				return "modified_indexed_date";
-			case "archived":
-				return "archived_indexed_boolean";
-			case "deleted":
-				return "deleted_indexed_boolean";
-			case "classCanonicalName":
-				return "classCanonicalName_indexed_string";
-			case "classSimpleName":
-				return "classSimpleName_indexed_string";
-			case "classCanonicalNames":
-				return "classCanonicalNames_indexed_strings";
-			case "transactionCodeKey":
-				return "transactionCodeKey_indexed_long";
-			case "transactionCode":
-				return "transactionCode_indexed_string";
-			case "transactionCodeDisplayName":
-				return "transactionCodeDisplayName_indexed_string";
-			case "transactionCodeCompleteName":
-				return "transactionCodeCompleteName_indexed_string";
-			case "transactionCodeId":
-				return "transactionCodeId_indexed_string";
-			case "pageUrl":
-				return "pageUrl_indexed_string";
-			case "objectSuggest":
-				return "objectSuggest_indexed_string";
-			default:
-				throw new RuntimeException(String.format("\"%s\" is not an indexed entity. ", entityVar));
-		}
-	}
-
-	public String varSearchTransactionCode(String entityVar) {
-		switch(entityVar) {
-			case "objectSuggest":
-				return "objectSuggest_suggested";
-			default:
-				throw new RuntimeException(String.format("\"%s\" is not an indexed entity. ", entityVar));
-		}
-	}
-
-	public String varSuggereTransactionCode(String entityVar) {
-		switch(entityVar) {
-			case "objectSuggest":
-				return "objectSuggest_suggested";
-			default:
-				throw new RuntimeException(String.format("\"%s\" is not an indexed entity. ", entityVar));
 		}
 	}
 
@@ -888,6 +897,7 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 								JsonArray createLine = createAsync.result().getResults().stream().findFirst().orElseGet(() -> null);
 								Long pkUser = createLine.getLong(0);
 								SiteUser siteUser = new SiteUser();
+								siteUser.setSiteRequest_(siteRequest);
 								siteUser.setPk(pkUser);
 
 								sqlConnection.queryWithParams(
@@ -925,6 +935,7 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 						} else {
 							Long pkUser = userValues.getLong(0);
 							SiteUser siteUser = new SiteUser();
+								siteUser.setSiteRequest_(siteRequest);
 							siteUser.setPk(pkUser);
 
 							sqlConnection.queryWithParams(
@@ -977,16 +988,7 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 			listSearch.setC(TransactionCode.class);
 			if(entityList != null)
 				listSearch.addFields(entityList);
-			listSearch.addSort("archived_indexed_boolean", ORDER.asc);
-			listSearch.addSort("deleted_indexed_boolean", ORDER.asc);
-			listSearch.addSort("created_indexed_date", ORDER.desc);
-			listSearch.addFilterQuery("classCanonicalNames_indexed_strings:" + ClientUtils.escapeQueryChars("org.computate.bancaire.enus.transaction.code.TransactionCode"));
 			listSearch.set("json.facet", "{max_modified:'max(modified_indexed_date)'}");
-			SiteUser siteUser = siteRequest.getSiteUser();
-			if(siteUser != null && !siteUser.getSeeDeleted())
-				listSearch.addFilterQuery("deleted_indexed_boolean:false");
-			if(siteUser != null && !siteUser.getSeeArchived())
-				listSearch.addFilterQuery("archived_indexed_boolean:false");
 
 			String id = operationRequest.getParams().getJsonObject("path").getString("id");
 			if(id != null) {
@@ -1009,7 +1011,7 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 						switch(paramName) {
 							case "q":
 								entityVar = StringUtils.trim(StringUtils.substringBefore((String)paramObject, ":"));
-								varIndexed = "*".equals(entityVar) ? entityVar : varSearchTransactionCode(entityVar);
+								varIndexed = "*".equals(entityVar) ? entityVar : TransactionCode.varSearchTransactionCode(entityVar);
 								valueIndexed = URLDecoder.decode(StringUtils.trim(StringUtils.substringAfter((String)paramObject, ":")), "UTF-8");
 								valueIndexed = StringUtils.isEmpty(valueIndexed) ? "*" : valueIndexed;
 								listSearch.setQuery(varIndexed + ":" + ("*".equals(valueIndexed) ? valueIndexed : ClientUtils.escapeQueryChars(valueIndexed)));
@@ -1023,13 +1025,13 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 							case "fq":
 								entityVar = StringUtils.trim(StringUtils.substringBefore((String)paramObject, ":"));
 								valueIndexed = URLDecoder.decode(StringUtils.trim(StringUtils.substringAfter((String)paramObject, ":")), "UTF-8");
-								varIndexed = varIndexedTransactionCode(entityVar);
+								varIndexed = TransactionCode.varIndexedTransactionCode(entityVar);
 								listSearch.addFilterQuery(varIndexed + ":" + ClientUtils.escapeQueryChars(valueIndexed));
 								break;
 							case "sort":
 								entityVar = StringUtils.trim(StringUtils.substringBefore((String)paramObject, " "));
 								valueSort = StringUtils.trim(StringUtils.substringAfter((String)paramObject, " "));
-								varIndexed = varIndexedTransactionCode(entityVar);
+								varIndexed = TransactionCode.varIndexedTransactionCode(entityVar);
 								listSearch.addSort(varIndexed, ORDER.valueOf(valueSort));
 								break;
 							case "start":
@@ -1046,6 +1048,8 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 					eventHandler.handle(Future.failedFuture(e));
 				}
 			});
+			if(listSearch.getSorts().size() == 0)
+				listSearch.addSort("created_indexed_date", ORDER.desc);
 			listSearch.initDeepForClass(siteRequest);
 			eventHandler.handle(Future.succeededFuture(listSearch));
 		} catch(Exception e) {
@@ -1066,7 +1070,11 @@ public class TransactionCodeEnUSGenApiServiceImpl implements TransactionCodeEnUS
 				if(defineAsync.succeeded()) {
 					try {
 						for(JsonArray definition : defineAsync.result().getResults()) {
-							o.defineForClass(definition.getString(0), definition.getString(1));
+							try {
+								o.defineForClass(definition.getString(0), definition.getString(1));
+							} catch(Exception e) {
+								LOGGER.error(e);
+							}
 						}
 						eventHandler.handle(Future.succeededFuture());
 					} catch(Exception e) {

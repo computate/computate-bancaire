@@ -13,6 +13,8 @@ import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import org.computate.bancaire.enus.user.SiteUserGenPage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 
 /**	
  * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.user.SiteUserPage&fq=classeEtendGen_indexed_boolean:true">Trouver la classe  dans Solr</a>
@@ -35,8 +37,8 @@ public abstract class SiteUserPageGen<DEV> extends SiteUserGenPage {
 	}
 
 	public void initDeepSiteUserPage() {
-		super.initDeepSiteUserGenPage(siteRequest_);
 		initSiteUserPage();
+		super.initDeepSiteUserGenPage(siteRequest_);
 	}
 
 	public void initSiteUserPage() {
@@ -204,6 +206,18 @@ public abstract class SiteUserPageGen<DEV> extends SiteUserGenPage {
 	}
 
 	public void htmlStyleSiteUserPage() {
+	}
+
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestSiteUserPage() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		SiteUserPage original = (SiteUserPage)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
+			super.patchRequestSiteUserGenPage();
+		}
 	}
 
 	//////////////

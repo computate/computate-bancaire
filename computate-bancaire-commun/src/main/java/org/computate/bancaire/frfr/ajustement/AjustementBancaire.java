@@ -1,4 +1,4 @@
-package org.computate.bancaire.frfr.ajustement;
+package org.computate.bancaire.frfr.ajustement;   
 
 import java.math.BigDecimal;
 import java.text.Normalizer;

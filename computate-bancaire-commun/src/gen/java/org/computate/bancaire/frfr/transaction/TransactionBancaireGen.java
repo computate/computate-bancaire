@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.transaction;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import java.util.Date;
 import java.time.ZonedDateTime;
 import java.time.LocalDateTime;
@@ -32,6 +33,7 @@ import java.util.Objects;
 import io.vertx.core.json.JsonArray;
 import org.apache.solr.common.SolrDocument;
 import java.util.List;
+import java.time.temporal.ChronoUnit;
 import org.computate.bancaire.frfr.couverture.Couverture;
 import org.computate.bancaire.frfr.recherche.ListeRecherche;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +42,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.computate.bancaire.frfr.compte.CompteBancaire;
+import java.util.Optional;
 import io.vertx.ext.sql.SQLClient;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -141,47 +144,6 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return transactionCle == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionCle());
 	}
 
-	public void htmTransactionCle(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "TransactionCle\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "TransactionCle() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionCle\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionCle()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionCle\"");
-							r.s(" value=\"", htmTransactionCle(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionCle());
-			}
-			r.l("</div>");
-		}
-	}
-
 	///////////////
 	// compteCle //
 	///////////////
@@ -249,45 +211,63 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return compteCle == null ? "" : StringEscapeUtils.escapeHtml4(strCompteCle());
 	}
 
-	public void htmCompteCle(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "CompteCle\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "CompteCle() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteCle\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteCle()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteCle\"");
-							r.s(" value=\"", htmCompteCle(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCompteCle());
-			}
-			r.l("</div>");
-		}
+	public void inputCompteCle(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
+			e("input")
+				.a("type", "text")
+				.a("placeholder", "compte")
+				.a("class", "valeur suggereCompteCle w3-input w3-border w3-cell w3-cell-middle ")
+				.a("name", "setCompteCle")
+				.a("id", classeApiMethodeMethode, "_compteCle")
+				.a("autocomplete", "off")
+				.a("oninput", "suggereTransactionBancaireCompteCle($(this).val() ? rechercherCompteBancaireFiltres($('#suggereTransactionBancaireCompteCle')) : [{'name':'fq','value':'transactionCles:", pk, "'}], $('#listTransactionBancaireCompteCle_", classeApiMethodeMethode, "'), ", pk, "); ")
+			.fg();
+
+	}
+
+	public void htmCompteCle(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereTransactionBancaireCompteCle").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row ").f();
+							{ e("a").a("href", "").a("class", "w3-cell w3-btn w3-center h4 w3-block h4 w3-gray w3-hover-gray ").f();
+								e("i").a("class", "fad fa-money-check w3-padding-small ").f().g("i");
+								sx("compte");
+							} g("a");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row ").f();
+							{ e("h5").a("class", "w3-cell ").f();
+								sx("relier un compte a cette transaction");
+							} g("h5");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-cell-row ").f();
+
+								inputCompteCle(classeApiMethodeMethode);
+								} g("div");
+							} g("div");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+								{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "listTransactionBancaireCompteCle_", classeApiMethodeMethode).f();
+								} g("ul");
+								{ e("div").a("class", "w3-cell-row ").f();
+									e("button")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
+										.a("onclick", "postCompteBancaireVals({ transactionCles: \"", pk, "\" }, function() { patchTransactionBancaireVals([{ name: 'fq', value: 'pk:", pk, "' }], {}); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "compteCle')); });")
+										.f().sx("ajouter un compte")
+									.g("button");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	/////////////////////
@@ -426,47 +406,6 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return compteNomComplet == null ? "" : StringEscapeUtils.escapeHtml4(strCompteNomComplet());
 	}
 
-	public void htmCompteNomComplet(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "CompteNomComplet\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "CompteNomComplet() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteNomComplet\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteNomComplet()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteNomComplet\"");
-							r.s(" value=\"", htmCompteNomComplet(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCompteNomComplet());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////////
 	// compteNumero //
 	//////////////////
@@ -526,47 +465,6 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 
 	public String htmCompteNumero() {
 		return compteNumero == null ? "" : StringEscapeUtils.escapeHtml4(strCompteNumero());
-	}
-
-	public void htmCompteNumero(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "CompteNumero\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "CompteNumero() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteNumero\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteNumero()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteNumero\"");
-							r.s(" value=\"", htmCompteNumero(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCompteNumero());
-			}
-			r.l("</div>");
-		}
 	}
 
 	/////////////////////
@@ -630,45 +528,58 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return transactionCode == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionCode());
 	}
 
-	public void htmTransactionCode(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "TransactionCode\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "TransactionCode() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionCode\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionCode()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionCode\"");
-							r.s(" value=\"", htmTransactionCode(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputTransactionCode(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "code de transaction")
+			.a("id", classeApiMethodeMethode, "_transactionCode");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setTransactionCode inputTransactionBancaire", pk, "TransactionCode w3-input w3-border ");
+				a("name", "setTransactionCode");
 			} else {
-				r.s(htmTransactionCode());
+				a("class", "valeurTransactionCode w3-input w3-border inputTransactionBancaire", pk, "TransactionCode w3-input w3-border ");
+				a("name", "transactionCode");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchTransactionBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setTransactionCode', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionCode')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionCode')); }); ");
+			}
+			a("value", strTransactionCode())
+		.fg();
+
+	}
+
+	public void htmTransactionCode(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereTransactionBancaireTransactionCode").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_transactionCode").a("class", "").f().sx("code de transaction").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputTransactionCode(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_transactionCode')); $('#", classeApiMethodeMethode, "_transactionCode').val(null); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=pk]').val() }], 'setTransactionCode', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionCode')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionCode')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	//////////////////////////////
@@ -807,47 +718,6 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return codeTransactionNomComplet == null ? "" : StringEscapeUtils.escapeHtml4(strCodeTransactionNomComplet());
 	}
 
-	public void htmCodeTransactionNomComplet(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "CodeTransactionNomComplet\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "CodeTransactionNomComplet() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCodeTransactionNomComplet\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCodeTransactionNomComplet()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"codeTransactionNomComplet\"");
-							r.s(" value=\"", htmCodeTransactionNomComplet(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCodeTransactionNomComplet());
-			}
-			r.l("</div>");
-		}
-	}
-
 	////////////////////////////
 	// transactionIdReference //
 	////////////////////////////
@@ -909,45 +779,58 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return transactionIdReference == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionIdReference());
 	}
 
-	public void htmTransactionIdReference(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "TransactionIdReference\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "TransactionIdReference() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionIdReference\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionIdReference()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionIdReference\"");
-							r.s(" value=\"", htmTransactionIdReference(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputTransactionIdReference(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "ID de référence de transaction")
+			.a("id", classeApiMethodeMethode, "_transactionIdReference");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setTransactionIdReference inputTransactionBancaire", pk, "TransactionIdReference w3-input w3-border ");
+				a("name", "setTransactionIdReference");
 			} else {
-				r.s(htmTransactionIdReference());
+				a("class", "valeurTransactionIdReference w3-input w3-border inputTransactionBancaire", pk, "TransactionIdReference w3-input w3-border ");
+				a("name", "transactionIdReference");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchTransactionBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setTransactionIdReference', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionIdReference')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionIdReference')); }); ");
+			}
+			a("value", strTransactionIdReference())
+		.fg();
+
+	}
+
+	public void htmTransactionIdReference(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereTransactionBancaireTransactionIdReference").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_transactionIdReference").a("class", "").f().sx("ID de référence de transaction").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputTransactionIdReference(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_transactionIdReference')); $('#", classeApiMethodeMethode, "_transactionIdReference').val(null); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=pk]').val() }], 'setTransactionIdReference', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionIdReference')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionIdReference')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	////////////////////////
@@ -1009,7 +892,7 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 	}
 
 	public String strTransactionMontant() {
-		return transactionMontant == null ? "" : transactionMontant.toString();
+		return transactionMontant == null ? "" : transactionMontant.setScale(2).toString();
 	}
 
 	public String jsonTransactionMontant() {
@@ -1028,45 +911,58 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return transactionMontant == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionMontant());
 	}
 
-	public void htmTransactionMontant(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "TransactionMontant\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "TransactionMontant() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionMontant\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionMontant()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionMontant\"");
-							r.s(" value=\"", htmTransactionMontant(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputTransactionMontant(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "date et heure de la transaction")
+			.a("id", classeApiMethodeMethode, "_transactionMontant");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setTransactionMontant inputTransactionBancaire", pk, "TransactionMontant w3-input w3-border ");
+				a("name", "setTransactionMontant");
 			} else {
-				r.s(htmTransactionMontant());
+				a("class", "valeurTransactionMontant w3-input w3-border inputTransactionBancaire", pk, "TransactionMontant w3-input w3-border ");
+				a("name", "transactionMontant");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchTransactionBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setTransactionMontant', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionMontant')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionMontant')); }); ");
+			}
+			a("value", strTransactionMontant())
+		.fg();
+
+	}
+
+	public void htmTransactionMontant(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereTransactionBancaireTransactionMontant").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_transactionMontant").a("class", "").f().sx("date et heure de la transaction").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputTransactionMontant(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_transactionMontant')); $('#", classeApiMethodeMethode, "_transactionMontant').val(null); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=pk]').val() }], 'setTransactionMontant', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionMontant')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionMontant')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	//////////////////////////
@@ -1097,18 +993,18 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		this.transactionDateHeureCouverture.dejaInitialise = true;
 	}
 	public TransactionBancaire setTransactionDateHeure(Instant o) {
-		this.transactionDateHeure = ZonedDateTime.from(o);
+		this.transactionDateHeure = ZonedDateTime.from(o).truncatedTo(ChronoUnit.MILLIS);
 		this.transactionDateHeureCouverture.dejaInitialise = true;
 		return (TransactionBancaire)this;
 	}
 	/** Example: 2011-12-03T10:15:30+01:00 **/
 	public TransactionBancaire setTransactionDateHeure(String o) {
-		this.transactionDateHeure = ZonedDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		this.transactionDateHeure = ZonedDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.of(requeteSite_.getConfigSite_().getSiteZone()))).truncatedTo(ChronoUnit.MILLIS);
 		this.transactionDateHeureCouverture.dejaInitialise = true;
 		return (TransactionBancaire)this;
 	}
 	public TransactionBancaire setTransactionDateHeure(Date o) {
-		this.transactionDateHeure = ZonedDateTime.ofInstant(o.toInstant(), ZoneId.of(requeteSite_.getConfigSite_().getSiteZone()));
+		this.transactionDateHeure = ZonedDateTime.ofInstant(o.toInstant(), ZoneId.of(requeteSite_.getConfigSite_().getSiteZone())).truncatedTo(ChronoUnit.MILLIS);
 		this.transactionDateHeureCouverture.dejaInitialise = true;
 		return (TransactionBancaire)this;
 	}
@@ -1127,7 +1023,7 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 	}
 
 	public String strTransactionDateHeure() {
-		return transactionDateHeure == null ? "" : transactionDateHeure.format(DateTimeFormatter.ofPattern("EEE d MMM yyyy H'h'mm:ss.SSS zz VV", Locale.FRANCE));
+		return transactionDateHeure == null ? "" : transactionDateHeure.format(DateTimeFormatter.ofPattern("EEE d MMM yyyy H'h'mm:ss zz", Locale.FRANCE));
 	}
 
 	public String jsonTransactionDateHeure() {
@@ -1146,45 +1042,49 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return transactionDateHeure == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionDateHeure());
 	}
 
-	public void htmTransactionDateHeure(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "TransactionDateHeure\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "TransactionDateHeure() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionDateHeure\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionDateHeure()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionDateHeure\"");
-							r.s(" value=\"", htmTransactionDateHeure(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionDateHeure());
-			}
-			r.l("</div>");
-		}
+	public void inputTransactionDateHeure(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("class", "w3-input w3-border datepicker setTransactionDateHeure inputTransactionBancaire", pk, "TransactionDateHeure w3-input w3-border ")
+			.a("placeholder", "DD-MM-YYYY")
+			.a("data-timeformat", "DD-MM-YYYY")
+			.a("id", classeApiMethodeMethode, "_transactionDateHeure")
+			.a("onclick", "enleverLueur($(this)); ")
+			.a("value", transactionDateHeure == null ? "" : DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.forLanguageTag("fr-FR")).format(transactionDateHeure))
+			.a("onchange", "var t = moment(this.value, 'DD-MM-YYYY'); if(t) { var s = t.format('MM/DD/YYYY'); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setTransactionDateHeure', s, function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionDateHeure')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionDateHeure')); }); } ")
+			.fg();
+	}
+
+	public void htmTransactionDateHeure(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereTransactionBancaireTransactionDateHeure").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_transactionDateHeure").a("class", "").f().sx("date et heure de la transaction").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								inputTransactionDateHeure(classeApiMethodeMethode);
+									} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_transactionDateHeure')); $('#", classeApiMethodeMethode, "_transactionDateHeure').val(null); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=pk]').val() }], 'setTransactionDateHeure', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionDateHeure')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionDateHeure')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	/////////////////////
@@ -1264,47 +1164,6 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return transactionDate == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionDate());
 	}
 
-	public void htmTransactionDate(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "TransactionDate\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "TransactionDate() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionDate\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionDate()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionDate\"");
-							r.s(" value=\"", htmTransactionDate(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionDate());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////////////
 	// transactionFrais //
 	//////////////////////
@@ -1371,45 +1230,48 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return transactionFrais == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionFrais());
 	}
 
-	public void htmTransactionFrais(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "TransactionFrais\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "TransactionFrais() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionFrais\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionFrais()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionFrais\"");
-							r.s(" value=\"", htmTransactionFrais(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputTransactionFrais(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		e("input")
+			.a("type", "checkbox")
+			.a("id", classeApiMethodeMethode, "_transactionFrais")
+			.a("value", "true");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setTransactionFrais inputTransactionBancaire", pk, "TransactionFrais w3-input w3-border ");
+				a("name", "setTransactionFrais");
 			} else {
-				r.s(htmTransactionFrais());
+				a("class", "valeurTransactionFrais inputTransactionBancaire", pk, "TransactionFrais w3-input w3-border ");
+				a("name", "transactionFrais");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onchange", "patchTransactionBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setTransactionFrais', $(this).prop('checked'), function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionFrais')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionFrais')); }); ");
+			}
+			;
+			if(getTransactionFrais() != null && getTransactionFrais())
+				a("checked", "checked");
+		fg();
+
+	}
+
+	public void htmTransactionFrais(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereTransactionBancaireTransactionFrais").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_transactionFrais").a("class", "").f().sx("transaction de frais").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputTransactionFrais(classeApiMethodeMethode);
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	/////////////////////////////
@@ -1473,45 +1335,58 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return transactionNomAffichage == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionNomAffichage());
 	}
 
-	public void htmTransactionNomAffichage(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "TransactionNomAffichage\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "TransactionNomAffichage() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionNomAffichage\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionNomAffichage()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionNomAffichage\"");
-							r.s(" value=\"", htmTransactionNomAffichage(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputTransactionNomAffichage(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "nom d'affichage")
+			.a("id", classeApiMethodeMethode, "_transactionNomAffichage");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setTransactionNomAffichage inputTransactionBancaire", pk, "TransactionNomAffichage w3-input w3-border ");
+				a("name", "setTransactionNomAffichage");
 			} else {
-				r.s(htmTransactionNomAffichage());
+				a("class", "valeurTransactionNomAffichage w3-input w3-border inputTransactionBancaire", pk, "TransactionNomAffichage w3-input w3-border ");
+				a("name", "transactionNomAffichage");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchTransactionBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setTransactionNomAffichage', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionNomAffichage')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionNomAffichage')); }); ");
+			}
+			a("value", strTransactionNomAffichage())
+		.fg();
+
+	}
+
+	public void htmTransactionNomAffichage(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereTransactionBancaireTransactionNomAffichage").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_transactionNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputTransactionNomAffichage(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_transactionNomAffichage')); $('#", classeApiMethodeMethode, "_transactionNomAffichage').val(null); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=pk]').val() }], 'setTransactionNomAffichage', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionNomAffichage')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionNomAffichage')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	///////////////////////////
@@ -1575,45 +1450,27 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return transactionNomComplet == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionNomComplet());
 	}
 
-	public void htmTransactionNomComplet(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "TransactionNomComplet\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "TransactionNomComplet() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionNomComplet\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionNomComplet()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionNomComplet\"");
-							r.s(" value=\"", htmTransactionNomComplet(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionNomComplet());
+	public void inputTransactionNomComplet(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+	}
+
+	public void htmTransactionNomComplet(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strTransactionNomComplet()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	///////////////////
@@ -1677,45 +1534,30 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return transactionId == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionId());
 	}
 
-	public void htmTransactionId(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "TransactionId\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "TransactionId() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionId\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionId()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionId\"");
-							r.s(" value=\"", htmTransactionId(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionId());
+	public void inputTransactionId(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+	}
+
+	public void htmTransactionId(String classeApiMethodeMethode) {
+		TransactionBancaire s = (TransactionBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("class", "").f().sx("ID").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strTransactionId()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	/////////////
@@ -1779,47 +1621,6 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return pageUrl == null ? "" : StringEscapeUtils.escapeHtml4(strPageUrl());
 	}
 
-	public void htmPageUrl(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "PageUrl\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "PageUrl() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setPageUrl\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichagePageUrl()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"pageUrl\"");
-							r.s(" value=\"", htmPageUrl(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmPageUrl());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////////
 	// objetSuggere //
 	//////////////////
@@ -1881,47 +1682,6 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		return objetSuggere == null ? "" : StringEscapeUtils.escapeHtml4(strObjetSuggere());
 	}
 
-	public void htmObjetSuggere(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchTransactionBancaire", strPk(), "ObjetSuggere\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchTransactionBancaire", strPk(), "ObjetSuggere() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setObjetSuggere\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageObjetSuggere()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"objetSuggere\"");
-							r.s(" value=\"", htmObjetSuggere(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmObjetSuggere());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////
 	// initLoin //
 	//////////////
@@ -1938,8 +1698,8 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 	}
 
 	public void initLoinTransactionBancaire() {
-		super.initLoinCluster(requeteSite_);
 		initTransactionBancaire();
+		super.initLoinCluster(requeteSite_);
 	}
 
 	public void initTransactionBancaire() {
@@ -2286,7 +2046,7 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 			SolrInputDocument document = new SolrInputDocument();
 			indexerTransactionBancaire(document);
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -2298,7 +2058,7 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 			indexerTransactionBancaire(document);
 			SolrClient clientSolr = requeteSite_.getSiteContexte_().getClientSolr();
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -2370,7 +2130,6 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		}
 		if(objetSuggere != null) {
 			document.addField("objetSuggere_suggested", objetSuggere);
-			document.addField("objetSuggere_indexed_string", objetSuggere);
 		}
 		super.indexerCluster(document);
 
@@ -2387,9 +2146,66 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 			initLoinTransactionBancaire(requeteSite);
 			SolrClient clientSolr = siteContexte.getClientSolr();
 			clientSolr.deleteById(id.toString());
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
+		}
+	}
+
+	public static String varIndexeTransactionBancaire(String entiteVar) {
+		switch(entiteVar) {
+			case "transactionCle":
+				return "transactionCle_indexed_long";
+			case "compteCle":
+				return "compteCle_indexed_long";
+			case "compteNomComplet":
+				return "compteNomComplet_indexed_string";
+			case "compteNumero":
+				return "compteNumero_indexed_string";
+			case "transactionCode":
+				return "transactionCode_indexed_string";
+			case "codeTransactionNomComplet":
+				return "codeTransactionNomComplet_indexed_string";
+			case "transactionIdReference":
+				return "transactionIdReference_indexed_string";
+			case "transactionMontant":
+				return "transactionMontant_indexed_double";
+			case "transactionDateHeure":
+				return "transactionDateHeure_indexed_date";
+			case "transactionDate":
+				return "transactionDate_indexed_date";
+			case "transactionFrais":
+				return "transactionFrais_indexed_boolean";
+			case "transactionNomAffichage":
+				return "transactionNomAffichage_indexed_string";
+			case "transactionNomComplet":
+				return "transactionNomComplet_indexed_string";
+			case "transactionId":
+				return "transactionId_indexed_string";
+			case "pageUrl":
+				return "pageUrl_indexed_string";
+			case "objetSuggere":
+				return "objetSuggere_indexed_string";
+			default:
+				return Cluster.varIndexeCluster(entiteVar);
+		}
+	}
+
+	public static String varRechercheTransactionBancaire(String entiteVar) {
+		switch(entiteVar) {
+			case "objetSuggere":
+				return "objetSuggere_suggested";
+			default:
+				return Cluster.varRechercheCluster(entiteVar);
+		}
+	}
+
+	public static String varSuggereTransactionBancaire(String entiteVar) {
+		switch(entiteVar) {
+			case "objetSuggere":
+				return "objetSuggere_suggested";
+			default:
+				return Cluster.varSuggereCluster(entiteVar);
 		}
 	}
 
@@ -2467,6 +2283,32 @@ public abstract class TransactionBancaireGen<DEV> extends Cluster {
 		oTransactionBancaire.setObjetSuggere(objetSuggere);
 
 		super.stockerCluster(solrDocument);
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchTransactionBancaire() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		TransactionBancaire original = (TransactionBancaire)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
+			if(!Objects.equals(compteCle, original.getCompteCle()))
+				requetePatch.addVars("compteCle");
+			if(!Objects.equals(transactionCode, original.getTransactionCode()))
+				requetePatch.addVars("transactionCode");
+			if(!Objects.equals(transactionIdReference, original.getTransactionIdReference()))
+				requetePatch.addVars("transactionIdReference");
+			if(!Objects.equals(transactionMontant, original.getTransactionMontant()))
+				requetePatch.addVars("transactionMontant");
+			if(!Objects.equals(transactionDateHeure, original.getTransactionDateHeure()))
+				requetePatch.addVars("transactionDateHeure");
+			if(!Objects.equals(transactionFrais, original.getTransactionFrais()))
+				requetePatch.addVars("transactionFrais");
+			if(!Objects.equals(transactionNomAffichage, original.getTransactionNomAffichage()))
+				requetePatch.addVars("transactionNomAffichage");
+			super.requetePatchCluster();
+		}
 	}
 
 	//////////////

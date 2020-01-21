@@ -14,6 +14,8 @@ import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 import org.computate.bancaire.enus.transaction.code.TransactionCode;
 
 /**	
@@ -55,6 +57,8 @@ public abstract class CodeTransactionGenPageGen<DEV> extends ClusterPage {
 			if(listTransactionCode == null)
 				setListTransactionCode(listTransactionCodeWrap.o);
 		}
+		if(listTransactionCode != null)
+			listTransactionCode.initDeepForClass(siteRequest_);
 		listTransactionCodeWrap.alreadyInitialized(true);
 		return (CodeTransactionGenPage)this;
 	}
@@ -92,6 +96,8 @@ public abstract class CodeTransactionGenPageGen<DEV> extends ClusterPage {
 			if(transactionCode == null)
 				setTransactionCode(transactionCodeWrap.o);
 		}
+		if(transactionCode != null)
+			transactionCode.initDeepForClass(siteRequest_);
 		transactionCodeWrap.alreadyInitialized(true);
 		return (CodeTransactionGenPage)this;
 	}
@@ -103,6 +109,7 @@ public abstract class CodeTransactionGenPageGen<DEV> extends ClusterPage {
 	protected boolean alreadyInitializedCodeTransactionGenPage = false;
 
 	public CodeTransactionGenPage initDeepCodeTransactionGenPage(SiteRequestEnUS siteRequest_) {
+		setSiteRequest_(siteRequest_);
 		if(!alreadyInitializedCodeTransactionGenPage) {
 			alreadyInitializedCodeTransactionGenPage = true;
 			initDeepCodeTransactionGenPage();
@@ -111,8 +118,8 @@ public abstract class CodeTransactionGenPageGen<DEV> extends ClusterPage {
 	}
 
 	public void initDeepCodeTransactionGenPage() {
-		super.initDeepClusterPage(siteRequest_);
 		initCodeTransactionGenPage();
+		super.initDeepClusterPage(siteRequest_);
 	}
 
 	public void initCodeTransactionGenPage() {
@@ -122,6 +129,22 @@ public abstract class CodeTransactionGenPageGen<DEV> extends ClusterPage {
 
 	@Override public void initDeepForClass(SiteRequestEnUS siteRequest_) {
 		initDeepCodeTransactionGenPage(siteRequest_);
+	}
+
+	/////////////////
+	// siteRequest //
+	/////////////////
+
+	public void siteRequestCodeTransactionGenPage(SiteRequestEnUS siteRequest_) {
+			super.siteRequestClusterPage(siteRequest_);
+		if(listTransactionCode != null)
+			listTransactionCode.setSiteRequest_(siteRequest_);
+		if(transactionCode != null)
+			transactionCode.setSiteRequest_(siteRequest_);
+	}
+
+	public void siteRequestForClass(SiteRequestEnUS siteRequest_) {
+		siteRequestCodeTransactionGenPage(siteRequest_);
 	}
 
 	/////////////
@@ -208,8 +231,9 @@ public abstract class CodeTransactionGenPageGen<DEV> extends ClusterPage {
 	// htmlScripts //
 	/////////////////
 
-	public void htmlScripts() {
+	@Override public void htmlScripts() {
 		htmlScriptsCodeTransactionGenPage();
+		super.htmlScripts();
 	}
 
 	public void htmlScriptsCodeTransactionGenPage() {
@@ -219,8 +243,9 @@ public abstract class CodeTransactionGenPageGen<DEV> extends ClusterPage {
 	// htmlScript //
 	////////////////
 
-	public void htmlScript() {
+	@Override public void htmlScript() {
 		htmlScriptCodeTransactionGenPage();
+		super.htmlScript();
 	}
 
 	public void htmlScriptCodeTransactionGenPage() {
@@ -230,11 +255,72 @@ public abstract class CodeTransactionGenPageGen<DEV> extends ClusterPage {
 	// htmlBody //
 	//////////////
 
-	public void htmlBody() {
+	@Override public void htmlBody() {
 		htmlBodyCodeTransactionGenPage();
+		super.htmlBody();
 	}
 
 	public void htmlBodyCodeTransactionGenPage() {
+	}
+
+	//////////
+	// html //
+	//////////
+
+	@Override public void html() {
+		htmlCodeTransactionGenPage();
+		super.html();
+	}
+
+	public void htmlCodeTransactionGenPage() {
+	}
+
+	//////////////
+	// htmlMeta //
+	//////////////
+
+	@Override public void htmlMeta() {
+		htmlMetaCodeTransactionGenPage();
+		super.htmlMeta();
+	}
+
+	public void htmlMetaCodeTransactionGenPage() {
+	}
+
+	////////////////
+	// htmlStyles //
+	////////////////
+
+	@Override public void htmlStyles() {
+		htmlStylesCodeTransactionGenPage();
+		super.htmlStyles();
+	}
+
+	public void htmlStylesCodeTransactionGenPage() {
+	}
+
+	///////////////
+	// htmlStyle //
+	///////////////
+
+	@Override public void htmlStyle() {
+		htmlStyleCodeTransactionGenPage();
+		super.htmlStyle();
+	}
+
+	public void htmlStyleCodeTransactionGenPage() {
+	}
+
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestCodeTransactionGenPage() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		CodeTransactionGenPage original = (CodeTransactionGenPage)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
+			super.patchRequestClusterPage();
+		}
 	}
 
 	//////////////

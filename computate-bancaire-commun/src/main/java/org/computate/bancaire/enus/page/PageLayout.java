@@ -6,18 +6,21 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.solr.common.SolrDocument;
+import org.computate.bancaire.enUS.html.part.HtmlPart;
 import org.computate.bancaire.enus.config.SiteConfig;
 import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.writer.AllWriter;
-import org.computate.bancaire.enus.page.PageLayout;
 import org.computate.bancaire.enus.page.part.PagePart;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import org.computate.bancaire.enus.user.SiteUser;
@@ -38,6 +41,8 @@ public class PageLayout extends PageLayoutGen<Object> {
 	public static DateTimeFormatter FORMATDateTimeDisplay = DateTimeFormatter.ofPattern("EEEE MMMM d yyyy h:mm a:ss.SSS", Locale.US);
 
 	public static DateTimeFormatter FORMATZonedDateTimeDisplay = DateTimeFormatter.ofPattern("EEEE MMMM d yyyy h:mm a:ss.SSS zz VV", Locale.US);
+
+	public static DateTimeFormatter FORMATTimeDisplay = DateTimeFormatter.ofPattern("h:mm a", Locale.US);
 
 	protected void _pageParts(List<PagePart> l) {
 	}
@@ -226,10 +231,13 @@ public class PageLayout extends PageLayoutGen<Object> {
 	public void  htmlScriptsPageLayout() {
 		e("script").a("src", staticBaseUrl, "/js/jquery-1.12.4.min.js").f().g("script");
 		e("script").a("src", staticBaseUrl, "/js/site-enUS.js").f().g("script");
-		e("script").a("src", staticBaseUrl, "/js/UtilisateurSiteFrFRPage.js").f().g("script");
+		e("script").a("src", staticBaseUrl, "/js/sockjs.js").f().g("script");
+		e("script").a("src", staticBaseUrl, "/js/vertx-eventbus.js").f().g("script");
+		e("script").a("src", staticBaseUrl, "/js/enUS/UtilisateurSitePage.js").f().g("script");
 		e("script").a("src", staticBaseUrl, "/js/moment.min.js").f().g("script");
 		e("script").a("src", staticBaseUrl, "/js/jqDatePicker.js").f().g("script");
 		e("script").a("src", staticBaseUrl, "/js/jquery.serialize-object.js").f().g("script");
+		e("script").a("src", staticBaseUrl, "/js/jSignature.min.js").f().g("script");
 		e("script").a("src", "https://kit.fontawesome.com/59d19567d5.js").f().g("script");
 	}
 
@@ -293,7 +301,7 @@ public class PageLayout extends PageLayoutGen<Object> {
 					e("div").a("class", "site-section-above ").f();
 						e("div").a("class", "w3-content w3-center w3-black ").f();
 							e("div").a("class", "").f();
-								menu();
+								menu("Menu1");
 							g("div"); 
 						g("div");
 						e("div").a("id", "site-section-primary").a("class", "site-section-primary w3-text-black w3-padding-bottom-32 ").f();
@@ -312,7 +320,7 @@ public class PageLayout extends PageLayoutGen<Object> {
 				g("div");
 				e("div").a("class", "w3-row site-section-contact ").f();
 					e("div").a("class", "w3-content w3-center  w3-cell-row w3-margin-bottom-32 ").f();
-						menu();
+						menu("Menu2");
 						e("div").a("class", "w3-container ").f();
 							e("div").a("class", "w3-container w3-text-black w3-margin-top ").f();
 								e("h6").a("id", "h2-contactez-nous").a("class",  "w3-xlarge ").f();
@@ -332,7 +340,7 @@ public class PageLayout extends PageLayoutGen<Object> {
 
 	}
 
-	public void  menu() {
+	public void  menu(String id) {
 		e("div").a("class", "w3-bar w3-text-white w3-padding-bottom-8 w3-padding-top-8 ").a("style", "padding-left: 16px; padding-right: 16px; ").f();
 			e("div").a("class", "site-bar-item w3-bar-item ").f();
 				e("a").a("class", "").a("href", pageHomeUri).f();
@@ -341,15 +349,7 @@ public class PageLayout extends PageLayoutGen<Object> {
 					g("span");
 				g("a");
 			g("div");
-			{ e("div").a("class", "w3-dropdown-hover ").f();
-				{ e("div").a("class", "w3-button w3-hover-yellow ").f();
-						e("i").a("class", "fad fa-school w3-padding-small ").f().g("i");
-						sx("Schools");
-				} g("div");
-				{ e("div").a("class", "w3-dropdown-content w3-card-4 w3-padding ").f();
-					htmlSuggestSchoolGenPage();
-				} g("div");
-			} g("div");
+
 			if(siteRequest_.getUserId() == null) {
 				e("div").a("class", "site-bar-item w3-bar-item ").f();
 					e("a").a("class", "w3-padding ").a("href", pageUserUri).f(); 
@@ -360,13 +360,44 @@ public class PageLayout extends PageLayoutGen<Object> {
 				g("div");
 			}
 			if(siteRequest_.getUserId() != null) {
-				e("div").a("class", "site-bar-item w3-bar-item ").f();
-					e("a").a("class", "w3-padding ").a("href", pageUserUri).f(); 
-						e("span").a("class", "site-menu-item").f();
+
+				{ e("div").a("class", "w3-dropdown-hover ").f();
+					{ e("div").a("class", "w3-button w3-hover-green ").f();
+							e("i").a("class", "far fa-user-cog w3-padding-small ").f().g("i");
 							sx(siteRequest_.getUserName());
-						g("span");
-					g("a");
-				g("div");
+					} g("div");
+					{ e("div").a("class", "w3-dropdown-content w3-card-4 w3-padding ").f();
+						SiteUser o = siteRequest_.getSiteUser();
+						{ e("div").a("class", "w3-cell-row ").f();
+							e("label").a("for", "Page_seeArchived").a("class", "").f().sx("see archived").g("label");
+							e("input")
+								.a("type", "checkbox")
+								.a("value", "true")
+								.a("class", "setSeeArchived")
+								.a("name", "setSeeArchived")
+								.a("id", "Page_seeArchived")
+								.a("onchange", "patchSiteUserVal([{ name: 'fq', value: 'pk:' + $('#SiteUserForm :input[name=\"pk\"]').val() }], 'setSeeArchived', $(this).prop('checked'), function() { addGlow($('#Page_seeArchived')); }, function() { addError($('#Page_seeArchived')); }); ")
+								;
+								if(o.getSeeArchived() != null && o.getSeeArchived())
+									a("checked", "checked");
+							fg();
+						} g("div");
+						{ e("div").a("class", "w3-cell-row ").f();
+							e("label").a("for", "Page_seeDeleted").a("class", "").f().sx("see deleted").g("label");
+							e("input")
+								.a("type", "checkbox")
+								.a("value", "true")
+								.a("class", "setSeeDeleted")
+								.a("name", "setSeeDeleted")
+								.a("id", "Page_seeDeleted")
+								.a("onchange", "patchSiteUserVal([{ name: 'fq', value: 'pk:' + $('#SiteUserForm :input[name=\"pk\"]').val() }], 'setSeeDeleted', $(this).prop('checked'), function() { addGlow($('#Page_seeDeleted')); }, function() { addError($('#Page_seeDeleted')); }); ")
+								;
+								if(o.getSeeDeleted() != null && o.getSeeDeleted())
+									a("checked", "checked");
+							fg();
+						} g("div");
+					} g("div");
+				} g("div");
 				e("div").a("class", "site-bar-item w3-bar-item ").f();
 					e("a").a("class", "w3-padding ").a("href", pageLogoutUri).f();
 						e("span").a("class", "site-menu-item").f();
@@ -376,56 +407,6 @@ public class PageLayout extends PageLayoutGen<Object> {
 				g("div");
 			}
 		g("div");
-	}
-
-	public void  htmlSuggestSchoolGenPage() {
-		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("href", "/school").a("class", "").f();
-					e("i").a("class", "fad fa-school w3-padding-small ").f().g("i");
-					sx("see all the schools");
-				} g("a");
-			} g("div");
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("id", "refreshSchoolGenPage").a("href", "/school").a("class", "").a("onclick", "patchSchoolVals([], {}, function() { addGlow($('#refreshSchoolGenPage')); }, function() { addError($('#refreshSchoolGenPage')); }); return false; ").f();
-					e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
-					sx("refresh all the schools");
-				} g("a");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("span").f();
-					sx("search schools: ");
-				} g("span");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("div").a("class", "w3-cell-row ").f();
-
-					e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
-					{ e("form").a("action", "").a("id", "suggestFormSchool").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "text")
-							.a("placeholder", "search schools")
-							.a("class", "suggestSchool w3-input w3-border w3-cell w3-cell-middle ")
-							.a("name", "suggestSchool")
-							.a("id", "suggestSchool")
-							.a("autocomplete", "off")
-							.a("oninput", "suggestSchoolObjectSuggest( [ { 'name': 'q', 'value': 'objectSuggest:' + $(this).val() } ], $('#suggestListSchool')); ")
-							.fg();
-
-					} g("form");
-				} g("div");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-				{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "suggestListSchool").f();
-				} g("ul");
-			} g("div");
-		} g("div");
 	}
 
 	public void  partagerPage() {
@@ -708,5 +689,209 @@ public class PageLayout extends PageLayoutGen<Object> {
 				} g("form");
 			} g("div");
 		} g("div");
+	}
+
+	public Integer htmlPageLayout2(List<HtmlPart> htmlPartList, HtmlPart htmlPartParent, Integer start, Integer size) {
+
+		Integer i;
+
+		Double parentSort1 = null;
+		Double parentSort2 = null;
+		Double parentSort3 = null;
+		Double parentSort4 = null;
+		Double parentSort5 = null;
+		Double parentSort6 = null;
+		Double parentSort7 = null;
+		Double parentSort8 = null;
+		Double parentSort9 = null;
+		Double parentSort10 = null;
+
+		if(htmlPartParent != null) {
+			parentSort1 = htmlPartParent.getSort1();
+			parentSort2 = htmlPartParent.getSort2();
+			parentSort3 = htmlPartParent.getSort3();
+			parentSort4 = htmlPartParent.getSort4();
+			parentSort5 = htmlPartParent.getSort5();
+			parentSort6 = htmlPartParent.getSort6();
+			parentSort7 = htmlPartParent.getSort7();
+			parentSort8 = htmlPartParent.getSort8();
+			parentSort9 = htmlPartParent.getSort9();
+			parentSort10 = htmlPartParent.getSort10();
+		}
+
+		for(i = Math.abs(start); i < size; i++) {
+			HtmlPart htmlPart = htmlPartList.get(i);
+
+			Double sort1 = htmlPart.getSort1();
+			Double sort2 = htmlPart.getSort2();
+			Double sort3 = htmlPart.getSort3();
+			Double sort4 = htmlPart.getSort4();
+			Double sort5 = htmlPart.getSort5();
+			Double sort6 = htmlPart.getSort6();
+			Double sort7 = htmlPart.getSort7();
+			Double sort8 = htmlPart.getSort8();
+			Double sort9 = htmlPart.getSort9();
+			Double sort10 = htmlPart.getSort10();
+
+			if(htmlPartParent != null) {
+				if(parentSort2 != null && (sort1 == null || parentSort1.compareTo(sort1) != 0))
+					return i;
+				if(parentSort3 != null && (sort2 == null || parentSort2.compareTo(sort2) != 0))
+					return i;
+				if(parentSort4 != null && (sort3 == null || parentSort3.compareTo(sort3) != 0))
+					return i;
+				if(parentSort5 != null && (sort4 == null || parentSort4.compareTo(sort4) != 0))
+					return i;
+				if(parentSort6 != null && (sort5 == null || parentSort5.compareTo(sort5) != 0))
+					return i;
+				if(parentSort7 != null && (sort6 == null || parentSort6.compareTo(sort6) != 0))
+					return i;
+				if(parentSort8 != null && (sort7 == null || parentSort7.compareTo(sort7) != 0))
+					return i;
+				if(parentSort9 != null && (sort8 == null || parentSort8.compareTo(sort8) != 0))
+					return i;
+				if(parentSort10 != null && (sort9 == null || parentSort9.compareTo(sort9) != 0))
+					return i;
+			}
+
+			if(start >= 0) {
+	
+				String htmlVar = htmlPart.getHtmlVar();
+				String htmlVarSpan = htmlPart.getHtmlVarSpan();
+				String htmlVarInput = htmlPart.getHtmlVarInput();
+				String htmlVarForm = htmlPart.getHtmlVarForm();
+				String htmlVarForEach = htmlPart.getHtmlVarForEach();
+				Boolean pdfExclude = htmlPart.getPdfExclude();
+				Boolean htmlExclude = htmlPart.getHtmlExclude();
+
+				if(htmlVarSpan != null)
+					htmlVar = htmlVarSpan;
+	
+				if(
+						"application/pdf".equals(pageContentType) && BooleanUtils.isNotTrue(pdfExclude)
+						|| !"application/pdf".equals(pageContentType) && BooleanUtils.isNotTrue(htmlExclude)
+						) {
+					s(htmlPart.getHtmlBefore());
+					if(htmlVar != null) {
+	
+						Object parent = StringUtils.contains(htmlVar, ".") ? obtainForClass(StringUtils.substringBeforeLast(htmlVar, ".")) : null;
+						if(parent == null)
+							parent = this;
+						String var = StringUtils.substringAfterLast(htmlVar, ".");
+						if(StringUtils.isBlank(var))
+							var = htmlVar;
+	
+						if(htmlVarForEach != null) {
+		
+							Object parentForEach = StringUtils.contains(htmlVarForEach, ".") ? obtainForClass(StringUtils.substringBeforeLast(htmlVarForEach, ".")) : null;
+							if(parentForEach == null)
+								parentForEach = this;
+							String varForEach = StringUtils.substringAfterLast(htmlVarForEach, ".");
+							if(StringUtils.isBlank(varForEach))
+								varForEach = htmlVarForEach;
+		
+							try {
+								Collection<?> collection = (Collection<?>)MethodUtils.invokeMethod(parentForEach, "get" + StringUtils.capitalize(varForEach), new Object[] {});
+								List<?> list = collection.stream().collect(Collectors.toList());
+								Integer forStart = i + 1;
+		
+								for(Object o : list) {
+									try {
+										MethodUtils.invokeExactMethod(parent, "set" + StringUtils.capitalize(var), o);
+										i = htmlPageLayout2(htmlPartList, htmlPart, forStart, size);
+									} catch (Exception e) {
+										throw new RuntimeException(String.format("Could not call method %s of var %s and object: %s", "set" + StringUtils.capitalize(var), htmlVar, parent), e);
+									}
+								}
+								if(list.size() == 0) {
+									i = htmlPageLayout2(htmlPartList, htmlPart, -forStart, size);
+								}
+								i = i - 1;
+							} catch (RuntimeException e) {
+								throw e;
+							} catch (Exception e) {
+								throw new RuntimeException(String.format("Could not call method %s of object: %s", "get" + StringUtils.capitalize(varForEach), parentForEach), e);
+							}
+						}
+						else {
+							try {
+								String s = (String)MethodUtils.invokeExactMethod(parent, "str" + StringUtils.capitalize(var));
+								if(htmlVarSpan != null) {
+									Long pk = (Long)MethodUtils.invokeExactMethod(parent, "getPk");
+									e("span").a("class", "var", parent.getClass().getSimpleName(), pk, StringUtils.capitalize(var), " ").f().s(s).g("span");
+								}
+								else {
+									s(s);
+								}
+							} catch (Exception e) {
+								s(obtainForClass(htmlVar));
+							}
+						}
+					}
+					if(htmlVarForm != null) {
+						Object parent = StringUtils.contains(htmlVarForm, ".") ? obtainForClass(StringUtils.substringBeforeLast(htmlVarForm, ".")) : null;
+						if(parent == null)
+							parent = this;
+						String var = StringUtils.substringAfterLast(htmlVarForm, ".");
+						if(StringUtils.isBlank(var))
+							var = htmlVarForm;
+	
+	//					Object o = obtainForClass(StringUtils.substringBeforeLast(htmlVarForm, "."));
+	//					String var = StringUtils.substringAfterLast(htmlVarForm, ".");
+						try {
+							MethodUtils.invokeExactMethod(parent, "htm" + StringUtils.capitalize(var), "Page");
+						} catch (RuntimeException e) {
+							throw e;
+						} catch (Exception e) {
+							throw new RuntimeException(String.format("Could not call method %s of var %s and object: %s", "htm" + StringUtils.capitalize(var), htmlVarInput, parent), e);
+						}
+					}
+					if(htmlVarInput != null) {
+						Object parent = StringUtils.contains(htmlVarInput, ".") ? obtainForClass(StringUtils.substringBeforeLast(htmlVarInput, ".")) : null;
+						if(parent == null)
+							parent = this;
+						String var = StringUtils.substringAfterLast(htmlVarInput, ".");
+						if(StringUtils.isBlank(var))
+							var = htmlVarInput;
+	
+						try {
+	//					Object o = obtainForClass(StringUtils.substringBeforeLast(htmlVarInput, "."));
+	//					String var = StringUtils.substringAfterLast(htmlVarInput, ".");
+							if("application/pdf".equals(pageContentType)) {
+								Object o = obtainForClass(htmlVarInput);
+								if(o instanceof Boolean) {
+									e("img").a("class", "").a("style", "width: 1em; height: 1em; position: relative; top: 3px; ").a("src", siteRequest_.getSiteConfig_().getStaticBaseUrl(), ((Boolean)o) ? "/png/check-square-o.png" : "/png/square-o.png").fg();
+								}
+								else if (o instanceof String && o.toString().startsWith("data:image")) {
+									e("img").a("class", "").a("style", "").a("src", o.toString()).fg();
+								}
+								else {
+									e("span").a("style", "border-bottom: 1px solid black; display: block; ").f();
+									String s = (String)MethodUtils.invokeExactMethod(parent, "str" + StringUtils.capitalize(var));
+									s(s);
+									g("span");
+								}
+							}
+							else {
+								try {
+									MethodUtils.invokeExactMethod(parent, "input" + StringUtils.capitalize(var), "Page");
+								} catch (RuntimeException e) {
+									throw e;
+								} catch (Exception e) {
+									throw new RuntimeException(String.format("Could not call method %s of var %s and object: %s", "input" + StringUtils.capitalize(var), htmlVarInput, parent), e);
+								}
+							}
+						} catch (RuntimeException e) {
+							throw e;
+						} catch (Exception e) {
+							throw new RuntimeException(String.format("Could not call method %s of var %s and object: %s", "htm" + StringUtils.capitalize(var), htmlVarInput, parent), e);
+						}
+					}
+					s(htmlPart.getHtmlAfter());
+				}
+			}
+		}
+
+		return i;
 	}
 }

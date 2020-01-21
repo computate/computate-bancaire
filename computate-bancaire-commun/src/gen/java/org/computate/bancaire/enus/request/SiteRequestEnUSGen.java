@@ -1,5 +1,6 @@
 package org.computate.bancaire.enus.request;
 
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 import org.apache.solr.common.SolrDocumentList;
 import java.security.MessageDigest;
 import javax.crypto.spec.SecretKeySpec;
@@ -16,6 +17,7 @@ import java.lang.Boolean;
 import io.vertx.core.json.JsonObject;
 import org.computate.bancaire.enus.writer.AllWriter;
 import java.lang.String;
+import io.vertx.core.http.CaseInsensitiveHeaders;
 import org.computate.bancaire.enus.user.SiteUser;
 import org.computate.bancaire.enus.cluster.Cluster;
 import java.math.MathContext;
@@ -31,6 +33,7 @@ import io.vertx.ext.web.api.OperationRequest;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.commons.lang3.math.NumberUtils;
 import io.vertx.ext.sql.SQLConnection;
+import java.util.Optional;
 import java.lang.Object;
 import org.computate.bancaire.enus.config.SiteConfig;
 
@@ -152,6 +155,43 @@ The site configuration.
 				setSiteRequest_(siteRequest_Wrap.o);
 		}
 		siteRequest_Wrap.alreadyInitialized(true);
+		return (SiteRequestEnUS)this;
+	}
+
+	///////////////////
+	// patchRequest_ //
+	///////////////////
+
+	/**	L'entité « patchRequest_ »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected PatchRequest patchRequest_;
+	@JsonIgnore
+	public Wrap<PatchRequest> patchRequest_Wrap = new Wrap<PatchRequest>().p(this).c(PatchRequest.class).var("patchRequest_").o(patchRequest_);
+
+	/**	<br/>L'entité « patchRequest_ »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.request.SiteRequestEnUS&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_enUS_indexed_string:patchRequest_">Trouver l'entité patchRequest_ dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _patchRequest_(Wrap<PatchRequest> c);
+
+	public PatchRequest getPatchRequest_() {
+		return patchRequest_;
+	}
+
+	public void setPatchRequest_(PatchRequest patchRequest_) {
+		this.patchRequest_ = patchRequest_;
+		this.patchRequest_Wrap.alreadyInitialized = true;
+	}
+	protected SiteRequestEnUS patchRequest_Init() {
+		if(!patchRequest_Wrap.alreadyInitialized) {
+			_patchRequest_(patchRequest_Wrap);
+			if(patchRequest_ == null)
+				setPatchRequest_(patchRequest_Wrap.o);
+		}
+		patchRequest_Wrap.alreadyInitialized(true);
 		return (SiteRequestEnUS)this;
 	}
 
@@ -551,6 +591,67 @@ The site configuration.
 		return userId == null ? "" : StringEscapeUtils.escapeHtml4(strUserId());
 	}
 
+	///////////////
+	// sessionId //
+	///////////////
+
+	/**	L'entité « sessionId »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected String sessionId;
+	@JsonIgnore
+	public Wrap<String> sessionIdWrap = new Wrap<String>().p(this).c(String.class).var("sessionId").o(sessionId);
+
+	/**	<br/>L'entité « sessionId »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.request.SiteRequestEnUS&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_enUS_indexed_string:sessionId">Trouver l'entité sessionId dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _sessionId(Wrap<String> c);
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+		this.sessionIdWrap.alreadyInitialized = true;
+	}
+	protected SiteRequestEnUS sessionIdInit() {
+		if(!sessionIdWrap.alreadyInitialized) {
+			_sessionId(sessionIdWrap);
+			if(sessionId == null)
+				setSessionId(sessionIdWrap.o);
+		}
+		sessionIdWrap.alreadyInitialized(true);
+		return (SiteRequestEnUS)this;
+	}
+
+	public String solrSessionId() {
+		return sessionId;
+	}
+
+	public String strSessionId() {
+		return sessionId == null ? "" : sessionId;
+	}
+
+	public String jsonSessionId() {
+		return sessionId == null ? "" : sessionId;
+	}
+
+	public String nomAffichageSessionId() {
+		return null;
+	}
+
+	public String htmTooltipSessionId() {
+		return null;
+	}
+
+	public String htmSessionId() {
+		return sessionId == null ? "" : StringEscapeUtils.escapeHtml4(strSessionId());
+	}
+
 	//////////////
 	// userName //
 	//////////////
@@ -910,6 +1011,84 @@ The site configuration.
 		return (SiteRequestEnUS)this;
 	}
 
+	///////////////////////
+	// userResourceRoles //
+	///////////////////////
+
+	/**	L'entité « userResourceRoles »
+	 *	Il est construit avant d'être initialisé avec le constructeur par défaut List<String>(). 
+	 */
+	protected List<String> userResourceRoles = new java.util.ArrayList<java.lang.String>();
+	@JsonIgnore
+	public Wrap<List<String>> userResourceRolesWrap = new Wrap<List<String>>().p(this).c(List.class).var("userResourceRoles").o(userResourceRoles);
+
+	/**	<br/>L'entité « userResourceRoles »
+	 * Il est construit avant d'être initialisé avec le constructeur par défaut List<String>(). 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.request.SiteRequestEnUS&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_enUS_indexed_string:userResourceRoles">Trouver l'entité userResourceRoles dans Solr</a>
+	 * <br/>
+	 * @param userResourceRoles est l'entité déjà construit. 
+	 **/
+	protected abstract void _userResourceRoles(List<String> o);
+
+	public List<String> getUserResourceRoles() {
+		return userResourceRoles;
+	}
+
+	public void setUserResourceRoles(List<String> userResourceRoles) {
+		this.userResourceRoles = userResourceRoles;
+		this.userResourceRolesWrap.alreadyInitialized = true;
+	}
+	public SiteRequestEnUS addUserResourceRoles(String...objets) {
+		for(String o : objets) {
+			addUserResourceRoles(o);
+		}
+		return (SiteRequestEnUS)this;
+	}
+	public SiteRequestEnUS addUserResourceRoles(String o) {
+		if(o != null && !userResourceRoles.contains(o))
+			this.userResourceRoles.add(o);
+		return (SiteRequestEnUS)this;
+	}
+	public SiteRequestEnUS setUserResourceRoles(JsonArray objets) {
+		userResourceRoles.clear();
+		for(int i = 0; i < objets.size(); i++) {
+			String o = objets.getString(i);
+			addUserResourceRoles(o);
+		}
+		return (SiteRequestEnUS)this;
+	}
+	protected SiteRequestEnUS userResourceRolesInit() {
+		if(!userResourceRolesWrap.alreadyInitialized) {
+			_userResourceRoles(userResourceRoles);
+		}
+		userResourceRolesWrap.alreadyInitialized(true);
+		return (SiteRequestEnUS)this;
+	}
+
+	public List<String> solrUserResourceRoles() {
+		return userResourceRoles;
+	}
+
+	public String strUserResourceRoles() {
+		return userResourceRoles == null ? "" : userResourceRoles.toString();
+	}
+
+	public String jsonUserResourceRoles() {
+		return userResourceRoles == null ? "" : userResourceRoles.toString();
+	}
+
+	public String nomAffichageUserResourceRoles() {
+		return null;
+	}
+
+	public String htmTooltipUserResourceRoles() {
+		return null;
+	}
+
+	public String htmUserResourceRoles() {
+		return userResourceRoles == null ? "" : StringEscapeUtils.escapeHtml4(strUserResourceRoles());
+	}
+
 	//////////////
 	// siteUser //
 	//////////////
@@ -1188,6 +1367,43 @@ The site configuration.
 				setSqlConnection(sqlConnectionWrap.o);
 		}
 		sqlConnectionWrap.alreadyInitialized(true);
+		return (SiteRequestEnUS)this;
+	}
+
+	////////////////////
+	// requestHeaders //
+	////////////////////
+
+	/**	L'entité « requestHeaders »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected CaseInsensitiveHeaders requestHeaders;
+	@JsonIgnore
+	public Wrap<CaseInsensitiveHeaders> requestHeadersWrap = new Wrap<CaseInsensitiveHeaders>().p(this).c(CaseInsensitiveHeaders.class).var("requestHeaders").o(requestHeaders);
+
+	/**	<br/>L'entité « requestHeaders »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.request.SiteRequestEnUS&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_enUS_indexed_string:requestHeaders">Trouver l'entité requestHeaders dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _requestHeaders(Wrap<CaseInsensitiveHeaders> c);
+
+	public CaseInsensitiveHeaders getRequestHeaders() {
+		return requestHeaders;
+	}
+
+	public void setRequestHeaders(CaseInsensitiveHeaders requestHeaders) {
+		this.requestHeaders = requestHeaders;
+		this.requestHeadersWrap.alreadyInitialized = true;
+	}
+	protected SiteRequestEnUS requestHeadersInit() {
+		if(!requestHeadersWrap.alreadyInitialized) {
+			_requestHeaders(requestHeadersWrap);
+			if(requestHeaders == null)
+				setRequestHeaders(requestHeadersWrap.o);
+		}
+		requestHeadersWrap.alreadyInitialized(true);
 		return (SiteRequestEnUS)this;
 	}
 
@@ -1495,6 +1711,7 @@ The site configuration.
 		siteContext_Init();
 		siteConfig_Init();
 		siteRequest_Init();
+		patchRequest_Init();
 		vertxInit();
 		jsonObjectInit();
 		solrQueryInit();
@@ -1505,18 +1722,21 @@ The site configuration.
 		userVertxInit();
 		jsonPrincipalInit();
 		userIdInit();
+		sessionIdInit();
 		userNameInit();
 		userLastNameInit();
 		userFirstNameInit();
 		userFullNameInit();
 		userRealmRolesInit();
 		userResourceInit();
+		userResourceRolesInit();
 		siteUserInit();
 		xmlStackInit();
 		solrDocumentInit();
 		pageAdminInit();
 		requestPkInit();
 		sqlConnectionInit();
+		requestHeadersInit();
 		encryptionPasswordInit();
 		encryptionCipherInit();
 		decryptionCipherInit();
@@ -1571,6 +1791,8 @@ The site configuration.
 				return oSiteRequestEnUS.siteConfig_;
 			case "siteRequest_":
 				return oSiteRequestEnUS.siteRequest_;
+			case "patchRequest_":
+				return oSiteRequestEnUS.patchRequest_;
 			case "vertx":
 				return oSiteRequestEnUS.vertx;
 			case "jsonObject":
@@ -1591,6 +1813,8 @@ The site configuration.
 				return oSiteRequestEnUS.jsonPrincipal;
 			case "userId":
 				return oSiteRequestEnUS.userId;
+			case "sessionId":
+				return oSiteRequestEnUS.sessionId;
 			case "userName":
 				return oSiteRequestEnUS.userName;
 			case "userLastName":
@@ -1603,6 +1827,8 @@ The site configuration.
 				return oSiteRequestEnUS.userRealmRoles;
 			case "userResource":
 				return oSiteRequestEnUS.userResource;
+			case "userResourceRoles":
+				return oSiteRequestEnUS.userResourceRoles;
 			case "siteUser":
 				return oSiteRequestEnUS.siteUser;
 			case "xmlStack":
@@ -1615,6 +1841,8 @@ The site configuration.
 				return oSiteRequestEnUS.requestPk;
 			case "sqlConnection":
 				return oSiteRequestEnUS.sqlConnection;
+			case "requestHeaders":
+				return oSiteRequestEnUS.requestHeaders;
 			case "encryptionPassword":
 				return oSiteRequestEnUS.encryptionPassword;
 			case "encryptionCipher":
@@ -1682,6 +1910,17 @@ The site configuration.
 		switch(var) {
 			default:
 				return null;
+		}
+	}
+
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestSiteRequestEnUS() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		SiteRequestEnUS original = (SiteRequestEnUS)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
 		}
 	}
 

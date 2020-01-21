@@ -1,7 +1,7 @@
 
 // PATCH //
 
-function patchUtilisateurSite($formulaireFiltres, $formulaireValeurs, success, error) {
+async function patchUtilisateurSite($formulaireFiltres, $formulaireValeurs, success, error) {
 	var filtres = patchUtilisateurSiteFiltres($formulaireFiltres);
 
 	var vals = {};
@@ -39,16 +39,49 @@ function patchUtilisateurSite($formulaireFiltres, $formulaireValeurs, success, e
 	if(removeModifie != null && removeModifie !== '')
 		vals['removeModifie'] = removeModifie;
 
-	var removeUtilisateurId = $formulaireFiltres.find('.removeUtilisateurId').val() === 'true';
-	var setUtilisateurId = removeUtilisateurId ? null : $formulaireValeurs.find('.setUtilisateurId').val();
-	if(removeUtilisateurId || setUtilisateurId != null && setUtilisateurId !== '')
-		vals['setUtilisateurId'] = setUtilisateurId;
-	var addUtilisateurId = $formulaireValeurs.find('.addUtilisateurId').val();
-	if(addUtilisateurId != null && addUtilisateurId !== '')
-		vals['addUtilisateurId'] = addUtilisateurId;
-	var removeUtilisateurId = $formulaireValeurs.find('.removeUtilisateurId').val();
-	if(removeUtilisateurId != null && removeUtilisateurId !== '')
-		vals['removeUtilisateurId'] = removeUtilisateurId;
+	var removeObjetId = $formulaireFiltres.find('.removeObjetId').val() === 'true';
+	var setObjetId = removeObjetId ? null : $formulaireValeurs.find('.setObjetId').val();
+	if(removeObjetId || setObjetId != null && setObjetId !== '')
+		vals['setObjetId'] = setObjetId;
+	var addObjetId = $formulaireValeurs.find('.addObjetId').val();
+	if(addObjetId != null && addObjetId !== '')
+		vals['addObjetId'] = addObjetId;
+	var removeObjetId = $formulaireValeurs.find('.removeObjetId').val();
+	if(removeObjetId != null && removeObjetId !== '')
+		vals['removeObjetId'] = removeObjetId;
+
+	var removeArchive = $formulaireFiltres.find('.removeArchive').val() === 'true';
+	var setArchive = removeArchive ? null : $formulaireValeurs.find('.setArchive').prop('checked');
+	if(removeArchive || setArchive != null && setArchive !== '')
+		vals['setArchive'] = setArchive;
+	var addArchive = $formulaireValeurs.find('.addArchive').prop('checked');
+	if(addArchive != null && addArchive !== '')
+		vals['addArchive'] = addArchive;
+	var removeArchive = $formulaireValeurs.find('.removeArchive').prop('checked');
+	if(removeArchive != null && removeArchive !== '')
+		vals['removeArchive'] = removeArchive;
+
+	var removeSupprime = $formulaireFiltres.find('.removeSupprime').val() === 'true';
+	var setSupprime = removeSupprime ? null : $formulaireValeurs.find('.setSupprime').prop('checked');
+	if(removeSupprime || setSupprime != null && setSupprime !== '')
+		vals['setSupprime'] = setSupprime;
+	var addSupprime = $formulaireValeurs.find('.addSupprime').prop('checked');
+	if(addSupprime != null && addSupprime !== '')
+		vals['addSupprime'] = addSupprime;
+	var removeSupprime = $formulaireValeurs.find('.removeSupprime').prop('checked');
+	if(removeSupprime != null && removeSupprime !== '')
+		vals['removeSupprime'] = removeSupprime;
+
+	var removeUtilisateurRecevoirCourriels = $formulaireFiltres.find('.removeUtilisateurRecevoirCourriels').val() === 'true';
+	var setUtilisateurRecevoirCourriels = removeUtilisateurRecevoirCourriels ? null : $formulaireValeurs.find('.setUtilisateurRecevoirCourriels').prop('checked');
+	if(removeUtilisateurRecevoirCourriels || setUtilisateurRecevoirCourriels != null && setUtilisateurRecevoirCourriels !== '')
+		vals['setUtilisateurRecevoirCourriels'] = setUtilisateurRecevoirCourriels;
+	var addUtilisateurRecevoirCourriels = $formulaireValeurs.find('.addUtilisateurRecevoirCourriels').prop('checked');
+	if(addUtilisateurRecevoirCourriels != null && addUtilisateurRecevoirCourriels !== '')
+		vals['addUtilisateurRecevoirCourriels'] = addUtilisateurRecevoirCourriels;
+	var removeUtilisateurRecevoirCourriels = $formulaireValeurs.find('.removeUtilisateurRecevoirCourriels').prop('checked');
+	if(removeUtilisateurRecevoirCourriels != null && removeUtilisateurRecevoirCourriels !== '')
+		vals['removeUtilisateurRecevoirCourriels'] = removeUtilisateurRecevoirCourriels;
 
 	var removeVoirArchive = $formulaireFiltres.find('.removeVoirArchive').val() === 'true';
 	var setVoirArchive = removeVoirArchive ? null : $formulaireValeurs.find('.setVoirArchive').prop('checked');
@@ -90,9 +123,21 @@ function patchUtilisateurSiteFiltres($formulaireFiltres) {
 	if(filtreModifie != null && filtreModifie !== '')
 		filtres.push({ name: 'fq', value: 'modifie:' + filtreModifie });
 
-	var filtreUtilisateurId = $formulaireFiltres.find('.valeurUtilisateurId').val();
-	if(filtreUtilisateurId != null && filtreUtilisateurId !== '')
-		filtres.push({ name: 'fq', value: 'utilisateurId:' + filtreUtilisateurId });
+	var filtreObjetId = $formulaireFiltres.find('.valeurObjetId').val();
+	if(filtreObjetId != null && filtreObjetId !== '')
+		filtres.push({ name: 'fq', value: 'objetId:' + filtreObjetId });
+
+	var filtreArchive = $formulaireFiltres.find('.valeurArchive').prop('checked');
+	if(filtreArchive != null && filtreArchive === true)
+		filtres.push({ name: 'fq', value: 'archive:' + filtreArchive });
+
+	var filtreSupprime = $formulaireFiltres.find('.valeurSupprime').prop('checked');
+	if(filtreSupprime != null && filtreSupprime === true)
+		filtres.push({ name: 'fq', value: 'supprime:' + filtreSupprime });
+
+	var filtreUtilisateurRecevoirCourriels = $formulaireFiltres.find('.valeurUtilisateurRecevoirCourriels').prop('checked');
+	if(filtreUtilisateurRecevoirCourriels != null && filtreUtilisateurRecevoirCourriels === true)
+		filtres.push({ name: 'fq', value: 'utilisateurRecevoirCourriels:' + filtreUtilisateurRecevoirCourriels });
 
 	var filtreVoirArchive = $formulaireFiltres.find('.valeurVoirArchive').prop('checked');
 	if(filtreVoirArchive != null && filtreVoirArchive === true)
@@ -106,14 +151,6 @@ function patchUtilisateurSiteFiltres($formulaireFiltres) {
 	if(filtreId != null && filtreId !== '')
 		filtres.push({ name: 'fq', value: 'id:' + filtreId });
 
-	var filtreArchive = $formulaireFiltres.find('.valeurArchive').prop('checked');
-	if(filtreArchive != null && filtreArchive === true)
-		filtres.push({ name: 'fq', value: 'archive:' + filtreArchive });
-
-	var filtreSupprime = $formulaireFiltres.find('.valeurSupprime').prop('checked');
-	if(filtreSupprime != null && filtreSupprime === true)
-		filtres.push({ name: 'fq', value: 'supprime:' + filtreSupprime });
-
 	var filtreClasseNomCanonique = $formulaireFiltres.find('.valeurClasseNomCanonique').val();
 	if(filtreClasseNomCanonique != null && filtreClasseNomCanonique !== '')
 		filtres.push({ name: 'fq', value: 'classeNomCanonique:' + filtreClasseNomCanonique });
@@ -125,6 +162,18 @@ function patchUtilisateurSiteFiltres($formulaireFiltres) {
 	var filtreClasseNomsCanoniques = $formulaireFiltres.find('.valeurClasseNomsCanoniques').val();
 	if(filtreClasseNomsCanoniques != null && filtreClasseNomsCanoniques !== '')
 		filtres.push({ name: 'fq', value: 'classeNomsCanoniques:' + filtreClasseNomsCanoniques });
+
+	var filtreObjetTitre = $formulaireFiltres.find('.valeurObjetTitre').val();
+	if(filtreObjetTitre != null && filtreObjetTitre !== '')
+		filtres.push({ name: 'fq', value: 'objetTitre:' + filtreObjetTitre });
+
+	var filtreObjetSuggere = $formulaireFiltres.find('.valeurObjetSuggere').val();
+	if(filtreObjetSuggere != null && filtreObjetSuggere !== '')
+		filtres.push({ name: 'q', value: 'objetSuggere:' + filtreObjetSuggere });
+
+	var filtrePageUrl = $formulaireFiltres.find('.valeurPageUrl').val();
+	if(filtrePageUrl != null && filtrePageUrl !== '')
+		filtres.push({ name: 'fq', value: 'pageUrl:' + filtrePageUrl });
 
 	var filtreUtilisateurNom = $formulaireFiltres.find('.valeurUtilisateurNom').val();
 	if(filtreUtilisateurNom != null && filtreUtilisateurNom !== '')
@@ -149,10 +198,6 @@ function patchUtilisateurSiteFiltres($formulaireFiltres) {
 	var filtreUtilisateurSite = $formulaireFiltres.find('.valeurUtilisateurSite').val();
 	if(filtreUtilisateurSite != null && filtreUtilisateurSite !== '')
 		filtres.push({ name: 'fq', value: 'utilisateurSite:' + filtreUtilisateurSite });
-
-	var filtreUtilisateurRecevoirCourriels = $formulaireFiltres.find('.valeurUtilisateurRecevoirCourriels').prop('checked');
-	if(filtreUtilisateurRecevoirCourriels != null && filtreUtilisateurRecevoirCourriels === true)
-		filtres.push({ name: 'fq', value: 'utilisateurRecevoirCourriels:' + filtreUtilisateurRecevoirCourriels });
 	return filtres;
 }
 
@@ -172,4 +217,98 @@ function patchUtilisateurSiteVals(filtres, vals, success, error) {
 		, success: success
 		, error: error
 	});
+}
+
+async function websocketUtilisateurSite(success) {
+	window.eventBus.onopen = function () {
+
+		window.eventBus.registerHandler('websocketUtilisateurSite', function (error, message) {
+			var json = JSON.parse(message['body']);
+			var id = json['id'];
+			var pk = json['pk'];
+			var pks = json['pks'];
+			var empty = json['empty'];
+			if(!empty) {
+				var numFound = json['numFound'];
+				var numPATCH = json['numPATCH'];
+				var percent = Math.floor( numPATCH / numFound * 100 ) + '%';
+				var $box = $('<div>').attr('class', 'w3-display-topright w3-quarter box-' + id + ' ').attr('id', 'box-' + id);
+				var $margin = $('<div>').attr('class', 'w3-margin ').attr('id', 'margin-' + id);
+				var $card = $('<div>').attr('class', 'w3-card ').attr('id', 'card-' + id);
+				var $header = $('<div>').attr('class', 'w3-container fa-gray ').attr('id', 'header-' + id);
+				var $i = $('<i>').attr('class', 'far fa-user-cog w3-margin-right ').attr('id', 'icon-' + id);
+				var $headerSpan = $('<span>').attr('class', '').text('modifier utilisateurs du site');
+				var $x = $('<span>').attr('class', 'w3-button w3-display-topright ').attr('onclick', '$("#card-' + id + '").hide(); ').attr('id', 'x-' + id);
+				var $body = $('<div>').attr('class', 'w3-container w3-padding ').attr('id', 'text-' + id);
+				var $bar = $('<div>').attr('class', 'w3-light-gray ').attr('id', 'bar-' + id);
+				var $progress = $('<div>').attr('class', 'w3-gray ').attr('style', 'height: 24px; width: ' + percent + '; ').attr('id', 'progress-' + id).text(numPATCH + '/' + numFound);
+				$card.append($header);
+				$header.append($i);
+				$header.append($headerSpan);
+				$header.append($x);
+				$body.append($bar);
+				$bar.append($progress);
+				$card.append($body);
+				$box.append($margin);
+				$margin.append($card);
+				$('.box-' + id).remove();
+				if(numPATCH < numFound)
+				$('.w3-content').append($box);
+				if(success)
+					success(json);
+			}
+		});
+	}
+}
+async function websocketUtilisateurSiteInner(requetePatch) {
+	var pk = requetePatch['pk'];
+	var pks = requetePatch['pks'];
+	var classes = requetePatch['classes'];
+	var vars = requetePatch['vars'];
+	var empty = requetePatch['empty'];
+
+	if(pk != null) {
+		rechercherUtilisateurSiteVals([ {name: 'fq', value: 'pk:' + pk} ], function( data, textStatus, jQxhr ) {
+			var o = data['list'][0];
+			if(vars.includes('cree')) {
+				$('.inputUtilisateurSite' + pk + 'Cree').val(o['cree']);
+				$('.varUtilisateurSite' + pk + 'Cree').text(o['cree']);
+			}
+			if(vars.includes('modifie')) {
+				$('.inputUtilisateurSite' + pk + 'Modifie').val(o['modifie']);
+				$('.varUtilisateurSite' + pk + 'Modifie').text(o['modifie']);
+			}
+			if(vars.includes('archive')) {
+				$('.inputUtilisateurSite' + pk + 'Archive').val(o['archive']);
+				$('.varUtilisateurSite' + pk + 'Archive').text(o['archive']);
+			}
+			if(vars.includes('supprime')) {
+				$('.inputUtilisateurSite' + pk + 'Supprime').val(o['supprime']);
+				$('.varUtilisateurSite' + pk + 'Supprime').text(o['supprime']);
+			}
+			if(vars.includes('utilisateurRecevoirCourriels')) {
+				$('.inputUtilisateurSite' + pk + 'UtilisateurRecevoirCourriels').val(o['utilisateurRecevoirCourriels']);
+				$('.varUtilisateurSite' + pk + 'UtilisateurRecevoirCourriels').text(o['utilisateurRecevoirCourriels']);
+			}
+			if(vars.includes('voirArchive')) {
+				$('.inputUtilisateurSite' + pk + 'VoirArchive').val(o['voirArchive']);
+				$('.varUtilisateurSite' + pk + 'VoirArchive').text(o['voirArchive']);
+			}
+			if(vars.includes('voirSupprime')) {
+				$('.inputUtilisateurSite' + pk + 'VoirSupprime').val(o['voirSupprime']);
+				$('.varUtilisateurSite' + pk + 'VoirSupprime').text(o['voirSupprime']);
+			}
+		});
+	}
+
+	if(!empty) {
+		if(pks) {
+			for(i=0; i < pks.length; i++) {
+				var pk2 = pks[i];
+				var c = classes[i];
+				await window['patch' + c + 'Vals']( [ {name: 'fq', value: 'pk:' + pk2} ], {});
+			}
+		}
+		await patchUtilisateurSiteVals( [ {name: 'fq', value: 'pk:' + pk} ], {});
+	}
 }

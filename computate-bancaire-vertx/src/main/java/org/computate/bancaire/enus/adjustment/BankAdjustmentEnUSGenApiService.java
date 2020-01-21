@@ -21,7 +21,7 @@ import io.vertx.ext.web.api.OperationResponse;
 @ProxyGen
 public interface BankAdjustmentEnUSGenApiService {
 	static void registerService(SiteContextEnUS siteContext, Vertx vertx) {
-		new ServiceBinder(vertx).setAddress("enUSBankAdjustment").register(BankAdjustmentEnUSGenApiService.class, new BankAdjustmentEnUSApiServiceImpl(siteContext));
+		new ServiceBinder(vertx).setAddress("computate-bancaire-commun-enUS-BankAdjustment").register(BankAdjustmentEnUSGenApiService.class, new BankAdjustmentEnUSApiServiceImpl(siteContext));
 	}
 
 	static BankAdjustmentEnUSGenApiService create(SiteContextEnUS siteContext, Vertx vertx) {

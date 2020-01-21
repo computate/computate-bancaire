@@ -1,4 +1,4 @@
-package org.computate.bancaire.frfr.vertx;  
+package org.computate.bancaire.frfr.vertx;    
 
 
 import org.computate.bancaire.frfr.vertx.AppliOpenApi3Gen;

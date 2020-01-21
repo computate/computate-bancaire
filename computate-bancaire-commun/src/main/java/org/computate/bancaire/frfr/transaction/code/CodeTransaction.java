@@ -1,4 +1,4 @@
-package org.computate.bancaire.frfr.transaction.code;
+package org.computate.bancaire.frfr.transaction.code;   
 
 import java.text.Normalizer;
 import java.util.List;

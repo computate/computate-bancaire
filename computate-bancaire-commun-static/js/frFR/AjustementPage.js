@@ -1,8 +1,18 @@
 
 // POST //
 
-function postAjustementBancaire($formulaireValeurs) {
+async function postAjustementBancaire($formulaireValeurs, success, error) {
 	var vals = {};
+	if(success == null) {
+		success = function( data, textStatus, jQxhr ) {
+			ajouterLueur($formulaireValeurs.next('button'));
+		};
+	}
+	if(error == null) {
+		error = function( jqXhr, textStatus, errorThrown ) {
+			ajouterErreur($formulaireValeurs.next('button'));
+		};
+	}
 
 	var valeurPk = $formulaireValeurs.find('.valeurPk').val();
 	if(valeurPk != null && valeurPk !== '')
@@ -16,9 +26,21 @@ function postAjustementBancaire($formulaireValeurs) {
 	if(valeurModifie != null && valeurModifie !== '')
 		vals['modifie'] = valeurModifie;
 
+	var valeurObjetId = $formulaireValeurs.find('.valeurObjetId').val();
+	if(valeurObjetId != null && valeurObjetId !== '')
+		vals['objetId'] = valeurObjetId;
+
 	var valeurAjustementId = $formulaireValeurs.find('.valeurAjustementId').val();
 	if(valeurAjustementId != null && valeurAjustementId !== '')
 		vals['ajustementId'] = valeurAjustementId;
+
+	var valeurArchive = $formulaireValeurs.find('.valeurArchive').prop('checked');
+	if(valeurArchive != null && valeurArchive !== '')
+		vals['archive'] = valeurArchive;
+
+	var valeurSupprime = $formulaireValeurs.find('.valeurSupprime').prop('checked');
+	if(valeurSupprime != null && valeurSupprime !== '')
+		vals['supprime'] = valeurSupprime;
 
 	var valeurCompteCle = $formulaireValeurs.find('.valeurCompteCle').val();
 	if(valeurCompteCle != null && valeurCompteCle !== '')
@@ -81,7 +103,7 @@ function postAjustementBancaireVals(vals, success, error) {
 
 // PATCH //
 
-function patchAjustementBancaire($formulaireFiltres, $formulaireValeurs, success, error) {
+async function patchAjustementBancaire($formulaireFiltres, $formulaireValeurs, success, error) {
 	var filtres = patchAjustementBancaireFiltres($formulaireFiltres);
 
 	var vals = {};
@@ -119,6 +141,17 @@ function patchAjustementBancaire($formulaireFiltres, $formulaireValeurs, success
 	if(removeModifie != null && removeModifie !== '')
 		vals['removeModifie'] = removeModifie;
 
+	var removeObjetId = $formulaireFiltres.find('.removeObjetId').val() === 'true';
+	var setObjetId = removeObjetId ? null : $formulaireValeurs.find('.setObjetId').val();
+	if(removeObjetId || setObjetId != null && setObjetId !== '')
+		vals['setObjetId'] = setObjetId;
+	var addObjetId = $formulaireValeurs.find('.addObjetId').val();
+	if(addObjetId != null && addObjetId !== '')
+		vals['addObjetId'] = addObjetId;
+	var removeObjetId = $formulaireValeurs.find('.removeObjetId').val();
+	if(removeObjetId != null && removeObjetId !== '')
+		vals['removeObjetId'] = removeObjetId;
+
 	var removeAjustementId = $formulaireFiltres.find('.removeAjustementId').val() === 'true';
 	var setAjustementId = removeAjustementId ? null : $formulaireValeurs.find('.setAjustementId').val();
 	if(removeAjustementId || setAjustementId != null && setAjustementId !== '')
@@ -129,6 +162,28 @@ function patchAjustementBancaire($formulaireFiltres, $formulaireValeurs, success
 	var removeAjustementId = $formulaireValeurs.find('.removeAjustementId').val();
 	if(removeAjustementId != null && removeAjustementId !== '')
 		vals['removeAjustementId'] = removeAjustementId;
+
+	var removeArchive = $formulaireFiltres.find('.removeArchive').val() === 'true';
+	var setArchive = removeArchive ? null : $formulaireValeurs.find('.setArchive').prop('checked');
+	if(removeArchive || setArchive != null && setArchive !== '')
+		vals['setArchive'] = setArchive;
+	var addArchive = $formulaireValeurs.find('.addArchive').prop('checked');
+	if(addArchive != null && addArchive !== '')
+		vals['addArchive'] = addArchive;
+	var removeArchive = $formulaireValeurs.find('.removeArchive').prop('checked');
+	if(removeArchive != null && removeArchive !== '')
+		vals['removeArchive'] = removeArchive;
+
+	var removeSupprime = $formulaireFiltres.find('.removeSupprime').val() === 'true';
+	var setSupprime = removeSupprime ? null : $formulaireValeurs.find('.setSupprime').prop('checked');
+	if(removeSupprime || setSupprime != null && setSupprime !== '')
+		vals['setSupprime'] = setSupprime;
+	var addSupprime = $formulaireValeurs.find('.addSupprime').prop('checked');
+	if(addSupprime != null && addSupprime !== '')
+		vals['addSupprime'] = addSupprime;
+	var removeSupprime = $formulaireValeurs.find('.removeSupprime').prop('checked');
+	if(removeSupprime != null && removeSupprime !== '')
+		vals['removeSupprime'] = removeSupprime;
 
 	var removeCompteCle = $formulaireFiltres.find('.removeCompteCle').val() === 'true';
 	var setCompteCle = removeCompteCle ? null : $formulaireValeurs.find('.setCompteCle').val();
@@ -247,9 +302,21 @@ function patchAjustementBancaireFiltres($formulaireFiltres) {
 	if(filtreModifie != null && filtreModifie !== '')
 		filtres.push({ name: 'fq', value: 'modifie:' + filtreModifie });
 
+	var filtreObjetId = $formulaireFiltres.find('.valeurObjetId').val();
+	if(filtreObjetId != null && filtreObjetId !== '')
+		filtres.push({ name: 'fq', value: 'objetId:' + filtreObjetId });
+
 	var filtreAjustementId = $formulaireFiltres.find('.valeurAjustementId').val();
 	if(filtreAjustementId != null && filtreAjustementId !== '')
 		filtres.push({ name: 'fq', value: 'ajustementId:' + filtreAjustementId });
+
+	var filtreArchive = $formulaireFiltres.find('.valeurArchive').prop('checked');
+	if(filtreArchive != null && filtreArchive === true)
+		filtres.push({ name: 'fq', value: 'archive:' + filtreArchive });
+
+	var filtreSupprime = $formulaireFiltres.find('.valeurSupprime').prop('checked');
+	if(filtreSupprime != null && filtreSupprime === true)
+		filtres.push({ name: 'fq', value: 'supprime:' + filtreSupprime });
 
 	var filtreCompteCle = $formulaireFiltres.find('.valeurCompteCle').val();
 	if(filtreCompteCle != null && filtreCompteCle !== '')
@@ -287,14 +354,6 @@ function patchAjustementBancaireFiltres($formulaireFiltres) {
 	if(filtreId != null && filtreId !== '')
 		filtres.push({ name: 'fq', value: 'id:' + filtreId });
 
-	var filtreArchive = $formulaireFiltres.find('.valeurArchive').prop('checked');
-	if(filtreArchive != null && filtreArchive === true)
-		filtres.push({ name: 'fq', value: 'archive:' + filtreArchive });
-
-	var filtreSupprime = $formulaireFiltres.find('.valeurSupprime').prop('checked');
-	if(filtreSupprime != null && filtreSupprime === true)
-		filtres.push({ name: 'fq', value: 'supprime:' + filtreSupprime });
-
 	var filtreClasseNomCanonique = $formulaireFiltres.find('.valeurClasseNomCanonique').val();
 	if(filtreClasseNomCanonique != null && filtreClasseNomCanonique !== '')
 		filtres.push({ name: 'fq', value: 'classeNomCanonique:' + filtreClasseNomCanonique });
@@ -306,6 +365,18 @@ function patchAjustementBancaireFiltres($formulaireFiltres) {
 	var filtreClasseNomsCanoniques = $formulaireFiltres.find('.valeurClasseNomsCanoniques').val();
 	if(filtreClasseNomsCanoniques != null && filtreClasseNomsCanoniques !== '')
 		filtres.push({ name: 'fq', value: 'classeNomsCanoniques:' + filtreClasseNomsCanoniques });
+
+	var filtreObjetTitre = $formulaireFiltres.find('.valeurObjetTitre').val();
+	if(filtreObjetTitre != null && filtreObjetTitre !== '')
+		filtres.push({ name: 'fq', value: 'objetTitre:' + filtreObjetTitre });
+
+	var filtreObjetSuggere = $formulaireFiltres.find('.valeurObjetSuggere').val();
+	if(filtreObjetSuggere != null && filtreObjetSuggere !== '')
+		filtres.push({ name: 'q', value: 'objetSuggere:' + filtreObjetSuggere });
+
+	var filtrePageUrl = $formulaireFiltres.find('.valeurPageUrl').val();
+	if(filtrePageUrl != null && filtrePageUrl !== '')
+		filtres.push({ name: 'fq', value: 'pageUrl:' + filtrePageUrl });
 
 	var filtreAjustementCle = $formulaireFiltres.find('.valeurAjustementCle').val();
 	if(filtreAjustementCle != null && filtreAjustementCle !== '')
@@ -377,7 +448,7 @@ function patchAjustementBancaireVals(filtres, vals, success, error) {
 
 // GET //
 
-function getAjustementBancaire(pk) {
+async function getAjustementBancaire(pk) {
 	$.ajax({
 		url: '/api/ajustement/' + id
 		, dataType: 'json'
@@ -390,7 +461,7 @@ function getAjustementBancaire(pk) {
 
 // DELETE //
 
-function deleteAjustementBancaire(pk) {
+async function deleteAjustementBancaire(pk) {
 	$.ajax({
 		url: '/api/ajustement/' + id
 		, dataType: 'json'
@@ -404,7 +475,7 @@ function deleteAjustementBancaire(pk) {
 
 // Recherche //
 
-function rechercheAjustementBancaire($formulaireFiltres, success, error) {
+async function rechercheAjustementBancaire($formulaireFiltres, success, error) {
 	var filtres = rechercheAjustementBancaireFiltres($formulaireFiltres);
 	if(success == null)
 		success = function( data, textStatus, jQxhr ) {};
@@ -429,9 +500,21 @@ function rechercheAjustementBancaireFiltres($formulaireFiltres) {
 	if(filtreModifie != null && filtreModifie !== '')
 		filtres.push({ name: 'fq', value: 'modifie:' + filtreModifie });
 
+	var filtreObjetId = $formulaireFiltres.find('.valeurObjetId').val();
+	if(filtreObjetId != null && filtreObjetId !== '')
+		filtres.push({ name: 'fq', value: 'objetId:' + filtreObjetId });
+
 	var filtreAjustementId = $formulaireFiltres.find('.valeurAjustementId').val();
 	if(filtreAjustementId != null && filtreAjustementId !== '')
 		filtres.push({ name: 'fq', value: 'ajustementId:' + filtreAjustementId });
+
+	var filtreArchive = $formulaireFiltres.find('.valeurArchive').prop('checked');
+	if(filtreArchive != null && filtreArchive === true)
+		filtres.push({ name: 'fq', value: 'archive:' + filtreArchive });
+
+	var filtreSupprime = $formulaireFiltres.find('.valeurSupprime').prop('checked');
+	if(filtreSupprime != null && filtreSupprime === true)
+		filtres.push({ name: 'fq', value: 'supprime:' + filtreSupprime });
 
 	var filtreCompteCle = $formulaireFiltres.find('.valeurCompteCle').val();
 	if(filtreCompteCle != null && filtreCompteCle !== '')
@@ -469,14 +552,6 @@ function rechercheAjustementBancaireFiltres($formulaireFiltres) {
 	if(filtreId != null && filtreId !== '')
 		filtres.push({ name: 'fq', value: 'id:' + filtreId });
 
-	var filtreArchive = $formulaireFiltres.find('.valeurArchive').prop('checked');
-	if(filtreArchive != null && filtreArchive === true)
-		filtres.push({ name: 'fq', value: 'archive:' + filtreArchive });
-
-	var filtreSupprime = $formulaireFiltres.find('.valeurSupprime').prop('checked');
-	if(filtreSupprime != null && filtreSupprime === true)
-		filtres.push({ name: 'fq', value: 'supprime:' + filtreSupprime });
-
 	var filtreClasseNomCanonique = $formulaireFiltres.find('.valeurClasseNomCanonique').val();
 	if(filtreClasseNomCanonique != null && filtreClasseNomCanonique !== '')
 		filtres.push({ name: 'fq', value: 'classeNomCanonique:' + filtreClasseNomCanonique });
@@ -488,6 +563,18 @@ function rechercheAjustementBancaireFiltres($formulaireFiltres) {
 	var filtreClasseNomsCanoniques = $formulaireFiltres.find('.valeurClasseNomsCanoniques').val();
 	if(filtreClasseNomsCanoniques != null && filtreClasseNomsCanoniques !== '')
 		filtres.push({ name: 'fq', value: 'classeNomsCanoniques:' + filtreClasseNomsCanoniques });
+
+	var filtreObjetTitre = $formulaireFiltres.find('.valeurObjetTitre').val();
+	if(filtreObjetTitre != null && filtreObjetTitre !== '')
+		filtres.push({ name: 'fq', value: 'objetTitre:' + filtreObjetTitre });
+
+	var filtreObjetSuggere = $formulaireFiltres.find('.valeurObjetSuggere').val();
+	if(filtreObjetSuggere != null && filtreObjetSuggere !== '')
+		filtres.push({ name: 'q', value: 'objetSuggere:' + filtreObjetSuggere });
+
+	var filtrePageUrl = $formulaireFiltres.find('.valeurPageUrl').val();
+	if(filtrePageUrl != null && filtrePageUrl !== '')
+		filtres.push({ name: 'fq', value: 'pageUrl:' + filtrePageUrl });
 
 	var filtreAjustementCle = $formulaireFiltres.find('.valeurAjustementCle').val();
 	if(filtreAjustementCle != null && filtreAjustementCle !== '')
@@ -557,7 +644,7 @@ function suggereAjustementBancaireObjetSuggere($formulaireFiltres, $list) {
 			var $i = $('<i>').attr('class', 'fad fa-cash-register w3-padding-small ');
 			var $span = $('<span>').attr('class', '').text(o['ajustementNomComplet']);
 			var $li = $('<li>');
-			var $a = $('<a>').attr('href', o['pageUrl']);
+			var $a = $('<a>').attr('href', o['']);
 			$a.append($i);
 			$a.append($span);
 			$li.append($a);
@@ -566,4 +653,128 @@ function suggereAjustementBancaireObjetSuggere($formulaireFiltres, $list) {
 	};
 	error = function( jqXhr, textStatus, errorThrown ) {};
 	rechercherAjustementBancaireVals($formulaireFiltres, success, error);
+}
+
+function suggereAjustementBancaireObjetSuggere($formulaireFiltres, $list) {
+	success = function( data, textStatus, jQxhr ) {
+		$list.empty();
+		$.each(data['list'], function(i, o) {
+			var $i = $('<i>').attr('class', 'fad fa-cash-register w3-padding-small ');
+			var $span = $('<span>').attr('class', '').text(o['ajustementNomComplet']);
+			var $li = $('<li>');
+			var $a = $('<a>').attr('href', o['']);
+			$a.append($i);
+			$a.append($span);
+			$li.append($a);
+			$list.append($li);
+		});
+	};
+	error = function( jqXhr, textStatus, errorThrown ) {};
+	rechercherAjustementBancaireVals($formulaireFiltres, success, error);
+}
+
+async function websocketAjustementBancaire(success) {
+	window.eventBus.onopen = function () {
+
+		window.eventBus.registerHandler('websocketAjustementBancaire', function (error, message) {
+			var json = JSON.parse(message['body']);
+			var id = json['id'];
+			var pk = json['pk'];
+			var pks = json['pks'];
+			var empty = json['empty'];
+			if(!empty) {
+				var numFound = json['numFound'];
+				var numPATCH = json['numPATCH'];
+				var percent = Math.floor( numPATCH / numFound * 100 ) + '%';
+				var $box = $('<div>').attr('class', 'w3-display-topright w3-quarter box-' + id + ' ').attr('id', 'box-' + id);
+				var $margin = $('<div>').attr('class', 'w3-margin ').attr('id', 'margin-' + id);
+				var $card = $('<div>').attr('class', 'w3-card ').attr('id', 'card-' + id);
+				var $header = $('<div>').attr('class', 'w3-container fa-yellow ').attr('id', 'header-' + id);
+				var $i = $('<i>').attr('class', 'fad fa-cash-register w3-margin-right ').attr('id', 'icon-' + id);
+				var $headerSpan = $('<span>').attr('class', '').text('modifier ajustements');
+				var $x = $('<span>').attr('class', 'w3-button w3-display-topright ').attr('onclick', '$("#card-' + id + '").hide(); ').attr('id', 'x-' + id);
+				var $body = $('<div>').attr('class', 'w3-container w3-padding ').attr('id', 'text-' + id);
+				var $bar = $('<div>').attr('class', 'w3-light-gray ').attr('id', 'bar-' + id);
+				var $progress = $('<div>').attr('class', 'w3-yellow ').attr('style', 'height: 24px; width: ' + percent + '; ').attr('id', 'progress-' + id).text(numPATCH + '/' + numFound);
+				$card.append($header);
+				$header.append($i);
+				$header.append($headerSpan);
+				$header.append($x);
+				$body.append($bar);
+				$bar.append($progress);
+				$card.append($body);
+				$box.append($margin);
+				$margin.append($card);
+				$('.box-' + id).remove();
+				if(numPATCH < numFound)
+				$('.w3-content').append($box);
+				if(success)
+					success(json);
+			}
+		});
+	}
+}
+async function websocketAjustementBancaireInner(requetePatch) {
+	var pk = requetePatch['pk'];
+	var pks = requetePatch['pks'];
+	var classes = requetePatch['classes'];
+	var vars = requetePatch['vars'];
+	var empty = requetePatch['empty'];
+
+	if(pk != null) {
+		rechercherAjustementBancaireVals([ {name: 'fq', value: 'pk:' + pk} ], function( data, textStatus, jQxhr ) {
+			var o = data['list'][0];
+			if(vars.includes('cree')) {
+				$('.inputAjustementBancaire' + pk + 'Cree').val(o['cree']);
+				$('.varAjustementBancaire' + pk + 'Cree').text(o['cree']);
+			}
+			if(vars.includes('modifie')) {
+				$('.inputAjustementBancaire' + pk + 'Modifie').val(o['modifie']);
+				$('.varAjustementBancaire' + pk + 'Modifie').text(o['modifie']);
+			}
+			if(vars.includes('archive')) {
+				$('.inputAjustementBancaire' + pk + 'Archive').val(o['archive']);
+				$('.varAjustementBancaire' + pk + 'Archive').text(o['archive']);
+			}
+			if(vars.includes('supprime')) {
+				$('.inputAjustementBancaire' + pk + 'Supprime').val(o['supprime']);
+				$('.varAjustementBancaire' + pk + 'Supprime').text(o['supprime']);
+			}
+			if(vars.includes('ajustementNomAffichage')) {
+				$('.inputAjustementBancaire' + pk + 'AjustementNomAffichage').val(o['ajustementNomAffichage']);
+				$('.varAjustementBancaire' + pk + 'AjustementNomAffichage').text(o['ajustementNomAffichage']);
+			}
+			if(vars.includes('agentZones')) {
+				$('.inputAjustementBancaire' + pk + 'AgentZones').val(o['agentZones']);
+				$('.varAjustementBancaire' + pk + 'AgentZones').text(o['agentZones']);
+			}
+			if(vars.includes('agentRoles')) {
+				$('.inputAjustementBancaire' + pk + 'AgentRoles').val(o['agentRoles']);
+				$('.varAjustementBancaire' + pk + 'AgentRoles').text(o['agentRoles']);
+			}
+			if(vars.includes('agentPasserOutre')) {
+				$('.inputAjustementBancaire' + pk + 'AgentPasserOutre').val(o['agentPasserOutre']);
+				$('.varAjustementBancaire' + pk + 'AgentPasserOutre').text(o['agentPasserOutre']);
+			}
+			if(vars.includes('droitEligible')) {
+				$('.inputAjustementBancaire' + pk + 'DroitEligible').val(o['droitEligible']);
+				$('.varAjustementBancaire' + pk + 'DroitEligible').text(o['droitEligible']);
+			}
+			if(vars.includes('partenaireNom')) {
+				$('.inputAjustementBancaire' + pk + 'PartenaireNom').val(o['partenaireNom']);
+				$('.varAjustementBancaire' + pk + 'PartenaireNom').text(o['partenaireNom']);
+			}
+		});
+	}
+
+	if(!empty) {
+		if(pks) {
+			for(i=0; i < pks.length; i++) {
+				var pk2 = pks[i];
+				var c = classes[i];
+				await window['patch' + c + 'Vals']( [ {name: 'fq', value: 'pk:' + pk2} ], {});
+			}
+		}
+		await patchAjustementBancaireVals( [ {name: 'fq', value: 'pk:' + pk} ], {});
+	}
 }

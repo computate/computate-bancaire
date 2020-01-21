@@ -14,6 +14,8 @@ import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 
 /**	
  * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.cluster.ClusterGenPage&fq=classeEtendGen_indexed_boolean:true">Trouver la classe  dans Solr</a>
@@ -54,6 +56,8 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 			if(listCluster == null)
 				setListCluster(listClusterWrap.o);
 		}
+		if(listCluster != null)
+			listCluster.initDeepForClass(siteRequest_);
 		listClusterWrap.alreadyInitialized(true);
 		return (ClusterGenPage)this;
 	}
@@ -91,6 +95,8 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 			if(cluster == null)
 				setCluster(clusterWrap.o);
 		}
+		if(cluster != null)
+			cluster.initDeepForClass(siteRequest_);
 		clusterWrap.alreadyInitialized(true);
 		return (ClusterGenPage)this;
 	}
@@ -102,6 +108,7 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 	protected boolean alreadyInitializedClusterGenPage = false;
 
 	public ClusterGenPage initDeepClusterGenPage(SiteRequestEnUS siteRequest_) {
+		setSiteRequest_(siteRequest_);
 		if(!alreadyInitializedClusterGenPage) {
 			alreadyInitializedClusterGenPage = true;
 			initDeepClusterGenPage();
@@ -111,6 +118,7 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 
 	public void initDeepClusterGenPage() {
 		initClusterGenPage();
+		super.initDeepPageLayout(siteRequest_);
 	}
 
 	public void initClusterGenPage() {
@@ -118,15 +126,31 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 		clusterInit();
 	}
 
-	public void initDeepForClass(SiteRequestEnUS siteRequest_) {
+	@Override public void initDeepForClass(SiteRequestEnUS siteRequest_) {
 		initDeepClusterGenPage(siteRequest_);
+	}
+
+	/////////////////
+	// siteRequest //
+	/////////////////
+
+	public void siteRequestClusterGenPage(SiteRequestEnUS siteRequest_) {
+			super.siteRequestPageLayout(siteRequest_);
+		if(listCluster != null)
+			listCluster.setSiteRequest_(siteRequest_);
+		if(cluster != null)
+			cluster.setSiteRequest_(siteRequest_);
+	}
+
+	public void siteRequestForClass(SiteRequestEnUS siteRequest_) {
+		siteRequestClusterGenPage(siteRequest_);
 	}
 
 	/////////////
 	// obtain //
 	/////////////
 
-	public Object obtainForClass(String var) {
+	@Override public Object obtainForClass(String var) {
 		String[] vars = StringUtils.split(var, ".");
 		Object o = null;
 		for(String v : vars) {
@@ -147,7 +171,7 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 			case "cluster":
 				return oClusterGenPage.cluster;
 			default:
-				return null;
+				return super.obtainPageLayout(var);
 		}
 	}
 
@@ -155,7 +179,7 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 	// attribute //
 	///////////////
 
-	public boolean attributeForClass(String var, Object val) {
+	@Override public boolean attributeForClass(String var, Object val) {
 		String[] vars = StringUtils.split(var, ".");
 		Object o = null;
 		for(String v : vars) {
@@ -172,7 +196,7 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 		ClusterGenPage oClusterGenPage = (ClusterGenPage)this;
 		switch(var) {
 			default:
-				return null;
+				return super.attributePageLayout(var, val);
 		}
 	}
 
@@ -180,7 +204,7 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 	// define //
 	/////////////
 
-	public boolean defineForClass(String var, String val) {
+	@Override public boolean defineForClass(String var, String val) {
 		String[] vars = StringUtils.split(var, ".");
 		Object o = null;
 		if(val != null) {
@@ -198,7 +222,7 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 	public Object defineClusterGenPage(String var, String val) {
 		switch(var) {
 			default:
-				return null;
+				return super.definePageLayout(var, val);
 		}
 	}
 
@@ -286,12 +310,24 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 	public void htmlStyleClusterGenPage() {
 	}
 
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestClusterGenPage() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		ClusterGenPage original = (ClusterGenPage)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
+			super.patchRequestPageLayout();
+		}
+	}
+
 	//////////////
 	// hashCode //
 	//////////////
 
 	@Override public int hashCode() {
-		return Objects.hash();
+		return Objects.hash(super.hashCode());
 	}
 
 	////////////
@@ -304,7 +340,7 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 		if(!(o instanceof ClusterGenPage))
 			return false;
 		ClusterGenPage that = (ClusterGenPage)o;
-		return true;
+		return super.equals(o);
 	}
 
 	//////////////
@@ -313,6 +349,7 @@ public abstract class ClusterGenPageGen<DEV> extends PageLayout {
 
 	@Override public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append(super.toString() + "\n");
 		sb.append("ClusterGenPage { ");
 		sb.append(" }");
 		return sb.toString();

@@ -1,4 +1,4 @@
-package org.computate.bancaire.frfr.config;    
+package org.computate.bancaire.frfr.config;     
 
 import java.io.File;
 import java.io.Serializable;
@@ -7,6 +7,8 @@ import java.time.ZoneId;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -43,14 +45,16 @@ public class ConfigSite extends ConfigSiteGen<Object> implements Serializable {
 	 * r.enUS: configPath
 	 **/ 
 	protected void _config(Couverture<INIConfiguration> c) {
-		Configurations configurations = new Configurations();
-		File fichierConfig = new File(configChemin);
-		if(configChemin != null && fichierConfig.exists()) {
-			try {
-				INIConfiguration o = configurations.ini(fichierConfig);
-				c.o(o);
-			} catch (ConfigurationException e) {
-				ExceptionUtils.rethrow(e);
+		if(configChemin != null) {
+			Configurations configurations = new Configurations();
+			File fichierConfig = new File(configChemin);
+			if(fichierConfig.exists()) {
+				try {
+					INIConfiguration o = configurations.ini(fichierConfig);
+					c.o(o);
+				} catch (ConfigurationException e) {
+					ExceptionUtils.rethrow(e);
+				}
 			}
 		}
 	}
@@ -698,7 +702,7 @@ public class ConfigSite extends ConfigSiteGen<Object> implements Serializable {
 	protected void _nombreExecuteurs(Couverture<Integer> c) {
 		Integer o;
 		if(config == null)
-			o = Integer.parseInt(System.getenv(c.var), 1);
+			o = Integer.parseInt(ObjectUtils.defaultIfNull(System.getenv(c.var), "1"));
 		else
 			o = config.getInt(prefixeEchappe + c.var, 1);
 		c.o(o);
@@ -877,6 +881,104 @@ public class ConfigSite extends ConfigSiteGen<Object> implements Serializable {
 			o = System.getenv(c.var);
 		else
 			o = StringUtils.defaultIfBlank(config.getString(prefixeEchappe + c.var), "/static");
+		c.o(o);
+	}
+
+	/**	
+	 * Var.enUS: emailHost
+	 * r: prefixeEchappe
+	 * r.enUS: prefixEscaped
+	 * **/
+	protected void _mailHote(Couverture<String> c) {
+		String o;
+		if(config == null)
+			o = System.getenv(c.var);
+		else
+			o = config.getString(prefixeEchappe + c.var);
+		c.o(o);
+	}
+
+	/**	
+	 * Var.enUS: emailPort
+	 * r: prefixeEchappe
+	 * r.enUS: prefixEscaped
+	 * **/
+	protected void _mailPort(Couverture<Integer> c) {
+		Integer o;
+		if(config == null)
+			o = NumberUtils.toInt(System.getenv(c.var));
+		else
+			o = config.getInt(prefixeEchappe + c.var);
+		c.o(o);
+	}
+
+	/**	
+	 * Var.enUS: emailUsername
+	 * r: prefixeEchappe
+	 * r.enUS: prefixEscaped
+	 * **/
+	protected void _mailUtilisateur(Couverture<String> c) {
+		String o;
+		if(config == null)
+			o = System.getenv(c.var);
+		else
+			o = config.getString(prefixeEchappe + c.var);
+		c.o(o);
+	}
+
+	/**	
+	 * Var.enUS: emailPassword
+	 * r: prefixeEchappe
+	 * r.enUS: prefixEscaped
+	 * **/
+	protected void _mailMotDePasse(Couverture<String> c) {
+		String o;
+		if(config == null)
+			o = System.getenv(c.var);
+		else
+			o = config.getString(prefixeEchappe + c.var);
+		c.o(o);
+	}
+
+	/**	
+	 * Var.enUS: emailFrom
+	 * r: prefixeEchappe
+	 * r.enUS: prefixEscaped
+	 * **/
+	protected void _mailDe(Couverture<String> c) {
+		String o;
+		if(config == null)
+			o = System.getenv(c.var);
+		else
+			o = config.getString(prefixeEchappe + c.var);
+		c.o(o);
+	}
+
+	/**	
+	 * Var.enUS: emailAuth
+	 * r: prefixeEchappe
+	 * r.enUS: prefixEscaped
+	 * **/
+	protected void _mailAuth(Couverture<Boolean> c) {
+		Boolean o;
+		if(config == null)
+			o = BooleanUtils.toBoolean(System.getenv(c.var));
+		else
+			o = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(config.getString(prefixeEchappe + c.var), "false"));
+		c.o(o);
+	}
+
+	/**	
+	 * Var.enUS: emailSsl
+	 * r: prefixeEchappe
+	 * r.enUS: prefixEscaped
+	 * **/
+	protected void _mailSsl(Couverture<Boolean> c) {
+		Boolean o;
+		if(config == null)
+			o = BooleanUtils.toBoolean(System.getenv(c.var));
+		else
+			o = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(config.getString(prefixeEchappe + c.var), "false"));
 		c.o(o);
 	}
 

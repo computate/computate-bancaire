@@ -1,4 +1,4 @@
-package org.computate.bancaire.frfr.requete; 
+package org.computate.bancaire.frfr.requete;  
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -29,10 +31,11 @@ import org.computate.bancaire.frfr.config.ConfigSite;
 import org.computate.bancaire.frfr.contexte.SiteContexteFrFR;
 import org.computate.bancaire.frfr.couverture.Couverture;
 import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
-
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import org.computate.bancaire.frfr.utilisateur.UtilisateurSite;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.http.CaseInsensitiveHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.oauth2.KeycloakHelper;
@@ -58,6 +61,8 @@ public class RequeteSiteFrFR extends RequeteSiteFrFRGen<Object> implements Seria
 	protected void _siteContexte_(Couverture<SiteContexteFrFR> c) {
 	}
 
+	private static final Pattern PATTERN_SESSION = Pattern.compile("vertx-web.session=(\\w+)");
+
 	/**	
 	 * Var.enUS: siteConfig_
 	 * 
@@ -79,6 +84,12 @@ public class RequeteSiteFrFR extends RequeteSiteFrFRGen<Object> implements Seria
 	 */
 	protected void _requeteSite_(Couverture<RequeteSiteFrFR> c) { 
 		c.o(this);
+	}
+
+	/**
+	 * Var.enUS: patchRequest_
+	 */
+	protected void _requetePatch_(Couverture<RequetePatch> c) { 
 	}
 
 	/**
@@ -190,6 +201,29 @@ public class RequeteSiteFrFR extends RequeteSiteFrFRGen<Object> implements Seria
 	}
 
 	/**	
+	 * {@inheritDoc}
+	 * Indexe: true
+	 * Stocke: true
+	 * r: requeteSite
+	 * r.enUS: siteRequest
+	 * r: principalJson
+	 * r.enUS: jsonPrincipal
+	 * r: operationRequete
+	 * r.enUS: operationRequest
+	 */                   
+	protected void _sessionId(Couverture<String> c) {
+		if(operationRequete != null) {
+			String cookie = operationRequete.getHeaders().get("Cookie");
+			if(StringUtils.isNotBlank(cookie)) {
+				Matcher m = PATTERN_SESSION.matcher(cookie);
+				if(m.matches()) {
+					c.o(m.group(1));
+				}
+			}
+		}
+	}
+
+	/**	
 	 * Var.enUS: userName
 	 * r: principalJson
 	 * r.enUS: jsonPrincipal
@@ -284,6 +318,27 @@ public class RequeteSiteFrFR extends RequeteSiteFrFRGen<Object> implements Seria
 	}
 
 	/**	
+	 * Var.enUS: userResourceRoles
+	 * r: configSite_
+	 * r.enUS: siteConfig_
+	 * r: utilisateurRessource
+	 * r.enUS: userResource
+	 * r: addUtilisateurRolesRessource
+	 * r.enUS: addUserResourceRoles
+	 * frFR: Les rôles de la ressource de l'utilisateur. 
+	 * **/
+	protected void _utilisateurRolesRessource(List<String> o) {
+		if(configSite_ != null && utilisateurRessource != null) {
+			JsonArray roles = utilisateurRessource.getJsonArray("roles");
+			if(roles != null) {
+				roles.stream().forEach(r -> {
+					addUtilisateurRolesRessource((String)r);
+				});
+			}
+		}
+	}
+
+	/**	
 	 * Var.enUS: siteUser
 	 * r: UtilisateurSite
 	 * r.enUS: SiteUser
@@ -349,6 +404,13 @@ public class RequeteSiteFrFR extends RequeteSiteFrFRGen<Object> implements Seria
 	 * Var.enUS: sqlConnection
 	 **/
 	protected void _connexionSql(Couverture<SQLConnection> c) {
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * Var.enUS: requestHeaders
+	 **/
+	protected void _requeteEnTetes(Couverture<CaseInsensitiveHeaders> c) {
 	}
 	
 	/**

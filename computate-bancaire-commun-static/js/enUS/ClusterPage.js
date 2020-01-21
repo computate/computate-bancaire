@@ -1,8 +1,21 @@
 
 // POST //
 
-function postCluster($formValues) {
+async function postCluster($formValues, success, error) {
 	var vals = {};
+	if(success == null) {
+		success = function( data, textStatus, jQxhr ) {
+			addGlow($formValues.next('button'));
+			var url = data['pageUrlPk'];
+			if(url)
+				window.location.href = url;
+		};
+	}
+	if(error == null) {
+		error = function( jqXhr, textStatus, errorThrown ) {
+			addError($formValues.next('button'));
+		};
+	}
 
 	var valuePk = $formValues.find('.valuePk').val();
 	if(valuePk != null && valuePk !== '')
@@ -15,6 +28,18 @@ function postCluster($formValues) {
 	var valueModified = $formValues.find('.valueModified').val();
 	if(valueModified != null && valueModified !== '')
 		vals['modified'] = valueModified;
+
+	var valueObjectId = $formValues.find('.valueObjectId').val();
+	if(valueObjectId != null && valueObjectId !== '')
+		vals['objectId'] = valueObjectId;
+
+	var valueArchived = $formValues.find('.valueArchived').prop('checked');
+	if(valueArchived != null && valueArchived !== '')
+		vals['archived'] = valueArchived;
+
+	var valueDeleted = $formValues.find('.valueDeleted').prop('checked');
+	if(valueDeleted != null && valueDeleted !== '')
+		vals['deleted'] = valueDeleted;
 
 	$.ajax({
 		url: '/api/cluster'
@@ -41,7 +66,7 @@ function postClusterVals(vals, success, error) {
 
 // PATCH //
 
-function patchCluster($formFilters, $formValues, success, error) {
+async function patchCluster($formFilters, $formValues, success, error) {
 	var filters = patchClusterFilters($formFilters);
 
 	var vals = {};
@@ -79,6 +104,39 @@ function patchCluster($formFilters, $formValues, success, error) {
 	if(removeModified != null && removeModified !== '')
 		vals['removeModified'] = removeModified;
 
+	var removeObjectId = $formFilters.find('.removeObjectId').val() === 'true';
+	var setObjectId = removeObjectId ? null : $formValues.find('.setObjectId').val();
+	if(removeObjectId || setObjectId != null && setObjectId !== '')
+		vals['setObjectId'] = setObjectId;
+	var addObjectId = $formValues.find('.addObjectId').val();
+	if(addObjectId != null && addObjectId !== '')
+		vals['addObjectId'] = addObjectId;
+	var removeObjectId = $formValues.find('.removeObjectId').val();
+	if(removeObjectId != null && removeObjectId !== '')
+		vals['removeObjectId'] = removeObjectId;
+
+	var removeArchived = $formFilters.find('.removeArchived').val() === 'true';
+	var setArchived = removeArchived ? null : $formValues.find('.setArchived').prop('checked');
+	if(removeArchived || setArchived != null && setArchived !== '')
+		vals['setArchived'] = setArchived;
+	var addArchived = $formValues.find('.addArchived').prop('checked');
+	if(addArchived != null && addArchived !== '')
+		vals['addArchived'] = addArchived;
+	var removeArchived = $formValues.find('.removeArchived').prop('checked');
+	if(removeArchived != null && removeArchived !== '')
+		vals['removeArchived'] = removeArchived;
+
+	var removeDeleted = $formFilters.find('.removeDeleted').val() === 'true';
+	var setDeleted = removeDeleted ? null : $formValues.find('.setDeleted').prop('checked');
+	if(removeDeleted || setDeleted != null && setDeleted !== '')
+		vals['setDeleted'] = setDeleted;
+	var addDeleted = $formValues.find('.addDeleted').prop('checked');
+	if(addDeleted != null && addDeleted !== '')
+		vals['addDeleted'] = addDeleted;
+	var removeDeleted = $formValues.find('.removeDeleted').prop('checked');
+	if(removeDeleted != null && removeDeleted !== '')
+		vals['removeDeleted'] = removeDeleted;
+
 	patchClusterVals(filters, vals, success, error);
 }
 
@@ -97,9 +155,9 @@ function patchClusterFilters($formFilters) {
 	if(filterModified != null && filterModified !== '')
 		filters.push({ name: 'fq', value: 'modified:' + filterModified });
 
-	var filterId = $formFilters.find('.valueId').val();
-	if(filterId != null && filterId !== '')
-		filters.push({ name: 'fq', value: 'id:' + filterId });
+	var filterObjectId = $formFilters.find('.valueObjectId').val();
+	if(filterObjectId != null && filterObjectId !== '')
+		filters.push({ name: 'fq', value: 'objectId:' + filterObjectId });
 
 	var filterArchived = $formFilters.find('.valueArchived').prop('checked');
 	if(filterArchived != null && filterArchived === true)
@@ -108,6 +166,10 @@ function patchClusterFilters($formFilters) {
 	var filterDeleted = $formFilters.find('.valueDeleted').prop('checked');
 	if(filterDeleted != null && filterDeleted === true)
 		filters.push({ name: 'fq', value: 'deleted:' + filterDeleted });
+
+	var filterId = $formFilters.find('.valueId').val();
+	if(filterId != null && filterId !== '')
+		filters.push({ name: 'fq', value: 'id:' + filterId });
 
 	var filterClassCanonicalName = $formFilters.find('.valueClassCanonicalName').val();
 	if(filterClassCanonicalName != null && filterClassCanonicalName !== '')
@@ -120,6 +182,26 @@ function patchClusterFilters($formFilters) {
 	var filterClassCanonicalNames = $formFilters.find('.valueClassCanonicalNames').val();
 	if(filterClassCanonicalNames != null && filterClassCanonicalNames !== '')
 		filters.push({ name: 'fq', value: 'classCanonicalNames:' + filterClassCanonicalNames });
+
+	var filterSessionId = $formFilters.find('.valueSessionId').val();
+	if(filterSessionId != null && filterSessionId !== '')
+		filters.push({ name: 'fq', value: 'sessionId:' + filterSessionId });
+
+	var filterObjectTitle = $formFilters.find('.valueObjectTitle').val();
+	if(filterObjectTitle != null && filterObjectTitle !== '')
+		filters.push({ name: 'fq', value: 'objectTitle:' + filterObjectTitle });
+
+	var filterObjectSuggest = $formFilters.find('.valueObjectSuggest').val();
+	if(filterObjectSuggest != null && filterObjectSuggest !== '')
+		filters.push({ name: 'q', value: 'objectSuggest:' + filterObjectSuggest });
+
+	var filterPageUrlId = $formFilters.find('.valuePageUrlId').val();
+	if(filterPageUrlId != null && filterPageUrlId !== '')
+		filters.push({ name: 'fq', value: 'pageUrlId:' + filterPageUrlId });
+
+	var filterPageUrlPk = $formFilters.find('.valuePageUrlPk').val();
+	if(filterPageUrlPk != null && filterPageUrlPk !== '')
+		filters.push({ name: 'fq', value: 'pageUrlPk:' + filterPageUrlPk });
 	return filters;
 }
 
@@ -143,7 +225,7 @@ function patchClusterVals(filters, vals, success, error) {
 
 // GET //
 
-function getCluster(pk) {
+async function getCluster(pk) {
 	$.ajax({
 		url: '/api/cluster/' + id
 		, dataType: 'json'
@@ -156,7 +238,7 @@ function getCluster(pk) {
 
 // DELETE //
 
-function deleteCluster(pk) {
+async function deleteCluster(pk) {
 	$.ajax({
 		url: '/api/cluster/' + id
 		, dataType: 'json'
@@ -170,7 +252,7 @@ function deleteCluster(pk) {
 
 // Search //
 
-function searchCluster($formFilters, success, error) {
+async function searchCluster($formFilters, success, error) {
 	var filters = searchClusterFilters($formFilters);
 	if(success == null)
 		success = function( data, textStatus, jQxhr ) {};
@@ -195,9 +277,9 @@ function searchClusterFilters($formFilters) {
 	if(filterModified != null && filterModified !== '')
 		filters.push({ name: 'fq', value: 'modified:' + filterModified });
 
-	var filterId = $formFilters.find('.valueId').val();
-	if(filterId != null && filterId !== '')
-		filters.push({ name: 'fq', value: 'id:' + filterId });
+	var filterObjectId = $formFilters.find('.valueObjectId').val();
+	if(filterObjectId != null && filterObjectId !== '')
+		filters.push({ name: 'fq', value: 'objectId:' + filterObjectId });
 
 	var filterArchived = $formFilters.find('.valueArchived').prop('checked');
 	if(filterArchived != null && filterArchived === true)
@@ -206,6 +288,10 @@ function searchClusterFilters($formFilters) {
 	var filterDeleted = $formFilters.find('.valueDeleted').prop('checked');
 	if(filterDeleted != null && filterDeleted === true)
 		filters.push({ name: 'fq', value: 'deleted:' + filterDeleted });
+
+	var filterId = $formFilters.find('.valueId').val();
+	if(filterId != null && filterId !== '')
+		filters.push({ name: 'fq', value: 'id:' + filterId });
 
 	var filterClassCanonicalName = $formFilters.find('.valueClassCanonicalName').val();
 	if(filterClassCanonicalName != null && filterClassCanonicalName !== '')
@@ -218,6 +304,26 @@ function searchClusterFilters($formFilters) {
 	var filterClassCanonicalNames = $formFilters.find('.valueClassCanonicalNames').val();
 	if(filterClassCanonicalNames != null && filterClassCanonicalNames !== '')
 		filters.push({ name: 'fq', value: 'classCanonicalNames:' + filterClassCanonicalNames });
+
+	var filterSessionId = $formFilters.find('.valueSessionId').val();
+	if(filterSessionId != null && filterSessionId !== '')
+		filters.push({ name: 'fq', value: 'sessionId:' + filterSessionId });
+
+	var filterObjectTitle = $formFilters.find('.valueObjectTitle').val();
+	if(filterObjectTitle != null && filterObjectTitle !== '')
+		filters.push({ name: 'fq', value: 'objectTitle:' + filterObjectTitle });
+
+	var filterObjectSuggest = $formFilters.find('.valueObjectSuggest').val();
+	if(filterObjectSuggest != null && filterObjectSuggest !== '')
+		filters.push({ name: 'q', value: 'objectSuggest:' + filterObjectSuggest });
+
+	var filterPageUrlId = $formFilters.find('.valuePageUrlId').val();
+	if(filterPageUrlId != null && filterPageUrlId !== '')
+		filters.push({ name: 'fq', value: 'pageUrlId:' + filterPageUrlId });
+
+	var filterPageUrlPk = $formFilters.find('.valuePageUrlPk').val();
+	if(filterPageUrlPk != null && filterPageUrlPk !== '')
+		filters.push({ name: 'fq', value: 'pageUrlPk:' + filterPageUrlPk });
 	return filters;
 }
 
@@ -230,4 +336,104 @@ function searchClusterVals(filters, success, error) {
 		, success: success
 		, error: error
 	});
+}
+
+function suggestClusterObjectSuggest($formFilters, $list) {
+	success = function( data, textStatus, jQxhr ) {
+		$list.empty();
+		$.each(data['list'], function(i, o) {
+			var $i = $('<i>').attr('class', 'far fa-fort-awesome w3-padding-small ');
+			var $span = $('<span>').attr('class', '').text(o['objectTitle']);
+			var $li = $('<li>');
+			var $a = $('<a>').attr('href', o['pageUrlPk']);
+			$a.append($i);
+			$a.append($span);
+			$li.append($a);
+			$list.append($li);
+		});
+	};
+	error = function( jqXhr, textStatus, errorThrown ) {};
+	searchClusterVals($formFilters, success, error);
+}
+
+async function websocketCluster(success) {
+	window.eventBus.onopen = function () {
+
+		window.eventBus.registerHandler('websocketCluster', function (error, message) {
+			var json = JSON.parse(message['body']);
+			var id = json['id'];
+			var pk = json['pk'];
+			var pks = json['pks'];
+			var empty = json['empty'];
+			if(!empty) {
+				var numFound = json['numFound'];
+				var numPATCH = json['numPATCH'];
+				var percent = Math.floor( numPATCH / numFound * 100 ) + '%';
+				var $box = $('<div>').attr('class', 'w3-display-topright w3-quarter box-' + id + ' ').attr('id', 'box-' + id);
+				var $margin = $('<div>').attr('class', 'w3-margin ').attr('id', 'margin-' + id);
+				var $card = $('<div>').attr('class', 'w3-card ').attr('id', 'card-' + id);
+				var $header = $('<div>').attr('class', 'w3-container fa-gray ').attr('id', 'header-' + id);
+				var $i = $('<i>').attr('class', 'far fa-fort-awesome w3-margin-right ').attr('id', 'icon-' + id);
+				var $headerSpan = $('<span>').attr('class', '').text('modify clusters');
+				var $x = $('<span>').attr('class', 'w3-button w3-display-topright ').attr('onclick', '$("#card-' + id + '").hide(); ').attr('id', 'x-' + id);
+				var $body = $('<div>').attr('class', 'w3-container w3-padding ').attr('id', 'text-' + id);
+				var $bar = $('<div>').attr('class', 'w3-light-gray ').attr('id', 'bar-' + id);
+				var $progress = $('<div>').attr('class', 'w3-gray ').attr('style', 'height: 24px; width: ' + percent + '; ').attr('id', 'progress-' + id).text(numPATCH + '/' + numFound);
+				$card.append($header);
+				$header.append($i);
+				$header.append($headerSpan);
+				$header.append($x);
+				$body.append($bar);
+				$bar.append($progress);
+				$card.append($body);
+				$box.append($margin);
+				$margin.append($card);
+				$('.box-' + id).remove();
+				if(numPATCH < numFound)
+				$('.w3-content').append($box);
+				if(success)
+					success(json);
+			}
+		});
+	}
+}
+async function websocketClusterInner(patchRequest) {
+	var pk = patchRequest['pk'];
+	var pks = patchRequest['pks'];
+	var classes = patchRequest['classes'];
+	var vars = patchRequest['vars'];
+	var empty = patchRequest['empty'];
+
+	if(pk != null) {
+		searchClusterVals([ {name: 'fq', value: 'pk:' + pk} ], function( data, textStatus, jQxhr ) {
+			var o = data['list'][0];
+			if(vars.includes('created')) {
+				$('.inputCluster' + pk + 'Created').val(o['created']);
+				$('.varCluster' + pk + 'Created').text(o['created']);
+			}
+			if(vars.includes('modified')) {
+				$('.inputCluster' + pk + 'Modified').val(o['modified']);
+				$('.varCluster' + pk + 'Modified').text(o['modified']);
+			}
+			if(vars.includes('archived')) {
+				$('.inputCluster' + pk + 'Archived').val(o['archived']);
+				$('.varCluster' + pk + 'Archived').text(o['archived']);
+			}
+			if(vars.includes('deleted')) {
+				$('.inputCluster' + pk + 'Deleted').val(o['deleted']);
+				$('.varCluster' + pk + 'Deleted').text(o['deleted']);
+			}
+		});
+	}
+
+	if(!empty) {
+		if(pks) {
+			for(i=0; i < pks.length; i++) {
+				var pk2 = pks[i];
+				var c = classes[i];
+				await window['patch' + c + 'Vals']( [ {name: 'fq', value: 'pk:' + pk2} ], {});
+			}
+		}
+		await patchClusterVals( [ {name: 'fq', value: 'pk:' + pk} ], {});
+	}
 }

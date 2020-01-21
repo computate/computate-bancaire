@@ -4,7 +4,9 @@ import org.computate.bancaire.enus.config.SiteConfig;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import org.computate.bancaire.enus.contexte.SiteContextEnUS;
 import org.computate.bancaire.enus.user.SiteUser;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 import org.computate.bancaire.enus.search.SearchResult;
+import io.vertx.core.WorkerExecutor;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -69,6 +71,7 @@ import java.util.stream.Stream;
 import java.net.URLDecoder;
 import java.time.ZonedDateTime;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.commons.collections.CollectionUtils;
 import org.computate.bancaire.enus.search.SearchList;
 import org.computate.bancaire.enus.writer.AllWriter;
 
@@ -99,42 +102,81 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 				if(a.succeeded()) {
 					userSiteUser(siteRequest, b -> {
 						if(b.succeeded()) {
-							aSearchSiteUser(siteRequest, false, true, null, c -> {
+							SQLConnection sqlConnection = siteRequest.getSqlConnection();
+							sqlConnection.close(c -> {
 								if(c.succeeded()) {
-									SearchList<SiteUser> listSiteUser = c.result();
-									SimpleOrderedMap facets = (SimpleOrderedMap)listSiteUser.getQueryResponse().getResponse().get("facets");
-									Date date = (Date)facets.get("max_modified");
-									String dateStr;
-									if(date == null)
-										dateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(ZonedDateTime.now().toInstant(), ZoneId.of("UTC")).minusNanos(1000));
-									else
-										dateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC")));
-									listPATCHSiteUser(listSiteUser, dateStr, d -> {
+									aSearchSiteUser(siteRequest, false, true, null, d -> {
 										if(d.succeeded()) {
-											SQLConnection sqlConnection = siteRequest.getSqlConnection();
-											if(sqlConnection == null) {
-												eventHandler.handle(Future.succeededFuture(d.result()));
-											} else {
-												sqlConnection.commit(e -> {
-													if(e.succeeded()) {
-														sqlConnection.close(f -> {
-															if(f.succeeded()) {
-																eventHandler.handle(Future.succeededFuture(d.result()));
-															} else {
-																errorSiteUser(siteRequest, eventHandler, f);
-															}
-														});
-													} else {
-														eventHandler.handle(Future.succeededFuture(d.result()));
-													}
-												});
+											SearchList<SiteUser> listSiteUser = d.result();
+											SimpleOrderedMap facets = (SimpleOrderedMap)Optional.ofNullable(listSiteUser.getQueryResponse()).map(QueryResponse::getResponse).map(r -> r.get("facets")).orElse(null);
+											Date date = null;
+											if(facets != null)
+												date = (Date)facets.get("max_modified");
+											String dt;
+											if(date == null)
+												dt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(ZonedDateTime.now().toInstant(), ZoneId.of("UTC")).minusNanos(1000));
+											else
+												dt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC")));
+											listSiteUser.addFilterQuery(String.format("modified_indexed_date:[* TO %s]", dt));
+
+											PatchRequest patchRequest = new PatchRequest();
+											patchRequest.setRows(listSiteUser.getRows());
+											patchRequest.setNumFound(Optional.ofNullable(listSiteUser.getQueryResponse()).map(QueryResponse::getResults).map(SolrDocumentList::getNumFound).orElse(new Long(listSiteUser.size())));
+											patchRequest.initDeepPatchRequest(siteRequest);
+											siteRequest.setPatchRequest_(patchRequest);
+											if(listSiteUser.size() == 1) {
+												SiteUser o = listSiteUser.get(0);
+												patchRequest.setPk(o.getPk());
+												patchRequest.setOriginal(o);
+												patchRequestSiteUser(o);
 											}
+											WorkerExecutor workerExecutor = siteContext.getWorkerExecutor();
+											workerExecutor.executeBlocking(
+												blockingCodeHandler -> {
+													sqlSiteUser(siteRequest, e -> {
+														if(e.succeeded()) {
+															try {
+																listPATCHSiteUser(patchRequest, listSiteUser, dt, f -> {
+																	if(f.succeeded()) {
+																		SQLConnection sqlConnection2 = siteRequest.getSqlConnection();
+																		if(sqlConnection2 == null) {
+																			blockingCodeHandler.handle(Future.succeededFuture(f.result()));
+																		} else {
+																			sqlConnection2.commit(g -> {
+																				if(f.succeeded()) {
+																					sqlConnection2.close(h -> {
+																						if(g.succeeded()) {
+																							blockingCodeHandler.handle(Future.succeededFuture(h.result()));
+																						} else {
+																							blockingCodeHandler.handle(Future.failedFuture(h.cause()));
+																						}
+																					});
+																				} else {
+																					blockingCodeHandler.handle(Future.failedFuture(g.cause()));
+																				}
+																			});
+																		}
+																	} else {
+																		blockingCodeHandler.handle(Future.failedFuture(f.cause()));
+																	}
+																});
+															} catch(Exception ex) {
+																blockingCodeHandler.handle(Future.failedFuture(ex));
+															}
+														} else {
+															blockingCodeHandler.handle(Future.failedFuture(e.cause()));
+														}
+													});
+												}, resultHandler -> {
+												}
+											);
+											response200PATCHSiteUser(patchRequest, eventHandler);
 										} else {
-											errorSiteUser(siteRequest, eventHandler, d);
+											errorSiteUser(siteRequest, eventHandler, c);
 										}
 									});
 								} else {
-									errorSiteUser(siteRequest, eventHandler, c);
+									errorSiteUser(siteRequest, eventHandler, b);
 								}
 							});
 						} else {
@@ -150,7 +192,7 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 		}
 	}
 
-	public void listPATCHSiteUser(SearchList<SiteUser> listSiteUser, String dt, Handler<AsyncResult<OperationResponse>> eventHandler) {
+	public void listPATCHSiteUser(PatchRequest patchRequest, SearchList<SiteUser> listSiteUser, String dt, Handler<AsyncResult<OperationResponse>> eventHandler) {
 		List<Future> futures = new ArrayList<>();
 		SiteRequestEnUS siteRequest = listSiteUser.getSiteRequest_();
 		listSiteUser.getList().forEach(o -> {
@@ -165,15 +207,25 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 		});
 		CompositeFuture.all(futures).setHandler( a -> {
 			if(a.succeeded()) {
+				patchRequest.setNumPATCH(patchRequest.getNumPATCH() + listSiteUser.size());
 				if(listSiteUser.next(dt)) {
-					listPATCHSiteUser(listSiteUser, dt, eventHandler);
+					siteRequest.getVertx().eventBus().publish("websocketSiteUser", JsonObject.mapFrom(patchRequest).toString());
+					listPATCHSiteUser(patchRequest, listSiteUser, dt, eventHandler);
 				} else {
-					response200PATCHSiteUser(listSiteUser, eventHandler);
+					response200PATCHSiteUser(patchRequest, eventHandler);
 				}
 			} else {
 				errorSiteUser(listSiteUser.getSiteRequest_(), eventHandler, a);
 			}
 		});
+	}
+
+	public void patchRequestSiteUser(SiteUser o) {
+		PatchRequest patchRequest = o.getSiteRequest_().getPatchRequest_();
+		if(patchRequest != null) {
+			List<Long> pks = patchRequest.getPks();
+			List<String> classes = patchRequest.getClasses();
+		}
 	}
 
 	public Future<SiteUser> futurePATCHSiteUser(SiteUser o,  Handler<AsyncResult<OperationResponse>> eventHandler) {
@@ -188,6 +240,8 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 								if(c.succeeded()) {
 									indexSiteUser(siteUser, d -> {
 										if(d.succeeded()) {
+											patchRequestSiteUser(siteUser);
+											siteUser.patchRequestSiteUser();
 											future.complete(o);
 											eventHandler.handle(Future.succeededFuture(d.result()));
 										} else {
@@ -228,43 +282,73 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 			for(String methodName : methodNames) {
 				switch(methodName) {
 					case "setCreated":
-						o2.setCreated(requestJson.getString(methodName));
-						if(o2.getCreated() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "created"));
 						} else {
+							o2.setCreated(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("created", o2.jsonCreated(), pk));
 						}
 						break;
 					case "setModified":
-						o2.setModified(requestJson.getString(methodName));
-						if(o2.getModified() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "modified"));
 						} else {
+							o2.setModified(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("modified", o2.jsonModified(), pk));
 						}
 						break;
 					case "setArchived":
-						o2.setArchived(requestJson.getBoolean(methodName));
-						if(o2.getArchived() == null) {
+						if(requestJson.getBoolean(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "archived"));
 						} else {
+							o2.setArchived(requestJson.getBoolean(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("archived", o2.jsonArchived(), pk));
 						}
 						break;
 					case "setDeleted":
-						o2.setDeleted(requestJson.getBoolean(methodName));
-						if(o2.getDeleted() == null) {
+						if(requestJson.getBoolean(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "deleted"));
 						} else {
+							o2.setDeleted(requestJson.getBoolean(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("deleted", o2.jsonDeleted(), pk));
+						}
+						break;
+					case "setUserReceiveEmails":
+						if(requestJson.getBoolean(methodName) == null) {
+							patchSql.append(SiteContextEnUS.SQL_removeD);
+							patchSqlParams.addAll(Arrays.asList(pk, "userReceiveEmails"));
+						} else {
+							o2.setUserReceiveEmails(requestJson.getBoolean(methodName));
+							patchSql.append(SiteContextEnUS.SQL_setD);
+							patchSqlParams.addAll(Arrays.asList("userReceiveEmails", o2.jsonUserReceiveEmails(), pk));
+						}
+						break;
+					case "setSeeArchived":
+						if(requestJson.getBoolean(methodName) == null) {
+							patchSql.append(SiteContextEnUS.SQL_removeD);
+							patchSqlParams.addAll(Arrays.asList(pk, "seeArchived"));
+						} else {
+							o2.setSeeArchived(requestJson.getBoolean(methodName));
+							patchSql.append(SiteContextEnUS.SQL_setD);
+							patchSqlParams.addAll(Arrays.asList("seeArchived", o2.jsonSeeArchived(), pk));
+						}
+						break;
+					case "setSeeDeleted":
+						if(requestJson.getBoolean(methodName) == null) {
+							patchSql.append(SiteContextEnUS.SQL_removeD);
+							patchSqlParams.addAll(Arrays.asList(pk, "seeDeleted"));
+						} else {
+							o2.setSeeDeleted(requestJson.getBoolean(methodName));
+							patchSql.append(SiteContextEnUS.SQL_setD);
+							patchSqlParams.addAll(Arrays.asList("seeDeleted", o2.jsonSeeDeleted(), pk));
 						}
 						break;
 				}
@@ -288,10 +372,10 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 		}
 	}
 
-	public void response200PATCHSiteUser(SearchList<SiteUser> listSiteUser, Handler<AsyncResult<OperationResponse>> eventHandler) {
+	public void response200PATCHSiteUser(PatchRequest patchRequest, Handler<AsyncResult<OperationResponse>> eventHandler) {
 		try {
-			SiteRequestEnUS siteRequest = listSiteUser.getSiteRequest_();
-			JsonObject json = new JsonObject();
+			SiteRequestEnUS siteRequest = patchRequest.getSiteRequest_();
+			JsonObject json = JsonObject.mapFrom(patchRequest);
 			eventHandler.handle(Future.succeededFuture(OperationResponse.completedWithJson(json)));
 		} catch(Exception e) {
 			eventHandler.handle(Future.failedFuture(e));
@@ -364,75 +448,22 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 			AllWriter w = AllWriter.create(listSiteUser.getSiteRequest_(), buffer);
 			SiteUserPage page = new SiteUserPage();
 			SolrDocument pageSolrDocument = new SolrDocument();
+			CaseInsensitiveHeaders requestHeaders = new CaseInsensitiveHeaders();
+			siteRequest.setRequestHeaders(requestHeaders);
 
 			pageSolrDocument.setField("pageUri_frFR_stored_string", "/user");
 			page.setPageSolrDocument(pageSolrDocument);
 			page.setW(w);
+			if(listSiteUser.size() == 1)
+				siteRequest.setRequestPk(listSiteUser.get(0).getPk());
+			siteRequest.setW(w);
 			page.setListSiteUser(listSiteUser);
+			page.setSiteRequest_(siteRequest);
 			page.initDeepSiteUserPage(siteRequest);
 			page.html();
-			eventHandler.handle(Future.succeededFuture(new OperationResponse(200, "OK", buffer, new CaseInsensitiveHeaders())));
+			eventHandler.handle(Future.succeededFuture(new OperationResponse(200, "OK", buffer, requestHeaders)));
 		} catch(Exception e) {
 			eventHandler.handle(Future.failedFuture(e));
-		}
-	}
-
-	public String varIndexedSiteUser(String entityVar) {
-		switch(entityVar) {
-			case "pk":
-				return "pk_indexed_long";
-			case "id":
-				return "id_indexed_string";
-			case "created":
-				return "created_indexed_date";
-			case "modified":
-				return "modified_indexed_date";
-			case "archived":
-				return "archived_indexed_boolean";
-			case "deleted":
-				return "deleted_indexed_boolean";
-			case "classCanonicalName":
-				return "classCanonicalName_indexed_string";
-			case "classSimpleName":
-				return "classSimpleName_indexed_string";
-			case "classCanonicalNames":
-				return "classCanonicalNames_indexed_strings";
-			case "userId":
-				return "userId_indexed_string";
-			case "userName":
-				return "userName_indexed_string";
-			case "userEmail":
-				return "userEmail_indexed_string";
-			case "userFirstName":
-				return "userFirstName_indexed_string";
-			case "userLastName":
-				return "userLastName_indexed_string";
-			case "userFullName":
-				return "userFullName_indexed_string";
-			case "userSite":
-				return "userSite_indexed_string";
-			case "userReceiveEmails":
-				return "userReceiveEmails_indexed_boolean";
-			case "seeArchived":
-				return "seeArchived_indexed_boolean";
-			case "seeDeleted":
-				return "seeDeleted_indexed_boolean";
-			default:
-				throw new RuntimeException(String.format("\"%s\" is not an indexed entity. ", entityVar));
-		}
-	}
-
-	public String varSearchSiteUser(String entityVar) {
-		switch(entityVar) {
-			default:
-				throw new RuntimeException(String.format("\"%s\" is not an indexed entity. ", entityVar));
-		}
-	}
-
-	public String varSuggereSiteUser(String entityVar) {
-		switch(entityVar) {
-			default:
-				throw new RuntimeException(String.format("\"%s\" is not an indexed entity. ", entityVar));
 		}
 	}
 
@@ -543,6 +574,7 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 								JsonArray createLine = createAsync.result().getResults().stream().findFirst().orElseGet(() -> null);
 								Long pkUser = createLine.getLong(0);
 								SiteUser siteUser = new SiteUser();
+								siteUser.setSiteRequest_(siteRequest);
 								siteUser.setPk(pkUser);
 
 								sqlConnection.queryWithParams(
@@ -580,6 +612,7 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 						} else {
 							Long pkUser = userValues.getLong(0);
 							SiteUser siteUser = new SiteUser();
+								siteUser.setSiteRequest_(siteRequest);
 							siteUser.setPk(pkUser);
 
 							sqlConnection.queryWithParams(
@@ -632,20 +665,11 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 			listSearch.setC(SiteUser.class);
 			if(entityList != null)
 				listSearch.addFields(entityList);
-			listSearch.addSort("archived_indexed_boolean", ORDER.asc);
-			listSearch.addSort("deleted_indexed_boolean", ORDER.asc);
-			listSearch.addSort("created_indexed_date", ORDER.desc);
-			listSearch.addFilterQuery("classCanonicalNames_indexed_strings:" + ClientUtils.escapeQueryChars("org.computate.bancaire.enus.user.SiteUser"));
 			listSearch.set("json.facet", "{max_modified:'max(modified_indexed_date)'}");
-			SiteUser siteUser = siteRequest.getSiteUser();
-			if(siteUser != null && !siteUser.getSeeDeleted())
-				listSearch.addFilterQuery("deleted_indexed_boolean:false");
-			if(siteUser != null && !siteUser.getSeeArchived())
-				listSearch.addFilterQuery("archived_indexed_boolean:false");
 
 			String id = operationRequest.getParams().getJsonObject("path").getString("id");
 			if(id != null) {
-				listSearch.addFilterQuery("(id:" + ClientUtils.escapeQueryChars(id) + " OR _indexed_string:" + ClientUtils.escapeQueryChars(id) + ")");
+				listSearch.addFilterQuery("(id:" + ClientUtils.escapeQueryChars(id) + " OR objectId_indexed_string:" + ClientUtils.escapeQueryChars(id) + ")");
 			}
 
 			operationRequest.getParams().getJsonObject("query").forEach(paramRequest -> {
@@ -664,7 +688,7 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 						switch(paramName) {
 							case "q":
 								entityVar = StringUtils.trim(StringUtils.substringBefore((String)paramObject, ":"));
-								varIndexed = "*".equals(entityVar) ? entityVar : varSearchSiteUser(entityVar);
+								varIndexed = "*".equals(entityVar) ? entityVar : SiteUser.varSearchSiteUser(entityVar);
 								valueIndexed = URLDecoder.decode(StringUtils.trim(StringUtils.substringAfter((String)paramObject, ":")), "UTF-8");
 								valueIndexed = StringUtils.isEmpty(valueIndexed) ? "*" : valueIndexed;
 								listSearch.setQuery(varIndexed + ":" + ("*".equals(valueIndexed) ? valueIndexed : ClientUtils.escapeQueryChars(valueIndexed)));
@@ -678,13 +702,13 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 							case "fq":
 								entityVar = StringUtils.trim(StringUtils.substringBefore((String)paramObject, ":"));
 								valueIndexed = URLDecoder.decode(StringUtils.trim(StringUtils.substringAfter((String)paramObject, ":")), "UTF-8");
-								varIndexed = varIndexedSiteUser(entityVar);
+								varIndexed = SiteUser.varIndexedSiteUser(entityVar);
 								listSearch.addFilterQuery(varIndexed + ":" + ClientUtils.escapeQueryChars(valueIndexed));
 								break;
 							case "sort":
 								entityVar = StringUtils.trim(StringUtils.substringBefore((String)paramObject, " "));
 								valueSort = StringUtils.trim(StringUtils.substringAfter((String)paramObject, " "));
-								varIndexed = varIndexedSiteUser(entityVar);
+								varIndexed = SiteUser.varIndexedSiteUser(entityVar);
 								listSearch.addSort(varIndexed, ORDER.valueOf(valueSort));
 								break;
 							case "start":
@@ -701,6 +725,8 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 					eventHandler.handle(Future.failedFuture(e));
 				}
 			});
+			if(listSearch.getSorts().size() == 0)
+				listSearch.addSort("created_indexed_date", ORDER.desc);
 			listSearch.initDeepForClass(siteRequest);
 			eventHandler.handle(Future.succeededFuture(listSearch));
 		} catch(Exception e) {
@@ -721,7 +747,11 @@ public class SiteUserEnUSGenApiServiceImpl implements SiteUserEnUSGenApiService 
 				if(defineAsync.succeeded()) {
 					try {
 						for(JsonArray definition : defineAsync.result().getResults()) {
-							o.defineForClass(definition.getString(0), definition.getString(1));
+							try {
+								o.defineForClass(definition.getString(0), definition.getString(1));
+							} catch(Exception e) {
+								LOGGER.error(e);
+							}
 						}
 						eventHandler.handle(Future.succeededFuture());
 					} catch(Exception e) {

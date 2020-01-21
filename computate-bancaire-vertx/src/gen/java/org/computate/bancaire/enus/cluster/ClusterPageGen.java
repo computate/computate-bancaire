@@ -12,6 +12,8 @@ import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 import org.computate.bancaire.enus.cluster.ClusterGenPage;
 
 /**	
@@ -27,6 +29,7 @@ public abstract class ClusterPageGen<DEV> extends ClusterGenPage {
 	protected boolean alreadyInitializedClusterPage = false;
 
 	public ClusterPage initDeepClusterPage(SiteRequestEnUS siteRequest_) {
+		setSiteRequest_(siteRequest_);
 		if(!alreadyInitializedClusterPage) {
 			alreadyInitializedClusterPage = true;
 			initDeepClusterPage();
@@ -35,8 +38,8 @@ public abstract class ClusterPageGen<DEV> extends ClusterGenPage {
 	}
 
 	public void initDeepClusterPage() {
-		super.initDeepClusterGenPage(siteRequest_);
 		initClusterPage();
+		super.initDeepClusterGenPage(siteRequest_);
 	}
 
 	public void initClusterPage() {
@@ -44,6 +47,18 @@ public abstract class ClusterPageGen<DEV> extends ClusterGenPage {
 
 	@Override public void initDeepForClass(SiteRequestEnUS siteRequest_) {
 		initDeepClusterPage(siteRequest_);
+	}
+
+	/////////////////
+	// siteRequest //
+	/////////////////
+
+	public void siteRequestClusterPage(SiteRequestEnUS siteRequest_) {
+			super.siteRequestClusterGenPage(siteRequest_);
+	}
+
+	public void siteRequestForClass(SiteRequestEnUS siteRequest_) {
+		siteRequestClusterPage(siteRequest_);
 	}
 
 	/////////////
@@ -204,6 +219,18 @@ public abstract class ClusterPageGen<DEV> extends ClusterGenPage {
 	}
 
 	public void htmlStyleClusterPage() {
+	}
+
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestClusterPage() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		ClusterPage original = (ClusterPage)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
+			super.patchRequestClusterGenPage();
+		}
 	}
 
 	//////////////

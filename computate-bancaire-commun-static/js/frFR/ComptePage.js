@@ -1,8 +1,18 @@
 
 // POST //
 
-function postCompteBancaire($formulaireValeurs) {
+async function postCompteBancaire($formulaireValeurs, success, error) {
 	var vals = {};
+	if(success == null) {
+		success = function( data, textStatus, jQxhr ) {
+			ajouterLueur($formulaireValeurs.next('button'));
+		};
+	}
+	if(error == null) {
+		error = function( jqXhr, textStatus, errorThrown ) {
+			ajouterErreur($formulaireValeurs.next('button'));
+		};
+	}
 
 	var valeurPk = $formulaireValeurs.find('.valeurPk').val();
 	if(valeurPk != null && valeurPk !== '')
@@ -16,9 +26,21 @@ function postCompteBancaire($formulaireValeurs) {
 	if(valeurModifie != null && valeurModifie !== '')
 		vals['modifie'] = valeurModifie;
 
+	var valeurObjetId = $formulaireValeurs.find('.valeurObjetId').val();
+	if(valeurObjetId != null && valeurObjetId !== '')
+		vals['objetId'] = valeurObjetId;
+
 	var valeurCompteId = $formulaireValeurs.find('.valeurCompteId').val();
 	if(valeurCompteId != null && valeurCompteId !== '')
 		vals['compteId'] = valeurCompteId;
+
+	var valeurArchive = $formulaireValeurs.find('.valeurArchive').prop('checked');
+	if(valeurArchive != null && valeurArchive !== '')
+		vals['archive'] = valeurArchive;
+
+	var valeurSupprime = $formulaireValeurs.find('.valeurSupprime').prop('checked');
+	if(valeurSupprime != null && valeurSupprime !== '')
+		vals['supprime'] = valeurSupprime;
 
 	var valeurTransactionCles = $formulaireValeurs.find('.valeurTransactionCles').val();
 	if(valeurTransactionCles != null && valeurTransactionCles !== '')
@@ -73,7 +95,7 @@ function postCompteBancaireVals(vals, success, error) {
 
 // PATCH //
 
-function patchCompteBancaire($formulaireFiltres, $formulaireValeurs, success, error) {
+async function patchCompteBancaire($formulaireFiltres, $formulaireValeurs, success, error) {
 	var filtres = patchCompteBancaireFiltres($formulaireFiltres);
 
 	var vals = {};
@@ -111,6 +133,17 @@ function patchCompteBancaire($formulaireFiltres, $formulaireValeurs, success, er
 	if(removeModifie != null && removeModifie !== '')
 		vals['removeModifie'] = removeModifie;
 
+	var removeObjetId = $formulaireFiltres.find('.removeObjetId').val() === 'true';
+	var setObjetId = removeObjetId ? null : $formulaireValeurs.find('.setObjetId').val();
+	if(removeObjetId || setObjetId != null && setObjetId !== '')
+		vals['setObjetId'] = setObjetId;
+	var addObjetId = $formulaireValeurs.find('.addObjetId').val();
+	if(addObjetId != null && addObjetId !== '')
+		vals['addObjetId'] = addObjetId;
+	var removeObjetId = $formulaireValeurs.find('.removeObjetId').val();
+	if(removeObjetId != null && removeObjetId !== '')
+		vals['removeObjetId'] = removeObjetId;
+
 	var removeCompteId = $formulaireFiltres.find('.removeCompteId').val() === 'true';
 	var setCompteId = removeCompteId ? null : $formulaireValeurs.find('.setCompteId').val();
 	if(removeCompteId || setCompteId != null && setCompteId !== '')
@@ -121,6 +154,28 @@ function patchCompteBancaire($formulaireFiltres, $formulaireValeurs, success, er
 	var removeCompteId = $formulaireValeurs.find('.removeCompteId').val();
 	if(removeCompteId != null && removeCompteId !== '')
 		vals['removeCompteId'] = removeCompteId;
+
+	var removeArchive = $formulaireFiltres.find('.removeArchive').val() === 'true';
+	var setArchive = removeArchive ? null : $formulaireValeurs.find('.setArchive').prop('checked');
+	if(removeArchive || setArchive != null && setArchive !== '')
+		vals['setArchive'] = setArchive;
+	var addArchive = $formulaireValeurs.find('.addArchive').prop('checked');
+	if(addArchive != null && addArchive !== '')
+		vals['addArchive'] = addArchive;
+	var removeArchive = $formulaireValeurs.find('.removeArchive').prop('checked');
+	if(removeArchive != null && removeArchive !== '')
+		vals['removeArchive'] = removeArchive;
+
+	var removeSupprime = $formulaireFiltres.find('.removeSupprime').val() === 'true';
+	var setSupprime = removeSupprime ? null : $formulaireValeurs.find('.setSupprime').prop('checked');
+	if(removeSupprime || setSupprime != null && setSupprime !== '')
+		vals['setSupprime'] = setSupprime;
+	var addSupprime = $formulaireValeurs.find('.addSupprime').prop('checked');
+	if(addSupprime != null && addSupprime !== '')
+		vals['addSupprime'] = addSupprime;
+	var removeSupprime = $formulaireValeurs.find('.removeSupprime').prop('checked');
+	if(removeSupprime != null && removeSupprime !== '')
+		vals['removeSupprime'] = removeSupprime;
 
 	var removeTransactionCles = $formulaireFiltres.find('.removeTransactionCles').val() === 'true';
 	var setTransactionCles = removeTransactionCles ? null : $formulaireValeurs.find('.setTransactionCles').val();
@@ -217,9 +272,21 @@ function patchCompteBancaireFiltres($formulaireFiltres) {
 	if(filtreModifie != null && filtreModifie !== '')
 		filtres.push({ name: 'fq', value: 'modifie:' + filtreModifie });
 
+	var filtreObjetId = $formulaireFiltres.find('.valeurObjetId').val();
+	if(filtreObjetId != null && filtreObjetId !== '')
+		filtres.push({ name: 'fq', value: 'objetId:' + filtreObjetId });
+
 	var filtreCompteId = $formulaireFiltres.find('.valeurCompteId').val();
 	if(filtreCompteId != null && filtreCompteId !== '')
 		filtres.push({ name: 'fq', value: 'compteId:' + filtreCompteId });
+
+	var filtreArchive = $formulaireFiltres.find('.valeurArchive').prop('checked');
+	if(filtreArchive != null && filtreArchive === true)
+		filtres.push({ name: 'fq', value: 'archive:' + filtreArchive });
+
+	var filtreSupprime = $formulaireFiltres.find('.valeurSupprime').prop('checked');
+	if(filtreSupprime != null && filtreSupprime === true)
+		filtres.push({ name: 'fq', value: 'supprime:' + filtreSupprime });
 
 	var filtreTransactionCles = $formulaireFiltres.find('.valeurTransactionCles').val();
 	if(filtreTransactionCles != null && filtreTransactionCles !== '')
@@ -249,14 +316,6 @@ function patchCompteBancaireFiltres($formulaireFiltres) {
 	if(filtreId != null && filtreId !== '')
 		filtres.push({ name: 'fq', value: 'id:' + filtreId });
 
-	var filtreArchive = $formulaireFiltres.find('.valeurArchive').prop('checked');
-	if(filtreArchive != null && filtreArchive === true)
-		filtres.push({ name: 'fq', value: 'archive:' + filtreArchive });
-
-	var filtreSupprime = $formulaireFiltres.find('.valeurSupprime').prop('checked');
-	if(filtreSupprime != null && filtreSupprime === true)
-		filtres.push({ name: 'fq', value: 'supprime:' + filtreSupprime });
-
 	var filtreClasseNomCanonique = $formulaireFiltres.find('.valeurClasseNomCanonique').val();
 	if(filtreClasseNomCanonique != null && filtreClasseNomCanonique !== '')
 		filtres.push({ name: 'fq', value: 'classeNomCanonique:' + filtreClasseNomCanonique });
@@ -268,6 +327,18 @@ function patchCompteBancaireFiltres($formulaireFiltres) {
 	var filtreClasseNomsCanoniques = $formulaireFiltres.find('.valeurClasseNomsCanoniques').val();
 	if(filtreClasseNomsCanoniques != null && filtreClasseNomsCanoniques !== '')
 		filtres.push({ name: 'fq', value: 'classeNomsCanoniques:' + filtreClasseNomsCanoniques });
+
+	var filtreObjetTitre = $formulaireFiltres.find('.valeurObjetTitre').val();
+	if(filtreObjetTitre != null && filtreObjetTitre !== '')
+		filtres.push({ name: 'fq', value: 'objetTitre:' + filtreObjetTitre });
+
+	var filtreObjetSuggere = $formulaireFiltres.find('.valeurObjetSuggere').val();
+	if(filtreObjetSuggere != null && filtreObjetSuggere !== '')
+		filtres.push({ name: 'q', value: 'objetSuggere:' + filtreObjetSuggere });
+
+	var filtrePageUrl = $formulaireFiltres.find('.valeurPageUrl').val();
+	if(filtrePageUrl != null && filtrePageUrl !== '')
+		filtres.push({ name: 'fq', value: 'pageUrl:' + filtrePageUrl });
 
 	var filtreCompteCle = $formulaireFiltres.find('.valeurCompteCle').val();
 	if(filtreCompteCle != null && filtreCompteCle !== '')
@@ -311,7 +382,7 @@ function patchCompteBancaireVals(filtres, vals, success, error) {
 
 // GET //
 
-function getCompteBancaire(pk) {
+async function getCompteBancaire(pk) {
 	$.ajax({
 		url: '/api/compte/' + id
 		, dataType: 'json'
@@ -324,7 +395,7 @@ function getCompteBancaire(pk) {
 
 // DELETE //
 
-function deleteCompteBancaire(pk) {
+async function deleteCompteBancaire(pk) {
 	$.ajax({
 		url: '/api/compte/' + id
 		, dataType: 'json'
@@ -338,7 +409,7 @@ function deleteCompteBancaire(pk) {
 
 // Recherche //
 
-function rechercheCompteBancaire($formulaireFiltres, success, error) {
+async function rechercheCompteBancaire($formulaireFiltres, success, error) {
 	var filtres = rechercheCompteBancaireFiltres($formulaireFiltres);
 	if(success == null)
 		success = function( data, textStatus, jQxhr ) {};
@@ -363,9 +434,21 @@ function rechercheCompteBancaireFiltres($formulaireFiltres) {
 	if(filtreModifie != null && filtreModifie !== '')
 		filtres.push({ name: 'fq', value: 'modifie:' + filtreModifie });
 
+	var filtreObjetId = $formulaireFiltres.find('.valeurObjetId').val();
+	if(filtreObjetId != null && filtreObjetId !== '')
+		filtres.push({ name: 'fq', value: 'objetId:' + filtreObjetId });
+
 	var filtreCompteId = $formulaireFiltres.find('.valeurCompteId').val();
 	if(filtreCompteId != null && filtreCompteId !== '')
 		filtres.push({ name: 'fq', value: 'compteId:' + filtreCompteId });
+
+	var filtreArchive = $formulaireFiltres.find('.valeurArchive').prop('checked');
+	if(filtreArchive != null && filtreArchive === true)
+		filtres.push({ name: 'fq', value: 'archive:' + filtreArchive });
+
+	var filtreSupprime = $formulaireFiltres.find('.valeurSupprime').prop('checked');
+	if(filtreSupprime != null && filtreSupprime === true)
+		filtres.push({ name: 'fq', value: 'supprime:' + filtreSupprime });
 
 	var filtreTransactionCles = $formulaireFiltres.find('.valeurTransactionCles').val();
 	if(filtreTransactionCles != null && filtreTransactionCles !== '')
@@ -395,14 +478,6 @@ function rechercheCompteBancaireFiltres($formulaireFiltres) {
 	if(filtreId != null && filtreId !== '')
 		filtres.push({ name: 'fq', value: 'id:' + filtreId });
 
-	var filtreArchive = $formulaireFiltres.find('.valeurArchive').prop('checked');
-	if(filtreArchive != null && filtreArchive === true)
-		filtres.push({ name: 'fq', value: 'archive:' + filtreArchive });
-
-	var filtreSupprime = $formulaireFiltres.find('.valeurSupprime').prop('checked');
-	if(filtreSupprime != null && filtreSupprime === true)
-		filtres.push({ name: 'fq', value: 'supprime:' + filtreSupprime });
-
 	var filtreClasseNomCanonique = $formulaireFiltres.find('.valeurClasseNomCanonique').val();
 	if(filtreClasseNomCanonique != null && filtreClasseNomCanonique !== '')
 		filtres.push({ name: 'fq', value: 'classeNomCanonique:' + filtreClasseNomCanonique });
@@ -414,6 +489,18 @@ function rechercheCompteBancaireFiltres($formulaireFiltres) {
 	var filtreClasseNomsCanoniques = $formulaireFiltres.find('.valeurClasseNomsCanoniques').val();
 	if(filtreClasseNomsCanoniques != null && filtreClasseNomsCanoniques !== '')
 		filtres.push({ name: 'fq', value: 'classeNomsCanoniques:' + filtreClasseNomsCanoniques });
+
+	var filtreObjetTitre = $formulaireFiltres.find('.valeurObjetTitre').val();
+	if(filtreObjetTitre != null && filtreObjetTitre !== '')
+		filtres.push({ name: 'fq', value: 'objetTitre:' + filtreObjetTitre });
+
+	var filtreObjetSuggere = $formulaireFiltres.find('.valeurObjetSuggere').val();
+	if(filtreObjetSuggere != null && filtreObjetSuggere !== '')
+		filtres.push({ name: 'q', value: 'objetSuggere:' + filtreObjetSuggere });
+
+	var filtrePageUrl = $formulaireFiltres.find('.valeurPageUrl').val();
+	if(filtrePageUrl != null && filtrePageUrl !== '')
+		filtres.push({ name: 'fq', value: 'pageUrl:' + filtrePageUrl });
 
 	var filtreCompteCle = $formulaireFiltres.find('.valeurCompteCle').val();
 	if(filtreCompteCle != null && filtreCompteCle !== '')
@@ -455,7 +542,7 @@ function suggereCompteBancaireObjetSuggere($formulaireFiltres, $list) {
 			var $i = $('<i>').attr('class', 'fad fa-money-check w3-padding-small ');
 			var $span = $('<span>').attr('class', '').text(o['compteNomComplet']);
 			var $li = $('<li>');
-			var $a = $('<a>').attr('href', o['pageUrl']);
+			var $a = $('<a>').attr('href', o['']);
 			$a.append($i);
 			$a.append($span);
 			$li.append($a);
@@ -464,4 +551,124 @@ function suggereCompteBancaireObjetSuggere($formulaireFiltres, $list) {
 	};
 	error = function( jqXhr, textStatus, errorThrown ) {};
 	rechercherCompteBancaireVals($formulaireFiltres, success, error);
+}
+
+function suggereCompteBancaireObjetSuggere($formulaireFiltres, $list) {
+	success = function( data, textStatus, jQxhr ) {
+		$list.empty();
+		$.each(data['list'], function(i, o) {
+			var $i = $('<i>').attr('class', 'fad fa-money-check w3-padding-small ');
+			var $span = $('<span>').attr('class', '').text(o['compteNomComplet']);
+			var $li = $('<li>');
+			var $a = $('<a>').attr('href', o['']);
+			$a.append($i);
+			$a.append($span);
+			$li.append($a);
+			$list.append($li);
+		});
+	};
+	error = function( jqXhr, textStatus, errorThrown ) {};
+	rechercherCompteBancaireVals($formulaireFiltres, success, error);
+}
+
+async function websocketCompteBancaire(success) {
+	window.eventBus.onopen = function () {
+
+		window.eventBus.registerHandler('websocketCompteBancaire', function (error, message) {
+			var json = JSON.parse(message['body']);
+			var id = json['id'];
+			var pk = json['pk'];
+			var pks = json['pks'];
+			var empty = json['empty'];
+			if(!empty) {
+				var numFound = json['numFound'];
+				var numPATCH = json['numPATCH'];
+				var percent = Math.floor( numPATCH / numFound * 100 ) + '%';
+				var $box = $('<div>').attr('class', 'w3-display-topright w3-quarter box-' + id + ' ').attr('id', 'box-' + id);
+				var $margin = $('<div>').attr('class', 'w3-margin ').attr('id', 'margin-' + id);
+				var $card = $('<div>').attr('class', 'w3-card ').attr('id', 'card-' + id);
+				var $header = $('<div>').attr('class', 'w3-container fa-gray ').attr('id', 'header-' + id);
+				var $i = $('<i>').attr('class', 'fad fa-money-check w3-margin-right ').attr('id', 'icon-' + id);
+				var $headerSpan = $('<span>').attr('class', '').text('modifier comptes');
+				var $x = $('<span>').attr('class', 'w3-button w3-display-topright ').attr('onclick', '$("#card-' + id + '").hide(); ').attr('id', 'x-' + id);
+				var $body = $('<div>').attr('class', 'w3-container w3-padding ').attr('id', 'text-' + id);
+				var $bar = $('<div>').attr('class', 'w3-light-gray ').attr('id', 'bar-' + id);
+				var $progress = $('<div>').attr('class', 'w3-gray ').attr('style', 'height: 24px; width: ' + percent + '; ').attr('id', 'progress-' + id).text(numPATCH + '/' + numFound);
+				$card.append($header);
+				$header.append($i);
+				$header.append($headerSpan);
+				$header.append($x);
+				$body.append($bar);
+				$bar.append($progress);
+				$card.append($body);
+				$box.append($margin);
+				$margin.append($card);
+				$('.box-' + id).remove();
+				if(numPATCH < numFound)
+				$('.w3-content').append($box);
+				if(success)
+					success(json);
+			}
+		});
+	}
+}
+async function websocketCompteBancaireInner(requetePatch) {
+	var pk = requetePatch['pk'];
+	var pks = requetePatch['pks'];
+	var classes = requetePatch['classes'];
+	var vars = requetePatch['vars'];
+	var empty = requetePatch['empty'];
+
+	if(pk != null) {
+		rechercherCompteBancaireVals([ {name: 'fq', value: 'pk:' + pk} ], function( data, textStatus, jQxhr ) {
+			var o = data['list'][0];
+			if(vars.includes('cree')) {
+				$('.inputCompteBancaire' + pk + 'Cree').val(o['cree']);
+				$('.varCompteBancaire' + pk + 'Cree').text(o['cree']);
+			}
+			if(vars.includes('modifie')) {
+				$('.inputCompteBancaire' + pk + 'Modifie').val(o['modifie']);
+				$('.varCompteBancaire' + pk + 'Modifie').text(o['modifie']);
+			}
+			if(vars.includes('archive')) {
+				$('.inputCompteBancaire' + pk + 'Archive').val(o['archive']);
+				$('.varCompteBancaire' + pk + 'Archive').text(o['archive']);
+			}
+			if(vars.includes('supprime')) {
+				$('.inputCompteBancaire' + pk + 'Supprime').val(o['supprime']);
+				$('.varCompteBancaire' + pk + 'Supprime').text(o['supprime']);
+			}
+			if(vars.includes('compteNumero')) {
+				$('.inputCompteBancaire' + pk + 'CompteNumero').val(o['compteNumero']);
+				$('.varCompteBancaire' + pk + 'CompteNumero').text(o['compteNumero']);
+			}
+			if(vars.includes('compteAdministrateurNom')) {
+				$('.inputCompteBancaire' + pk + 'CompteAdministrateurNom').val(o['compteAdministrateurNom']);
+				$('.varCompteBancaire' + pk + 'CompteAdministrateurNom').text(o['compteAdministrateurNom']);
+			}
+			if(vars.includes('compteEmplacement')) {
+				$('.inputCompteBancaire' + pk + 'CompteEmplacement').val(o['compteEmplacement']);
+				$('.varCompteBancaire' + pk + 'CompteEmplacement').text(o['compteEmplacement']);
+			}
+			if(vars.includes('compteNumeroTelephone')) {
+				$('.inputCompteBancaire' + pk + 'CompteNumeroTelephone').val(o['compteNumeroTelephone']);
+				$('.varCompteBancaire' + pk + 'CompteNumeroTelephone').text(o['compteNumeroTelephone']);
+			}
+			if(vars.includes('compteAddresse')) {
+				$('.inputCompteBancaire' + pk + 'CompteAddresse').val(o['compteAddresse']);
+				$('.varCompteBancaire' + pk + 'CompteAddresse').text(o['compteAddresse']);
+			}
+		});
+	}
+
+	if(!empty) {
+		if(pks) {
+			for(i=0; i < pks.length; i++) {
+				var pk2 = pks[i];
+				var c = classes[i];
+				await window['patch' + c + 'Vals']( [ {name: 'fq', value: 'pk:' + pk2} ], {});
+			}
+		}
+		await patchCompteBancaireVals( [ {name: 'fq', value: 'pk:' + pk} ], {});
+	}
 }

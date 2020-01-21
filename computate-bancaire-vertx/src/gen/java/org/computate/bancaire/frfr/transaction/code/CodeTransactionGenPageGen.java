@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.transaction.code;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import org.computate.bancaire.frfr.transaction.code.CodeTransaction;
 import org.computate.bancaire.frfr.cluster.Cluster;
 import java.math.MathContext;
@@ -13,6 +14,7 @@ import org.computate.bancaire.frfr.couverture.Couverture;
 import org.computate.bancaire.frfr.recherche.ListeRecherche;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
 import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 import org.computate.bancaire.frfr.cluster.ClusterPage;
 
@@ -116,8 +118,8 @@ public abstract class CodeTransactionGenPageGen<DEV> extends ClusterPage {
 	}
 
 	public void initLoinCodeTransactionGenPage() {
-		super.initLoinClusterPage(requeteSite_);
 		initCodeTransactionGenPage();
+		super.initLoinClusterPage(requeteSite_);
 	}
 
 	public void initCodeTransactionGenPage() {
@@ -307,6 +309,18 @@ public abstract class CodeTransactionGenPageGen<DEV> extends ClusterPage {
 	}
 
 	public void htmlStyleCodeTransactionGenPage() {
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchCodeTransactionGenPage() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		CodeTransactionGenPage original = (CodeTransactionGenPage)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
+			super.requetePatchClusterPage();
+		}
 	}
 
 	//////////////

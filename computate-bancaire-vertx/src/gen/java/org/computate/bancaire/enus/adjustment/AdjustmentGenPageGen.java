@@ -15,6 +15,8 @@ import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import org.computate.bancaire.enus.adjustment.BankAdjustment;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 
 /**	
  * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.adjustment.AdjustmentGenPage&fq=classeEtendGen_indexed_boolean:true">Trouver la classe  dans Solr</a>
@@ -55,6 +57,8 @@ public abstract class AdjustmentGenPageGen<DEV> extends ClusterPage {
 			if(listBankAdjustment == null)
 				setListBankAdjustment(listBankAdjustmentWrap.o);
 		}
+		if(listBankAdjustment != null)
+			listBankAdjustment.initDeepForClass(null);
 		listBankAdjustmentWrap.alreadyInitialized(true);
 		return (AdjustmentGenPage)this;
 	}
@@ -92,6 +96,8 @@ public abstract class AdjustmentGenPageGen<DEV> extends ClusterPage {
 			if(bankAdjustment == null)
 				setBankAdjustment(bankAdjustmentWrap.o);
 		}
+		if(bankAdjustment != null)
+			bankAdjustment.initDeepForClass(null);
 		bankAdjustmentWrap.alreadyInitialized(true);
 		return (AdjustmentGenPage)this;
 	}
@@ -111,8 +117,8 @@ public abstract class AdjustmentGenPageGen<DEV> extends ClusterPage {
 	}
 
 	public void initDeepAdjustmentGenPage() {
-		super.initDeepClusterPage(siteRequest_);
 		initAdjustmentGenPage();
+		super.initDeepClusterPage(siteRequest_);
 	}
 
 	public void initAdjustmentGenPage() {
@@ -286,6 +292,18 @@ public abstract class AdjustmentGenPageGen<DEV> extends ClusterPage {
 	}
 
 	public void htmlStyleAdjustmentGenPage() {
+	}
+
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestAdjustmentGenPage() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		AdjustmentGenPage original = (AdjustmentGenPage)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
+			super.patchRequestClusterPage();
+		}
 	}
 
 	//////////////

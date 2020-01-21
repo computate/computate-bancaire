@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.ajustement;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import java.util.Date;
 import java.time.ZonedDateTime;
 import java.time.LocalDateTime;
@@ -32,6 +33,7 @@ import java.util.Objects;
 import io.vertx.core.json.JsonArray;
 import org.apache.solr.common.SolrDocument;
 import java.util.List;
+import java.time.temporal.ChronoUnit;
 import org.computate.bancaire.frfr.couverture.Couverture;
 import org.computate.bancaire.frfr.recherche.ListeRecherche;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +42,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.computate.bancaire.frfr.compte.CompteBancaire;
+import java.util.Optional;
 import io.vertx.ext.sql.SQLClient;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -141,47 +144,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return ajustementCle == null ? "" : StringEscapeUtils.escapeHtml4(strAjustementCle());
 	}
 
-	public void htmAjustementCle(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "AjustementCle\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "AjustementCle() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAjustementCle\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAjustementCle()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"ajustementCle\"");
-							r.s(" value=\"", htmAjustementCle(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmAjustementCle());
-			}
-			r.l("</div>");
-		}
-	}
-
 	///////////////
 	// compteCle //
 	///////////////
@@ -249,45 +211,30 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return compteCle == null ? "" : StringEscapeUtils.escapeHtml4(strCompteCle());
 	}
 
-	public void htmCompteCle(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "CompteCle\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "CompteCle() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteCle\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteCle()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteCle\"");
-							r.s(" value=\"", htmCompteCle(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCompteCle());
+	public void inputCompteCle(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+	}
+
+	public void htmCompteCle(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("class", "").f().sx("compte").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strCompteCle()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	/////////////////////
@@ -426,47 +373,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return compteNomComplet == null ? "" : StringEscapeUtils.escapeHtml4(strCompteNomComplet());
 	}
 
-	public void htmCompteNomComplet(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "CompteNomComplet\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "CompteNomComplet() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteNomComplet\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteNomComplet()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteNomComplet\"");
-							r.s(" value=\"", htmCompteNomComplet(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCompteNomComplet());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////////
 	// compteNumero //
 	//////////////////
@@ -526,47 +432,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 
 	public String htmCompteNumero() {
 		return compteNumero == null ? "" : StringEscapeUtils.escapeHtml4(strCompteNumero());
-	}
-
-	public void htmCompteNumero(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "CompteNumero\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "CompteNumero() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteNumero\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteNumero()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteNumero\"");
-							r.s(" value=\"", htmCompteNumero(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCompteNumero());
-			}
-			r.l("</div>");
-		}
 	}
 
 	////////////////////
@@ -636,45 +501,30 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return transactionCle == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionCle());
 	}
 
-	public void htmTransactionCle(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "TransactionCle\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "TransactionCle() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionCle\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionCle()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionCle\"");
-							r.s(" value=\"", htmTransactionCle(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionCle());
+	public void inputTransactionCle(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+	}
+
+	public void htmTransactionCle(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("class", "").f().sx("transaction").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strTransactionCle()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	//////////////////////////
@@ -813,47 +663,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return transactionIdReference == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionIdReference());
 	}
 
-	public void htmTransactionIdReference(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "TransactionIdReference\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "TransactionIdReference() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionIdReference\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionIdReference()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionIdReference\"");
-							r.s(" value=\"", htmTransactionIdReference(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionIdReference());
-			}
-			r.l("</div>");
-		}
-	}
-
 	/////////////////////
 	// transactionCode //
 	/////////////////////
@@ -915,47 +724,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return transactionCode == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionCode());
 	}
 
-	public void htmTransactionCode(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "TransactionCode\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "TransactionCode() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionCode\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionCode()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionCode\"");
-							r.s(" value=\"", htmTransactionCode(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionCode());
-			}
-			r.l("</div>");
-		}
-	}
-
 	////////////////////////
 	// transactionMontant //
 	////////////////////////
@@ -1015,7 +783,7 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 	}
 
 	public String strTransactionMontant() {
-		return transactionMontant == null ? "" : transactionMontant.toString();
+		return transactionMontant == null ? "" : transactionMontant.setScale(2).toString();
 	}
 
 	public String jsonTransactionMontant() {
@@ -1032,47 +800,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 
 	public String htmTransactionMontant() {
 		return transactionMontant == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionMontant());
-	}
-
-	public void htmTransactionMontant(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "TransactionMontant\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "TransactionMontant() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionMontant\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionMontant()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionMontant\"");
-							r.s(" value=\"", htmTransactionMontant(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionMontant());
-			}
-			r.l("</div>");
-		}
 	}
 
 	//////////////////////////
@@ -1103,18 +830,18 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		this.transactionDateHeureCouverture.dejaInitialise = true;
 	}
 	public AjustementBancaire setTransactionDateHeure(Instant o) {
-		this.transactionDateHeure = ZonedDateTime.from(o);
+		this.transactionDateHeure = ZonedDateTime.from(o).truncatedTo(ChronoUnit.MILLIS);
 		this.transactionDateHeureCouverture.dejaInitialise = true;
 		return (AjustementBancaire)this;
 	}
 	/** Example: 2011-12-03T10:15:30+01:00 **/
 	public AjustementBancaire setTransactionDateHeure(String o) {
-		this.transactionDateHeure = ZonedDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		this.transactionDateHeure = ZonedDateTime.parse(o, DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.of(requeteSite_.getConfigSite_().getSiteZone()))).truncatedTo(ChronoUnit.MILLIS);
 		this.transactionDateHeureCouverture.dejaInitialise = true;
 		return (AjustementBancaire)this;
 	}
 	public AjustementBancaire setTransactionDateHeure(Date o) {
-		this.transactionDateHeure = ZonedDateTime.ofInstant(o.toInstant(), ZoneId.of(requeteSite_.getConfigSite_().getSiteZone()));
+		this.transactionDateHeure = ZonedDateTime.ofInstant(o.toInstant(), ZoneId.of(requeteSite_.getConfigSite_().getSiteZone())).truncatedTo(ChronoUnit.MILLIS);
 		this.transactionDateHeureCouverture.dejaInitialise = true;
 		return (AjustementBancaire)this;
 	}
@@ -1133,7 +860,7 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 	}
 
 	public String strTransactionDateHeure() {
-		return transactionDateHeure == null ? "" : transactionDateHeure.format(DateTimeFormatter.ofPattern("EEE d MMM yyyy H'h'mm:ss.SSS zz VV", Locale.FRANCE));
+		return transactionDateHeure == null ? "" : transactionDateHeure.format(DateTimeFormatter.ofPattern("EEE d MMM yyyy H'h'mm:ss zz", Locale.FRANCE));
 	}
 
 	public String jsonTransactionDateHeure() {
@@ -1150,47 +877,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 
 	public String htmTransactionDateHeure() {
 		return transactionDateHeure == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionDateHeure());
-	}
-
-	public void htmTransactionDateHeure(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "TransactionDateHeure\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "TransactionDateHeure() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionDateHeure\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionDateHeure()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionDateHeure\"");
-							r.s(" value=\"", htmTransactionDateHeure(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionDateHeure());
-			}
-			r.l("</div>");
-		}
 	}
 
 	/////////////////////
@@ -1270,47 +956,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return transactionDate == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionDate());
 	}
 
-	public void htmTransactionDate(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "TransactionDate\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "TransactionDate() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionDate\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionDate()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionDate\"");
-							r.s(" value=\"", htmTransactionDate(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionDate());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////////////
 	// transactionFrais //
 	//////////////////////
@@ -1375,47 +1020,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 
 	public String htmTransactionFrais() {
 		return transactionFrais == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionFrais());
-	}
-
-	public void htmTransactionFrais(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "TransactionFrais\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "TransactionFrais() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionFrais\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionFrais()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionFrais\"");
-							r.s(" value=\"", htmTransactionFrais(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionFrais());
-			}
-			r.l("</div>");
-		}
 	}
 
 	////////////////
@@ -1496,45 +1100,58 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return agentZones == null ? "" : StringEscapeUtils.escapeHtml4(strAgentZones());
 	}
 
-	public void htmAgentZones(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "AgentZones\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "AgentZones() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAgentZones\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAgentZones()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"agentZones\"");
-							r.s(" value=\"", htmAgentZones(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputAgentZones(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "zones d'agent")
+			.a("id", classeApiMethodeMethode, "_agentZones");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setAgentZones inputAjustementBancaire", pk, "AgentZones w3-input w3-border ");
+				a("name", "setAgentZones");
 			} else {
-				r.s(htmAgentZones());
+				a("class", "valeurAgentZones w3-input w3-border inputAjustementBancaire", pk, "AgentZones w3-input w3-border ");
+				a("name", "agentZones");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchAjustementBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setAgentZones', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_agentZones')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_agentZones')); }); ");
+			}
+			a("value", strAgentZones())
+		.fg();
+
+	}
+
+	public void htmAgentZones(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereAjustementBancaireAgentZones").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_agentZones").a("class", "").f().sx("zones d'agent").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputAgentZones(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_agentZones')); $('#", classeApiMethodeMethode, "_agentZones').val(null); patchAjustementBancaireVal([{ name: 'fq', value: 'pk:' + $('#AjustementBancaireForm :input[name=pk]').val() }], 'setAgentZones', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_agentZones')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_agentZones')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	////////////////
@@ -1615,45 +1232,58 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return agentRoles == null ? "" : StringEscapeUtils.escapeHtml4(strAgentRoles());
 	}
 
-	public void htmAgentRoles(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "AgentRoles\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "AgentRoles() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAgentRoles\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAgentRoles()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"agentRoles\"");
-							r.s(" value=\"", htmAgentRoles(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputAgentRoles(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "rôles d'agent")
+			.a("id", classeApiMethodeMethode, "_agentRoles");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setAgentRoles inputAjustementBancaire", pk, "AgentRoles w3-input w3-border ");
+				a("name", "setAgentRoles");
 			} else {
-				r.s(htmAgentRoles());
+				a("class", "valeurAgentRoles w3-input w3-border inputAjustementBancaire", pk, "AgentRoles w3-input w3-border ");
+				a("name", "agentRoles");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchAjustementBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setAgentRoles', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_agentRoles')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_agentRoles')); }); ");
+			}
+			a("value", strAgentRoles())
+		.fg();
+
+	}
+
+	public void htmAgentRoles(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereAjustementBancaireAgentRoles").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_agentRoles").a("class", "").f().sx("rôles d'agent").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputAgentRoles(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_agentRoles')); $('#", classeApiMethodeMethode, "_agentRoles').val(null); patchAjustementBancaireVal([{ name: 'fq', value: 'pk:' + $('#AjustementBancaireForm :input[name=pk]').val() }], 'setAgentRoles', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_agentRoles')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_agentRoles')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	//////////////////////
@@ -1722,45 +1352,48 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return agentPasserOutre == null ? "" : StringEscapeUtils.escapeHtml4(strAgentPasserOutre());
 	}
 
-	public void htmAgentPasserOutre(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "AgentPasserOutre\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "AgentPasserOutre() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAgentPasserOutre\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAgentPasserOutre()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"agentPasserOutre\"");
-							r.s(" value=\"", htmAgentPasserOutre(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputAgentPasserOutre(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		e("input")
+			.a("type", "checkbox")
+			.a("id", classeApiMethodeMethode, "_agentPasserOutre")
+			.a("value", "true");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setAgentPasserOutre inputAjustementBancaire", pk, "AgentPasserOutre w3-input w3-border ");
+				a("name", "setAgentPasserOutre");
 			} else {
-				r.s(htmAgentPasserOutre());
+				a("class", "valeurAgentPasserOutre inputAjustementBancaire", pk, "AgentPasserOutre w3-input w3-border ");
+				a("name", "agentPasserOutre");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onchange", "patchAjustementBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setAgentPasserOutre', $(this).prop('checked'), function() { ajouterLueur($('#", classeApiMethodeMethode, "_agentPasserOutre')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_agentPasserOutre')); }); ");
+			}
+			;
+			if(getAgentPasserOutre() != null && getAgentPasserOutre())
+				a("checked", "checked");
+		fg();
+
+	}
+
+	public void htmAgentPasserOutre(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereAjustementBancaireAgentPasserOutre").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_agentPasserOutre").a("class", "").f().sx("agent peut passer outre").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputAgentPasserOutre(classeApiMethodeMethode);
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	///////////////////
@@ -1829,45 +1462,48 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return droitEligible == null ? "" : StringEscapeUtils.escapeHtml4(strDroitEligible());
 	}
 
-	public void htmDroitEligible(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "DroitEligible\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "DroitEligible() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setDroitEligible\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageDroitEligible()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"droitEligible\"");
-							r.s(" value=\"", htmDroitEligible(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputDroitEligible(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		e("input")
+			.a("type", "checkbox")
+			.a("id", classeApiMethodeMethode, "_droitEligible")
+			.a("value", "true");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setDroitEligible inputAjustementBancaire", pk, "DroitEligible w3-input w3-border ");
+				a("name", "setDroitEligible");
 			} else {
-				r.s(htmDroitEligible());
+				a("class", "valeurDroitEligible inputAjustementBancaire", pk, "DroitEligible w3-input w3-border ");
+				a("name", "droitEligible");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onchange", "patchAjustementBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setDroitEligible', $(this).prop('checked'), function() { ajouterLueur($('#", classeApiMethodeMethode, "_droitEligible')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_droitEligible')); }); ");
+			}
+			;
+			if(getDroitEligible() != null && getDroitEligible())
+				a("checked", "checked");
+		fg();
+
+	}
+
+	public void htmDroitEligible(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereAjustementBancaireDroitEligible").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_droitEligible").a("class", "").f().sx("droit éligible").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputDroitEligible(classeApiMethodeMethode);
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	///////////////////
@@ -1931,45 +1567,58 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return partenaireNom == null ? "" : StringEscapeUtils.escapeHtml4(strPartenaireNom());
 	}
 
-	public void htmPartenaireNom(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "PartenaireNom\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "PartenaireNom() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setPartenaireNom\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichagePartenaireNom()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"partenaireNom\"");
-							r.s(" value=\"", htmPartenaireNom(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputPartenaireNom(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "nom de partenaire")
+			.a("id", classeApiMethodeMethode, "_partenaireNom");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setPartenaireNom inputAjustementBancaire", pk, "PartenaireNom w3-input w3-border ");
+				a("name", "setPartenaireNom");
 			} else {
-				r.s(htmPartenaireNom());
+				a("class", "valeurPartenaireNom w3-input w3-border inputAjustementBancaire", pk, "PartenaireNom w3-input w3-border ");
+				a("name", "partenaireNom");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchAjustementBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setPartenaireNom', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_partenaireNom')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_partenaireNom')); }); ");
+			}
+			a("value", strPartenaireNom())
+		.fg();
+
+	}
+
+	public void htmPartenaireNom(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereAjustementBancairePartenaireNom").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_partenaireNom").a("class", "").f().sx("nom de partenaire").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputPartenaireNom(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_partenaireNom')); $('#", classeApiMethodeMethode, "_partenaireNom').val(null); patchAjustementBancaireVal([{ name: 'fq', value: 'pk:' + $('#AjustementBancaireForm :input[name=pk]').val() }], 'setPartenaireNom', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_partenaireNom')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_partenaireNom')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	////////////////////////////
@@ -2033,45 +1682,58 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return ajustementNomAffichage == null ? "" : StringEscapeUtils.escapeHtml4(strAjustementNomAffichage());
 	}
 
-	public void htmAjustementNomAffichage(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "AjustementNomAffichage\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "AjustementNomAffichage() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAjustementNomAffichage\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAjustementNomAffichage()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"ajustementNomAffichage\"");
-							r.s(" value=\"", htmAjustementNomAffichage(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputAjustementNomAffichage(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "nom d'affichage")
+			.a("id", classeApiMethodeMethode, "_ajustementNomAffichage");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setAjustementNomAffichage inputAjustementBancaire", pk, "AjustementNomAffichage w3-input w3-border ");
+				a("name", "setAjustementNomAffichage");
 			} else {
-				r.s(htmAjustementNomAffichage());
+				a("class", "valeurAjustementNomAffichage w3-input w3-border inputAjustementBancaire", pk, "AjustementNomAffichage w3-input w3-border ");
+				a("name", "ajustementNomAffichage");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchAjustementBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setAjustementNomAffichage', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_ajustementNomAffichage')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_ajustementNomAffichage')); }); ");
+			}
+			a("value", strAjustementNomAffichage())
+		.fg();
+
+	}
+
+	public void htmAjustementNomAffichage(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereAjustementBancaireAjustementNomAffichage").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_ajustementNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputAjustementNomAffichage(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_ajustementNomAffichage')); $('#", classeApiMethodeMethode, "_ajustementNomAffichage').val(null); patchAjustementBancaireVal([{ name: 'fq', value: 'pk:' + $('#AjustementBancaireForm :input[name=pk]').val() }], 'setAjustementNomAffichage', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_ajustementNomAffichage')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_ajustementNomAffichage')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	//////////////////////////
@@ -2135,45 +1797,27 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return ajustementNomComplet == null ? "" : StringEscapeUtils.escapeHtml4(strAjustementNomComplet());
 	}
 
-	public void htmAjustementNomComplet(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "AjustementNomComplet\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "AjustementNomComplet() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAjustementNomComplet\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAjustementNomComplet()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"ajustementNomComplet\"");
-							r.s(" value=\"", htmAjustementNomComplet(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmAjustementNomComplet());
+	public void inputAjustementNomComplet(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+	}
+
+	public void htmAjustementNomComplet(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strAjustementNomComplet()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	//////////////////
@@ -2237,45 +1881,30 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return ajustementId == null ? "" : StringEscapeUtils.escapeHtml4(strAjustementId());
 	}
 
-	public void htmAjustementId(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "AjustementId\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "AjustementId() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAjustementId\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAjustementId()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"ajustementId\"");
-							r.s(" value=\"", htmAjustementId(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmAjustementId());
+	public void inputAjustementId(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+	}
+
+	public void htmAjustementId(String classeApiMethodeMethode) {
+		AjustementBancaire s = (AjustementBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("class", "").f().sx("ID").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strAjustementId()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	/////////////
@@ -2339,47 +1968,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return pageUrl == null ? "" : StringEscapeUtils.escapeHtml4(strPageUrl());
 	}
 
-	public void htmPageUrl(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "PageUrl\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "PageUrl() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setPageUrl\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichagePageUrl()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"pageUrl\"");
-							r.s(" value=\"", htmPageUrl(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmPageUrl());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////////
 	// objetSuggere //
 	//////////////////
@@ -2441,47 +2029,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		return objetSuggere == null ? "" : StringEscapeUtils.escapeHtml4(strObjetSuggere());
 	}
 
-	public void htmObjetSuggere(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchAjustementBancaire", strPk(), "ObjetSuggere\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchAjustementBancaire", strPk(), "ObjetSuggere() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setObjetSuggere\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageObjetSuggere()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"objetSuggere\"");
-							r.s(" value=\"", htmObjetSuggere(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmObjetSuggere());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////
 	// initLoin //
 	//////////////
@@ -2498,8 +2045,8 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 	}
 
 	public void initLoinAjustementBancaire() {
-		super.initLoinCluster(requeteSite_);
 		initAjustementBancaire();
+		super.initLoinCluster(requeteSite_);
 	}
 
 	public void initAjustementBancaire() {
@@ -2892,7 +2439,7 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 			SolrInputDocument document = new SolrInputDocument();
 			indexerAjustementBancaire(document);
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -2904,7 +2451,7 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 			indexerAjustementBancaire(document);
 			SolrClient clientSolr = requeteSite_.getSiteContexte_().getClientSolr();
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -3004,7 +2551,6 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		}
 		if(objetSuggere != null) {
 			document.addField("objetSuggere_suggested", objetSuggere);
-			document.addField("objetSuggere_indexed_string", objetSuggere);
 		}
 		super.indexerCluster(document);
 
@@ -3021,9 +2567,76 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 			initLoinAjustementBancaire(requeteSite);
 			SolrClient clientSolr = siteContexte.getClientSolr();
 			clientSolr.deleteById(id.toString());
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
+		}
+	}
+
+	public static String varIndexeAjustementBancaire(String entiteVar) {
+		switch(entiteVar) {
+			case "ajustementCle":
+				return "ajustementCle_indexed_long";
+			case "compteCle":
+				return "compteCle_indexed_long";
+			case "compteNomComplet":
+				return "compteNomComplet_indexed_string";
+			case "compteNumero":
+				return "compteNumero_indexed_string";
+			case "transactionCle":
+				return "transactionCle_indexed_long";
+			case "transactionIdReference":
+				return "transactionIdReference_indexed_string";
+			case "transactionCode":
+				return "transactionCode_indexed_string";
+			case "transactionMontant":
+				return "transactionMontant_indexed_double";
+			case "transactionDateHeure":
+				return "transactionDateHeure_indexed_date";
+			case "transactionDate":
+				return "transactionDate_indexed_date";
+			case "transactionFrais":
+				return "transactionFrais_indexed_boolean";
+			case "agentZones":
+				return "agentZones_indexed_strings";
+			case "agentRoles":
+				return "agentRoles_indexed_strings";
+			case "agentPasserOutre":
+				return "agentPasserOutre_indexed_boolean";
+			case "droitEligible":
+				return "droitEligible_indexed_boolean";
+			case "partenaireNom":
+				return "partenaireNom_indexed_string";
+			case "ajustementNomAffichage":
+				return "ajustementNomAffichage_indexed_string";
+			case "ajustementNomComplet":
+				return "ajustementNomComplet_indexed_string";
+			case "ajustementId":
+				return "ajustementId_indexed_string";
+			case "pageUrl":
+				return "pageUrl_indexed_string";
+			case "objetSuggere":
+				return "objetSuggere_indexed_string";
+			default:
+				return Cluster.varIndexeCluster(entiteVar);
+		}
+	}
+
+	public static String varRechercheAjustementBancaire(String entiteVar) {
+		switch(entiteVar) {
+			case "objetSuggere":
+				return "objetSuggere_suggested";
+			default:
+				return Cluster.varRechercheCluster(entiteVar);
+		}
+	}
+
+	public static String varSuggereAjustementBancaire(String entiteVar) {
+		switch(entiteVar) {
+			case "objetSuggere":
+				return "objetSuggere_suggested";
+			default:
+				return Cluster.varSuggereCluster(entiteVar);
 		}
 	}
 
@@ -3121,6 +2734,30 @@ public abstract class AjustementBancaireGen<DEV> extends Cluster {
 		oAjustementBancaire.setObjetSuggere(objetSuggere);
 
 		super.stockerCluster(solrDocument);
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchAjustementBancaire() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		AjustementBancaire original = (AjustementBancaire)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
+			if(!Objects.equals(agentZones, original.getAgentZones()))
+				requetePatch.addVars("agentZones");
+			if(!Objects.equals(agentRoles, original.getAgentRoles()))
+				requetePatch.addVars("agentRoles");
+			if(!Objects.equals(agentPasserOutre, original.getAgentPasserOutre()))
+				requetePatch.addVars("agentPasserOutre");
+			if(!Objects.equals(droitEligible, original.getDroitEligible()))
+				requetePatch.addVars("droitEligible");
+			if(!Objects.equals(partenaireNom, original.getPartenaireNom()))
+				requetePatch.addVars("partenaireNom");
+			if(!Objects.equals(ajustementNomAffichage, original.getAjustementNomAffichage()))
+				requetePatch.addVars("ajustementNomAffichage");
+			super.requetePatchCluster();
+		}
 	}
 
 	//////////////

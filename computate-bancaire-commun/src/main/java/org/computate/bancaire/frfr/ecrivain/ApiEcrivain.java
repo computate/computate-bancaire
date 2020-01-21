@@ -12,14 +12,11 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.computate.bancaire.frfr.vertx.AppliSwagger2;
 import org.computate.bancaire.frfr.config.ConfigSite;
 import org.computate.bancaire.frfr.contexte.SiteContexteFrFR;
 import org.computate.bancaire.frfr.couverture.Couverture;
-import org.computate.bancaire.frfr.ecrivain.TousEcrivains;
-import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
-import org.computate.bancaire.frfr.ecrivain.ApiEcrivainGen;
+import org.computate.bancaire.frfr.vertx.AppliSwagger2;
 
 /**
  * NomCanonique.enUS: org.computate.bancaire.enus.writer.ApiWriter
@@ -319,6 +316,18 @@ public class ApiEcrivain extends ApiEcrivainGen<Object> implements Comparable<Ap
 
 	/**
 	 * {@inheritDoc}
+	 * Var.enUS: appName
+	 * r: classeDocumentSolr
+	 * r.enUS: classSolrDocument
+	 * r: frFR
+	 * r.enUS: enUS
+	 **/
+	protected void _appliNom(Couverture<String> c) {
+		c.o((String)classeDocumentSolr.get("appliNom_stored_string"));
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * Var.enUS: classAbsolutePath
 	 * r: classeDocumentSolr
 	 * r.enUS: classSolrDocument
@@ -476,6 +485,16 @@ public class ApiEcrivain extends ApiEcrivainGen<Object> implements Comparable<Ap
 		if(o == null)
 			o = new ArrayList<>();
 		c.o(o);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * Var.enUS: classRoleSession
+	 * r: classeDocumentSolr
+	 * r.enUS: classSolrDocument
+	 **/
+	protected void _classeRoleSession(Couverture<Boolean> c) {
+		c.o((Boolean)classeDocumentSolr.get("classeRoleSession_stored_boolean"));
 	}
 
 	/**
@@ -1297,6 +1316,10 @@ public class ApiEcrivain extends ApiEcrivainGen<Object> implements Comparable<Ap
 	 * r.enUS: "Search"
 	 * r: ecrireApi
 	 * r.enUS: writeApi
+	 * r: appliNom
+	 * r.enUS: appName
+	 * r: classeRoleSession
+	 * r.enUS: classRoleSession
 	 */
 	public void ecrireApi(Boolean id) throws Exception {
 
@@ -1307,9 +1330,9 @@ public class ApiEcrivain extends ApiEcrivainGen<Object> implements Comparable<Ap
 	
 			wChemins.tl(2, StringUtils.lowerCase(classeApiMethodeMethode), ":");
 			wChemins.tl(3, "operationId: ", classeApiOperationIdMethode, (id ? "Id" : ""));
-			wChemins.tl(3, "x-vertx-event-bus: ", langueNom, classeNomSimple);
+			wChemins.tl(3, "x-vertx-event-bus: ", appliNom, "-", langueNom, "-", classeNomSimple);
 	
-			if(classeRolesTrouves) {
+			if(classeRolesTrouves && BooleanUtils.isNotTrue(classeRoleSession)) {
 				wChemins.tl(3, "security:");
 				wChemins.tl(4, "- openIdConnect:");
 				for(int i = 0; i < classeRoles.size(); i++) {
@@ -1386,7 +1409,7 @@ public class ApiEcrivain extends ApiEcrivainGen<Object> implements Comparable<Ap
 				wChemins.tl(5, "schema:");
 				wChemins.tl(6, "type: integer");
 				wChemins.tl(6, "default: 10");
-				wChemins.tl(6, "minimum: 1");
+				wChemins.tl(6, "minimum: 0");
 			}
 		}
 
@@ -1424,6 +1447,10 @@ public class ApiEcrivain extends ApiEcrivainGen<Object> implements Comparable<Ap
 			String strReponseDescription = wReponseDescription.toString();
 			wChemins.t(5, "description: ").yamlStr(6, strReponseDescription);
 			wChemins.tl(5, "content:");
+
+			if("application/pdf".equals(classeApiTypeMedia200Methode))
+				wChemins.tl(6, classeApiTypeMedia200Methode, ":");
+			else
 			wChemins.tl(6, classeApiTypeMedia200Methode, "; charset=utf-8:");
 		}
 		else {
@@ -1499,7 +1526,11 @@ public class ApiEcrivain extends ApiEcrivainGen<Object> implements Comparable<Ap
 				}
 				wCorpsRequetes.tl(2, classeApiOperationIdMethodeReponse, ":");
 				wCorpsRequetes.tl(3, "content:");
-				wCorpsRequetes.tl(4, classeApiTypeMedia200Methode, "; charset=utf-8:");
+
+				if("application/pdf".equals(classeApiTypeMedia200Methode))
+					wCorpsRequetes.tl(4, classeApiTypeMedia200Methode, ":");
+				else
+					wCorpsRequetes.tl(4, classeApiTypeMedia200Methode, "; charset=utf-8:");
 				wCorpsRequetes.tl(5, "schema:");
 				wCorpsRequetes.tl(6, "$ref: '#/components/schemas/", classeApiOperationIdMethodeReponse, "'");
 			}
@@ -1521,6 +1552,10 @@ public class ApiEcrivain extends ApiEcrivainGen<Object> implements Comparable<Ap
 				wSchemas.tl(tabsSchema + 1, "allOf:");
 				if("text/html".equals(classeApiTypeMedia200Methode)) {
 					wSchemas.tl(tabsSchema + 2, "- type: string");
+				}
+				else if("application/pdf".equals(classeApiTypeMedia200Methode)) {
+					wSchemas.tl(tabsSchema + 2, "- type: string");
+					wSchemas.tl(tabsSchema + 2, "- format: binary");
 				}
 				else {
 					if(BooleanUtils.isTrue(classeEtendBase)) {

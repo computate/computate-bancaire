@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -27,8 +29,10 @@ import org.computate.bancaire.enus.config.SiteConfig;
 import org.computate.bancaire.enus.contexte.SiteContextEnUS;
 import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.writer.AllWriter;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 import org.computate.bancaire.enus.user.SiteUser;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.CaseInsensitiveHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.oauth2.KeycloakHelper;
@@ -45,6 +49,8 @@ public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Seria
 	protected void _siteContext_(Wrap<SiteContextEnUS> c) {
 	}
 
+	private static final Pattern PATTERN_SESSION = Pattern.compile("vertx-web.session=(\\w+)");
+
 	/**	
 	 *	The site configuration. 
 	 **/
@@ -55,6 +61,9 @@ public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Seria
 
 	protected void _siteRequest_(Wrap<SiteRequestEnUS> c) { 
 		c.o(this);
+	}
+
+	protected void _patchRequest_(Wrap<PatchRequest> c) { 
 	}
 
 	protected void _vertx(Wrap<Vertx> c) {
@@ -114,6 +123,18 @@ public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Seria
 		}
 	}
 
+	protected void _sessionId(Wrap<String> c) {
+		if(operationRequest != null) {
+			String cookie = operationRequest.getHeaders().get("Cookie");
+			if(StringUtils.isNotBlank(cookie)) {
+				Matcher m = PATTERN_SESSION.matcher(cookie);
+				if(m.matches()) {
+					c.o(m.group(1));
+				}
+			}
+		}
+	}
+
 	protected void _userName(Wrap<String> c) {
 		if(jsonPrincipal != null) {
 			String o = jsonPrincipal.getString("preferred_username");
@@ -160,6 +181,17 @@ public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Seria
 		}
 	}
 
+	protected void _userResourceRoles(List<String> o) {
+		if(siteConfig_ != null && userResource != null) {
+			JsonArray roles = userResource.getJsonArray("roles");
+			if(roles != null) {
+				roles.stream().forEach(r -> {
+					addUserResourceRoles((String)r);
+				});
+			}
+		}
+	}
+
 	protected void _siteUser(Wrap<SiteUser> c) { 
 		if(userId != null) {
 			SiteUser o = new SiteUser();
@@ -186,6 +218,9 @@ public class SiteRequestEnUS extends SiteRequestEnUSGen<Object> implements Seria
 	}
 
 	protected void _sqlConnection(Wrap<SQLConnection> c) {
+	}
+
+	protected void _requestHeaders(Wrap<CaseInsensitiveHeaders> c) {
 	}
 
 	protected void _encryptionPassword(Wrap<String> c) {

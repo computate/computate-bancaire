@@ -29,6 +29,7 @@ import java.util.List;
 
 /**
  * Traduire: false
+ * NomCanonique.enUS: org.computate.bancaire.enus.transaction.TransactionGenPage
  **/
 public class TransactionGenPage extends TransactionGenPageGen<ClusterPage> {
 
@@ -93,1423 +94,116 @@ public class TransactionGenPage extends TransactionGenPageGen<ClusterPage> {
 
 	@Override public void htmlScriptTransactionGenPage() {
 		l("$(document).ready(function() {");
-		tl(1, "suggereTransactionBancaireCompteCle($('#formTransactionBancaireCompteCle'), $('#listTransactionBancaireCompteCle')); ");
+		tl(1, "window.eventBus = new EventBus('/eventbus');");
+		tl(1, "var pk = ", requeteSite_.getRequetePk(), ";");
+		tl(1, "suggereTransactionBancaireCompteCle([{'name':'fq','value':'transactionCles:' + pk}], $('#listTransactionBancaireCompteCle_Page'), pk); ");
+		tl(1, "websocketTransactionBancaire(websocketTransactionBancaireInner);");
 		l("});");
 	}
 
 	public void htmlFormPageTransactionBancaire(TransactionBancaire o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("class", "").f().sx("clé primaire").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strPk()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("class", "").f().sx("crée").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strCree()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("class", "").f().sx("modifié").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strModifie()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("class", "").f().sx("ID").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strTransactionId()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
+			o.htmPk("Page");
+			o.htmCree("Page");
+			o.htmModifie("Page");
+			o.htmObjetId("Page");
+			o.htmTransactionId("Page");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formTransactionBancaireCompteCle").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeurTransactionCles")
-							.a("class", "valeurTransactionCles ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereTransactionBancaireCompteCle").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row ").f();
-								{ e("a").a("href", "").a("class", "w3-cell w3-btn w3-center h4 w3-block h4 w3-gray w3-hover-gray ").f();
-									e("i").a("class", "fad fa-money-check w3-padding-small ").f().g("i");
-									sx("compte");
-								} g("a");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row ").f();
-								{ e("h5").a("class", "w3-cell ").f();
-									sx("relier un compte a cette transaction");
-								} g("h5");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-									{ e("div").a("class", "w3-cell-row ").f();
-
-									e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
-										e("input")
-											.a("type", "text")
-											.a("placeholder", "compte")
-											.a("class", "valeurObjetSuggere suggereCompteCle w3-input w3-border w3-cell w3-cell-middle ")
-											.a("name", "setCompteCle")
-											.a("id", "Page_compteCle")
-											.a("autocomplete", "off")
-											.a("oninput", "suggereTransactionBancaireCompteCle($('#' + ($(this).val() ? 'suggere' : 'form') + 'TransactionBancaireCompteCle'), $('#listTransactionBancaireCompteCle')); ")
-										.fg();
-
-									} g("div");
-								} g("div");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "listTransactionBancaireCompteCle").f();
-									} g("ul");
-									{ e("div").a("class", "w3-cell-row ").f();
-										e("button")
-											.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
-											.a("onclick", "postCompteBancaireVals({ transactionCles: [ \"", o.getPk(), "\" ] }, function() { patchTransactionBancaireVals([{ name: 'fq', value: 'pk:", o.getPk(), "' }], {}, function() { suggereTransactionBancaireCompteCle($('#' + ($('#Page_compteCle').val() ? 'suggere' : 'form') + 'TransactionBancaireCompteCle'), $('#listTransactionBancaireCompteCle')); var $e = $('#Page_compteCle'); $e.html($e.val()); }, function() { ajouterErreur($('#Page_compteCle')); }); }, function() { ajouterErreur($('#Page_compteCle')); });")
-											.f().sx("ajouter un compte")
-										.g("button");
-									} g("div");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-								e("label").a("for", "Page_transactionCode").a("class", "").f().sx("code de transaction").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "code de transaction")
-										.a("class", "setTransactionCode w3-input w3-border ")
-										.a("name", "setTransactionCode")
-										.a("id", "Page_transactionCode")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionCode', $(this).val(), function() { ajouterLueur($('#Page_transactionCode')); }, function() { ajouterErreur($('#Page_transactionCode')); }); ")
-										.a("value", o.strTransactionCode())
-									.fg();
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
-									.a("onclick", "enleverLueur($('#Page_transactionCode')); $('#Page_transactionCode').val(null); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionCode', null, function() { ajouterLueur($('#Page_transactionCode')); }, function() { ajouterErreur($('#Page_transactionCode')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionFrais").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionFrais").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-								e("label").a("for", "Page_transactionFrais").a("class", "").f().sx("transaction de frais").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "checkbox")
-										.a("value", "true")
-										.a("class", "setTransactionFrais")
-										.a("name", "setTransactionFrais")
-										.a("id", "Page_transactionFrais")
-										.a("onchange", "patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionFrais', $(this).prop('checked'), function() { ajouterLueur($('#Page_transactionFrais')); }, function() { ajouterErreur($('#Page_transactionFrais')); }); ")
-										;
-										if(o.getTransactionFrais() != null && o.getTransactionFrais())
-											a("checked", "checked");
-									fg();
-
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-								e("label").a("for", "Page_transactionNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "nom d'affichage")
-										.a("class", "setTransactionNomAffichage w3-input w3-border ")
-										.a("name", "setTransactionNomAffichage")
-										.a("id", "Page_transactionNomAffichage")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionNomAffichage', $(this).val(), function() { ajouterLueur($('#Page_transactionNomAffichage')); }, function() { ajouterErreur($('#Page_transactionNomAffichage')); }); ")
-										.a("value", o.strTransactionNomAffichage())
-									.fg();
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
-									.a("onclick", "enleverLueur($('#Page_transactionNomAffichage')); $('#Page_transactionNomAffichage').val(null); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionNomAffichage', null, function() { ajouterLueur($('#Page_transactionNomAffichage')); }, function() { ajouterErreur($('#Page_transactionNomAffichage')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
+			o.htmArchive("Page");
+			o.htmSupprime("Page");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionIdReference").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionIdReference").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-								e("label").a("for", "Page_transactionIdReference").a("class", "").f().sx("ID de référence de transaction").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "ID de référence de transaction")
-										.a("class", "setTransactionIdReference w3-input w3-border ")
-										.a("name", "setTransactionIdReference")
-										.a("id", "Page_transactionIdReference")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionIdReference', $(this).val(), function() { ajouterLueur($('#Page_transactionIdReference')); }, function() { ajouterErreur($('#Page_transactionIdReference')); }); ")
-										.a("value", o.strTransactionIdReference())
-									.fg();
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
-									.a("onclick", "enleverLueur($('#Page_transactionIdReference')); $('#Page_transactionIdReference').val(null); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionIdReference', null, function() { ajouterLueur($('#Page_transactionIdReference')); }, function() { ajouterErreur($('#Page_transactionIdReference')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionMontant").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionMontant").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-								e("label").a("for", "Page_transactionMontant").a("class", "").f().sx("date et heure de la transaction").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "date et heure de la transaction")
-										.a("class", "setTransactionMontant w3-input w3-border ")
-										.a("name", "setTransactionMontant")
-										.a("id", "Page_transactionMontant")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionMontant', $(this).val(), function() { ajouterLueur($('#Page_transactionMontant')); }, function() { ajouterErreur($('#Page_transactionMontant')); }); ")
-										.a("value", o.strTransactionMontant())
-									.fg();
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
-									.a("onclick", "enleverLueur($('#Page_transactionMontant')); $('#Page_transactionMontant').val(null); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionMontant', null, function() { ajouterLueur($('#Page_transactionMontant')); }, function() { ajouterErreur($('#Page_transactionMontant')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionDateHeure").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionDateHeure").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							ZonedDateTime val = o.getTransactionDateHeure();
-
-							{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-								e("label").a("for", "Page_transactionDateHeure").a("class", "").f().sx("date et heure de la transaction").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-									e("input")
-										.a("type", "text")
-										.a("class", "w3-input w3-border datepicker ")
-										.a("placeholder", "DD-MM-YYYY")
-										.a("data-timeformat", "DD-MM-YYYY")
-										.a("id", "Page_transactionDateHeure")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("value", val == null ? "" : DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.forLanguageTag("fr-FR")).format(val))
-										.a("onchange", "var t = moment(this.value, 'DD-MM-YYYY'); if(t) { var s = t.format('MM/DD/YYYY'); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionDateHeure', s, function() { ajouterLueur($('#Page_transactionDateHeure')); }, function() { ajouterErreur($('#Page_transactionDateHeure')); }); } ")
-										.fg();
-										} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
-									.a("onclick", "enleverLueur($('#Page_transactionDateHeure')); $('#Page_transactionDateHeure').val(null); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionDateHeure', null, function() { ajouterLueur($('#Page_transactionDateHeure')); }, function() { ajouterErreur($('#Page_transactionDateHeure')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
+			o.htmCompteCle("Page");
+			o.htmTransactionCode("Page");
+			o.htmTransactionFrais("Page");
+			o.htmTransactionNomAffichage("Page");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmTransactionIdReference("Page");
+			o.htmTransactionMontant("Page");
+			o.htmTransactionDateHeure("Page");
 		} g("div");
 	}
 
 	public void htmlFormPOSTTransactionBancaire(TransactionBancaire o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("ID").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strTransactionId()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("POST");
+			o.htmCree("POST");
+			o.htmModifie("POST");
+			o.htmObjetId("POST");
+			o.htmTransactionId("POST");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireCompteCle").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeurTransactionCles")
-						.a("class", "valeurTransactionCles ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireCompteCle").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row ").f();
-							{ e("a").a("href", "").a("class", "w3-cell w3-btn w3-center h4 w3-block h4 w3-gray w3-hover-gray ").f();
-								e("i").a("class", "fad fa-money-check w3-padding-small ").f().g("i");
-								sx("compte");
-							} g("a");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row ").f();
-							{ e("h5").a("class", "w3-cell ").f();
-								sx("relier un compte a cette transaction");
-							} g("h5");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-cell-row ").f();
-
-								e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "compte")
-										.a("class", "valeurObjetSuggere suggereCompteCle w3-input w3-border w3-cell w3-cell-middle ")
-										.a("name", "setCompteCle")
-										.a("id", "POST_compteCle")
-										.a("autocomplete", "off")
-										.a("oninput", "suggereTransactionBancaireCompteCle($('#' + ($(this).val() ? 'suggere' : 'form') + 'TransactionBancaireCompteCle'), $('#listTransactionBancaireCompteCle')); ")
-									.fg();
-
-								} g("div");
-							} g("div");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-								{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "listTransactionBancaireCompteCle").f();
-								} g("ul");
-								{ e("div").a("class", "w3-cell-row ").f();
-									e("button")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
-										.a("onclick", "postCompteBancaireVals({ transactionCles: [ \"", o.getPk(), "\" ] }, function() { patchTransactionBancaireVals([{ name: 'fq', value: 'pk:", o.getPk(), "' }], {}, function() { suggereTransactionBancaireCompteCle($('#' + ($('#POST_compteCle').val() ? 'suggere' : 'form') + 'TransactionBancaireCompteCle'), $('#listTransactionBancaireCompteCle')); var $e = $('#POST_compteCle'); $e.html($e.val()); }, function() { ajouterErreur($('#POST_compteCle')); }); }, function() { ajouterErreur($('#POST_compteCle')); });")
-										.f().sx("ajouter un compte")
-									.g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "POST_transactionCode").a("class", "").f().sx("code de transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "code de transaction")
-									.a("class", "valeurTransactionCode w3-input w3-border ")
-									.a("name", "transactionCode")
-									.a("id", "POST_transactionCode")
-									.a("value", o.strTransactionCode())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionFrais").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionFrais").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "POST_transactionFrais").a("class", "").f().sx("transaction de frais").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "checkbox")
-									.a("value", "true")
-									.a("class", "valeurTransactionFrais")
-									.a("name", "transactionFrais")
-									.a("id", "POST_transactionFrais")
-									;
-									if(o.getTransactionFrais() != null && o.getTransactionFrais())
-										a("checked", "checked");
-								fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "POST_transactionNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "nom d'affichage")
-									.a("class", "valeurTransactionNomAffichage w3-input w3-border ")
-									.a("name", "transactionNomAffichage")
-									.a("id", "POST_transactionNomAffichage")
-									.a("value", o.strTransactionNomAffichage())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmArchive("POST");
+			o.htmSupprime("POST");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionIdReference").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionIdReference").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "POST_transactionIdReference").a("class", "").f().sx("ID de référence de transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "ID de référence de transaction")
-									.a("class", "valeurTransactionIdReference w3-input w3-border ")
-									.a("name", "transactionIdReference")
-									.a("id", "POST_transactionIdReference")
-									.a("value", o.strTransactionIdReference())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionMontant").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionMontant").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "POST_transactionMontant").a("class", "").f().sx("date et heure de la transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "date et heure de la transaction")
-									.a("class", "valeurTransactionMontant w3-input w3-border ")
-									.a("name", "transactionMontant")
-									.a("id", "POST_transactionMontant")
-									.a("value", o.strTransactionMontant())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionDateHeure").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionDateHeure").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						ZonedDateTime val = o.getTransactionDateHeure();
-
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "POST_transactionDateHeure").a("class", "").f().sx("date et heure de la transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								e("input")
-									.a("type", "text")
-									.a("class", "w3-input w3-border datepicker ")
-									.a("placeholder", "DD-MM-YYYY")
-									.a("data-timeformat", "DD-MM-YYYY")
-									.a("id", "POST_transactionDateHeure")
-									.a("onclick", "enleverLueur($(this)); ")
-									.a("value", val == null ? "" : DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.forLanguageTag("fr-FR")).format(val))
-									.a("onchange", "var t = moment(this.value, 'DD-MM-YYYY'); if(t) { var s = t.format('MM/DD/YYYY'); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionDateHeure', s, function() { ajouterLueur($('#POST_transactionDateHeure')); }, function() { ajouterErreur($('#POST_transactionDateHeure')); }); } ")
-									.fg();
-									} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmCompteCle("POST");
+			o.htmTransactionCode("POST");
+			o.htmTransactionFrais("POST");
+			o.htmTransactionNomAffichage("POST");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmTransactionIdReference("POST");
+			o.htmTransactionMontant("POST");
+			o.htmTransactionDateHeure("POST");
 		} g("div");
 	}
 
 	public void htmlFormPATCHTransactionBancaire(TransactionBancaire o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("ID").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strTransactionId()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("PATCH");
+			o.htmCree("PATCH");
+			o.htmModifie("PATCH");
+			o.htmObjetId("PATCH");
+			o.htmTransactionId("PATCH");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireCompteCle").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeurTransactionCles")
-						.a("class", "valeurTransactionCles ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireCompteCle").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row ").f();
-							{ e("a").a("href", "").a("class", "w3-cell w3-btn w3-center h4 w3-block h4 w3-gray w3-hover-gray ").f();
-								e("i").a("class", "fad fa-money-check w3-padding-small ").f().g("i");
-								sx("compte");
-							} g("a");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row ").f();
-							{ e("h5").a("class", "w3-cell ").f();
-								sx("relier un compte a cette transaction");
-							} g("h5");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-cell-row ").f();
-
-								e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "compte")
-										.a("class", "valeurObjetSuggere suggereCompteCle w3-input w3-border w3-cell w3-cell-middle ")
-										.a("name", "setCompteCle")
-										.a("id", "PATCH_compteCle")
-										.a("autocomplete", "off")
-										.a("oninput", "suggereTransactionBancaireCompteCle($('#' + ($(this).val() ? 'suggere' : 'form') + 'TransactionBancaireCompteCle'), $('#listTransactionBancaireCompteCle')); ")
-									.fg();
-
-								} g("div");
-							} g("div");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-								{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "listTransactionBancaireCompteCle").f();
-								} g("ul");
-								{ e("div").a("class", "w3-cell-row ").f();
-									e("button")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
-										.a("onclick", "postCompteBancaireVals({ transactionCles: [ \"", o.getPk(), "\" ] }, function() { patchTransactionBancaireVals([{ name: 'fq', value: 'pk:", o.getPk(), "' }], {}, function() { suggereTransactionBancaireCompteCle($('#' + ($('#PATCH_compteCle').val() ? 'suggere' : 'form') + 'TransactionBancaireCompteCle'), $('#listTransactionBancaireCompteCle')); var $e = $('#PATCH_compteCle'); $e.html($e.val()); }, function() { ajouterErreur($('#PATCH_compteCle')); }); }, function() { ajouterErreur($('#PATCH_compteCle')); });")
-										.f().sx("ajouter un compte")
-									.g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "PATCH_transactionCode").a("class", "").f().sx("code de transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "code de transaction")
-									.a("class", "setTransactionCode w3-input w3-border ")
-									.a("name", "setTransactionCode")
-									.a("id", "PATCH_transactionCode")
-									.a("value", o.strTransactionCode())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionFrais").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionFrais").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "PATCH_transactionFrais").a("class", "").f().sx("transaction de frais").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "checkbox")
-									.a("value", "true")
-									.a("class", "setTransactionFrais")
-									.a("name", "setTransactionFrais")
-									.a("id", "PATCH_transactionFrais")
-									;
-									if(o.getTransactionFrais() != null && o.getTransactionFrais())
-										a("checked", "checked");
-								fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "PATCH_transactionNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "nom d'affichage")
-									.a("class", "setTransactionNomAffichage w3-input w3-border ")
-									.a("name", "setTransactionNomAffichage")
-									.a("id", "PATCH_transactionNomAffichage")
-									.a("value", o.strTransactionNomAffichage())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmArchive("PATCH");
+			o.htmSupprime("PATCH");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionIdReference").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionIdReference").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "PATCH_transactionIdReference").a("class", "").f().sx("ID de référence de transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "ID de référence de transaction")
-									.a("class", "setTransactionIdReference w3-input w3-border ")
-									.a("name", "setTransactionIdReference")
-									.a("id", "PATCH_transactionIdReference")
-									.a("value", o.strTransactionIdReference())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionMontant").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionMontant").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "PATCH_transactionMontant").a("class", "").f().sx("date et heure de la transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "date et heure de la transaction")
-									.a("class", "setTransactionMontant w3-input w3-border ")
-									.a("name", "setTransactionMontant")
-									.a("id", "PATCH_transactionMontant")
-									.a("value", o.strTransactionMontant())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionDateHeure").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionDateHeure").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						ZonedDateTime val = o.getTransactionDateHeure();
-
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "PATCH_transactionDateHeure").a("class", "").f().sx("date et heure de la transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								e("input")
-									.a("type", "text")
-									.a("class", "w3-input w3-border datepicker ")
-									.a("placeholder", "DD-MM-YYYY")
-									.a("data-timeformat", "DD-MM-YYYY")
-									.a("id", "PATCH_transactionDateHeure")
-									.a("onclick", "enleverLueur($(this)); ")
-									.a("value", val == null ? "" : DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.forLanguageTag("fr-FR")).format(val))
-									.a("onchange", "var t = moment(this.value, 'DD-MM-YYYY'); if(t) { var s = t.format('MM/DD/YYYY'); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionDateHeure', s, function() { ajouterLueur($('#PATCH_transactionDateHeure')); }, function() { ajouterErreur($('#PATCH_transactionDateHeure')); }); } ")
-									.fg();
-									} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmCompteCle("PATCH");
+			o.htmTransactionCode("PATCH");
+			o.htmTransactionFrais("PATCH");
+			o.htmTransactionNomAffichage("PATCH");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strTransactionNomComplet()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmTransactionIdReference("PATCH");
+			o.htmTransactionMontant("PATCH");
+			o.htmTransactionDateHeure("PATCH");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmTransactionNomComplet("PATCH");
 		} g("div");
 	}
 
 	public void htmlFormRechercheTransactionBancaire(TransactionBancaire o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-						e("label").a("class", "").f().sx("ID").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strTransactionId()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("Recherche");
+			o.htmCree("Recherche");
+			o.htmModifie("Recherche");
+			o.htmObjetId("Recherche");
+			o.htmTransactionId("Recherche");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireCompteCle").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeurTransactionCles")
-						.a("class", "valeurTransactionCles ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireCompteCle").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row ").f();
-							{ e("a").a("href", "").a("class", "w3-cell w3-btn w3-center h4 w3-block h4 w3-gray w3-hover-gray ").f();
-								e("i").a("class", "fad fa-money-check w3-padding-small ").f().g("i");
-								sx("compte");
-							} g("a");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row ").f();
-							{ e("h5").a("class", "w3-cell ").f();
-								sx("relier un compte a cette transaction");
-							} g("h5");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-cell-row ").f();
-
-								e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "compte")
-										.a("class", "valeurObjetSuggere suggereCompteCle w3-input w3-border w3-cell w3-cell-middle ")
-										.a("name", "setCompteCle")
-										.a("id", "Recherche_compteCle")
-										.a("autocomplete", "off")
-										.a("oninput", "suggereTransactionBancaireCompteCle($('#' + ($(this).val() ? 'suggere' : 'form') + 'TransactionBancaireCompteCle'), $('#listTransactionBancaireCompteCle')); ")
-									.fg();
-
-								} g("div");
-							} g("div");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-								{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "listTransactionBancaireCompteCle").f();
-								} g("ul");
-								{ e("div").a("class", "w3-cell-row ").f();
-									e("button")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
-										.a("onclick", "postCompteBancaireVals({ transactionCles: [ \"", o.getPk(), "\" ] }, function() { patchTransactionBancaireVals([{ name: 'fq', value: 'pk:", o.getPk(), "' }], {}, function() { suggereTransactionBancaireCompteCle($('#' + ($('#Recherche_compteCle').val() ? 'suggere' : 'form') + 'TransactionBancaireCompteCle'), $('#listTransactionBancaireCompteCle')); var $e = $('#Recherche_compteCle'); $e.html($e.val()); }, function() { ajouterErreur($('#Recherche_compteCle')); }); }, function() { ajouterErreur($('#Recherche_compteCle')); });")
-										.f().sx("ajouter un compte")
-									.g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionCode").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "Recherche_transactionCode").a("class", "").f().sx("code de transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "code de transaction")
-									.a("class", "valeurTransactionCode w3-input w3-border ")
-									.a("name", "transactionCode")
-									.a("id", "Recherche_transactionCode")
-									.a("value", o.strTransactionCode())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionFrais").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionFrais").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "Recherche_transactionFrais").a("class", "").f().sx("transaction de frais").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "checkbox")
-									.a("value", "true")
-									.a("class", "valeurTransactionFrais")
-									.a("name", "transactionFrais")
-									.a("id", "Recherche_transactionFrais")
-									;
-									if(o.getTransactionFrais() != null && o.getTransactionFrais())
-										a("checked", "checked");
-								fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionNomAffichage").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "Recherche_transactionNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "nom d'affichage")
-									.a("class", "valeurTransactionNomAffichage w3-input w3-border ")
-									.a("name", "transactionNomAffichage")
-									.a("id", "Recherche_transactionNomAffichage")
-									.a("value", o.strTransactionNomAffichage())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmArchive("Recherche");
+			o.htmSupprime("Recherche");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionIdReference").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionIdReference").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "Recherche_transactionIdReference").a("class", "").f().sx("ID de référence de transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "ID de référence de transaction")
-									.a("class", "valeurTransactionIdReference w3-input w3-border ")
-									.a("name", "transactionIdReference")
-									.a("id", "Recherche_transactionIdReference")
-									.a("value", o.strTransactionIdReference())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionMontant").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionMontant").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "Recherche_transactionMontant").a("class", "").f().sx("date et heure de la transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "date et heure de la transaction")
-									.a("class", "valeurTransactionMontant w3-input w3-border ")
-									.a("name", "transactionMontant")
-									.a("id", "Recherche_transactionMontant")
-									.a("value", o.strTransactionMontant())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formTransactionBancaireTransactionDateHeure").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereTransactionBancaireTransactionDateHeure").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						ZonedDateTime val = o.getTransactionDateHeure();
-
-						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
-							e("label").a("for", "Recherche_transactionDateHeure").a("class", "").f().sx("date et heure de la transaction").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								e("input")
-									.a("type", "text")
-									.a("class", "w3-input w3-border datepicker ")
-									.a("placeholder", "DD-MM-YYYY")
-									.a("data-timeformat", "DD-MM-YYYY")
-									.a("id", "Recherche_transactionDateHeure")
-									.a("onclick", "enleverLueur($(this)); ")
-									.a("value", val == null ? "" : DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.forLanguageTag("fr-FR")).format(val))
-									.a("onchange", "var t = moment(this.value, 'DD-MM-YYYY'); if(t) { var s = t.format('MM/DD/YYYY'); patchTransactionBancaireVal([{ name: 'fq', value: 'pk:' + $('#TransactionBancaireForm :input[name=\"pk\"]').val() }], 'setTransactionDateHeure', s, function() { ajouterLueur($('#Recherche_transactionDateHeure')); }, function() { ajouterErreur($('#Recherche_transactionDateHeure')); }); } ")
-									.fg();
-									} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmCompteCle("Recherche");
+			o.htmTransactionCode("Recherche");
+			o.htmTransactionFrais("Recherche");
+			o.htmTransactionNomAffichage("Recherche");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strTransactionNomComplet()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmTransactionIdReference("Recherche");
+			o.htmTransactionMontant("Recherche");
+			o.htmTransactionDateHeure("Recherche");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmTransactionNomComplet("Recherche");
 		} g("div");
 	}
 
@@ -1563,16 +257,59 @@ public class TransactionGenPage extends TransactionGenPageGen<ClusterPage> {
 			}
 		} else {
 
-			{ e("h1").f();
-				if(contexteIconeClassesCss != null)
-					e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
-				e("span").a("class", " ").f().sx("transactions").g("span");
-			} g("h1");
-			e("div").a("class", "w3-padding-16 w3-card-4 w3-light-grey ").f();
+				{ e("h1").f();
+					{ e("a").a("href", "/transaction").a("class", "w3-bar-item w3-btn w3-center w3-block w3-yellow w3-hover-yellow ").f();
+						if(contexteIconeClassesCss != null)
+							e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
+						e("span").a("class", " ").f().sx(pageH1).g("span");
+					} g("a");
+				} g("h1");
+			e("div").a("class", "").f();
+				{ e("div").f();
+					Long num = listeTransactionBancaire.getQueryResponse().getResults().getNumFound();
+					String query = StringUtils.replace(listeTransactionBancaire.getQuery(), "_suggested", "");
+					Integer rows1 = listeTransactionBancaire.getRows();
+					Integer start1 = listeTransactionBancaire.getStart();
+					Integer start2 = start1 - rows1;
+					Integer start3 = start1 + rows1;
+					Integer rows2 = rows1 / 2;
+					Integer rows3 = rows1 * 2;
+					start2 = start2 < 0 ? 0 : start2;
+
+					if(start1 == 0) {
+						e("i").a("class", "fas fa-arrow-square-left w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/transaction?q=", query, "&start=", start2, "&rows=", rows1).f();
+							e("i").a("class", "fas fa-arrow-square-left ").f().g("i");
+						} g("a");
+					}
+
+					if(rows1 <= 1) {
+						e("i").a("class", "fas fa-minus-square w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/transaction?q=", query, "&start=", start1, "&rows=", rows2).f();
+							e("i").a("class", "fas fa-minus-square ").f().g("i");
+						} g("a");
+					}
+
+					{ e("a").a("href", "/transaction?q=", query, "&start=", start1, "&rows=", rows3).f();
+						e("i").a("class", "fas fa-plus-square ").f().g("i");
+					} g("a");
+
+					if(start3 >= num) {
+						e("i").a("class", "fas fa-arrow-square-right w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/transaction?q=", query, "&start=", start3, "&rows=", rows1).f();
+							e("i").a("class", "fas fa-arrow-square-right ").f().g("i");
+						} g("a");
+					}
+						e("span").f().sx((start1 + 1), " - ", (start1 + rows1), " de ", num).g("span");
+				} g("div");
 			{ e("table").a("class", "w3-table w3-bordered w3-striped w3-border w3-hoverable ").f();
-				{ e("thead").f();
+				{ e("thead").a("class", "w3-yellow w3-hover-yellow ").f();
 					{ e("tr").f();
 						e("th").f().sx("").g("th");
+						e("th").f().sx("crée").g("th");
 					} g("tr");
 				} g("thead");
 				{ e("tbody").f();
@@ -1587,7 +324,14 @@ public class TransactionGenPage extends TransactionGenPageGen<ClusterPage> {
 								{ e("a").a("href", uri).f();
 									e("i").a("class", "fad fa-cash-register w3-padding-small ").f().g("i");
 									{ e("span").f();
-										sx(o.getTransactionNomComplet());
+										sx(o.strTransactionNomComplet());
+									} g("span");
+								} g("a");
+							} g("td");
+							{ e("td").f();
+								{ e("a").a("href", uri).f();
+									{ e("span").f();
+										sx(o.strCree());
 									} g("span");
 								} g("a");
 							} g("td");
@@ -1610,6 +354,10 @@ public class TransactionGenPage extends TransactionGenPageGen<ClusterPage> {
 						.a("type", "hidden")
 						.a("value", o.getPk())
 						.fg();
+						e("input")
+						.a("name", "focusId")
+						.a("type", "hidden")
+						.fg();
 					} g("form");
 					htmlFormPageTransactionBancaire(o);
 				}
@@ -1618,13 +366,20 @@ public class TransactionGenPage extends TransactionGenPageGen<ClusterPage> {
 
 		}
 		htmlBodyFormsTransactionGenPage();
-		htmlSuggereTransactionGenPage();
+		htmlSuggereTransactionGenPage(this, null);
 		g("div");
 	}
 
 	public void htmlBodyFormsTransactionGenPage() {
-		e("div").f();
+		e("div").a("class", "w3-margin-top ").f();
 
+		{ e("button")
+			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
+				.a("id", "rechargerCetteTransactionGenPage")
+				.a("onclick", "patchTransactionBancaireVals( [ {name: 'fq', value: 'pk:' + " + requeteSite_.getRequetePk() + " } ], {}, function() { ajouterLueur($('#rechargerCetteTransactionGenPage')); }, function() { ajouterErreur($('#rechargerCetteTransactionGenPage')); }); return false; ").f();
+				e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
+			sx("recharger cette transaction");
+		} g("button");
 
 		e("button")
 			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
@@ -1635,15 +390,16 @@ public class TransactionGenPage extends TransactionGenPageGen<ClusterPage> {
 			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
 				{ e("header").a("class", "w3-container w3-yellow ").f();
 					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#postTransactionBancaireModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Créer une transaction").g("h2");
+					e("h2").a("class", "w3-padding ").f().sx("Créer une transaction").g("h2");
 				} g("header");
 				{ e("div").a("class", "w3-container ").f();
 					TransactionBancaire o = new TransactionBancaire();
+					o.setRequeteSite_(requeteSite_);
 
 					// Form POST
-					{ e("form").a("action", "").a("id", "postTransactionBancaireForm").a("onsubmit", "event.preventDefault(); return false; ").f();
+					{ e("div").a("id", "postTransactionBancaireForm").f();
 						htmlFormPOSTTransactionBancaire(o);
-					} g("form");
+					} g("div");
 					e("button")
 						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
 						.a("onclick", "postTransactionBancaire($('#postTransactionBancaireForm')); ")
@@ -1664,10 +420,11 @@ public class TransactionGenPage extends TransactionGenPageGen<ClusterPage> {
 			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
 				{ e("header").a("class", "w3-container w3-yellow ").f();
 					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#patchTransactionBancaireModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Modifier des transactions").g("h2");
+					e("h2").a("class", "w3-padding ").f().sx("Modifier des transactions").g("h2");
 				} g("header");
 				{ e("div").a("class", "w3-container ").f();
 					TransactionBancaire o = new TransactionBancaire();
+					o.setRequeteSite_(requeteSite_);
 
 					// FormulaireFiltres PATCH
 					{ e("form").a("action", "").a("id", "patchTransactionBancaireFormulaireFiltres").a("onsubmit", "event.preventDefault(); return false; ").f();
@@ -1695,34 +452,37 @@ public class TransactionGenPage extends TransactionGenPageGen<ClusterPage> {
 		} g("div");
 
 
-		e("button")
-			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
-			.a("onclick", "$('#deleteTransactionBancaireModale').show(); ")
-			.f().sx("Supprimer des transactions")
-		.g("button");
-		{ e("div").a("id", "deleteTransactionBancaireModale").a("class", "w3-modal ").f();
-			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
-				{ e("header").a("class", "w3-container w3-yellow ").f();
-					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#deleteTransactionBancaireModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Supprimer des transactions").g("h2");
-				} g("header");
-				{ e("div").a("class", "w3-container ").f();
-					TransactionBancaire o = new TransactionBancaire();
+		if(listeTransactionBancaire != null && listeTransactionBancaire.size() == 1) {
+			e("button")
+				.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
+				.a("onclick", "$('#deleteTransactionBancaireModale').show(); ")
+				.f().sx("Supprimer des transactions")
+			.g("button");
+			{ e("div").a("id", "deleteTransactionBancaireModale").a("class", "w3-modal ").f();
+				{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
+					{ e("header").a("class", "w3-container w3-yellow ").f();
+						e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#deleteTransactionBancaireModale').hide(); ").f().sx("×").g("span");
+						e("h2").a("class", "w3-padding ").f().sx("Supprimer des transactions").g("h2");
+					} g("header");
+					{ e("div").a("class", "w3-container ").f();
+						TransactionBancaire o = new TransactionBancaire();
+						o.setRequeteSite_(requeteSite_);
 
-					// Form DELETE
-					{ e("form").a("action", "").a("id", "deleteTransactionBancaireForm").a("onsubmit", "event.preventDefault(); return false; ").f();
-						htmlFormPATCHTransactionBancaire(o);
-					} g("form");
-					e("button")
-						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
-						.a("onclick", "deleteTransactionBancaire(); ")
-						.f().sx("Supprimer des transactions")
-					.g("button");
+						// Form DELETE
+						{ e("div").a("id", "deleteTransactionBancaireForm").f();
+							htmlFormPATCHTransactionBancaire(o);
+						} g("div");
+						e("button")
+							.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-yellow ")
+							.a("onclick", "deleteTransactionBancaire(", o.getPk(), "); ")
+							.f().sx("Supprimer des transactions")
+						.g("button");
 
+					} g("div");
 				} g("div");
 			} g("div");
-		} g("div");
 
+		}
 		g("div");
 	}
 
@@ -1763,54 +523,54 @@ public class TransactionGenPage extends TransactionGenPageGen<ClusterPage> {
 	 * r: "suggereListTransactionBancaire"
 	 * r.enUS: "suggestListBankTransaction"
 	**/
-	public void htmlSuggereTransactionGenPage() {
-		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("href", "/transaction").a("class", "").f();
-					e("i").a("class", "fad fa-cash-register w3-padding-small ").f().g("i");
-					sx("voir toutes les transactions");
-				} g("a");
-			} g("div");
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("id", "rechargerTransactionGenPage").a("href", "/transaction").a("class", "").a("onclick", "patchTransactionBancaireVals([], {}, function() { ajouterLueur($('#rechargerTransactionGenPage')); }, function() { ajouterErreur($('#rechargerTransactionGenPage')); }); return false; ").f();
-					e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
-					sx("recharger toutes les transactions");
-				} g("a");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("span").f();
-					sx("rechercher transactions : ");
-				} g("span");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("div").a("class", "w3-cell-row ").f();
+	public static void htmlSuggereTransactionGenPage(MiseEnPage p, String id) {
+		{ p.e("div").a("class", "w3-cell-row ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("a").a("href", "/transaction").a("class", "").f();
+					p.e("i").a("class", "fad fa-cash-register w3-padding-small ").f().g("i");
+					p.sx("voir toutes les transactions");
+				} p.g("a");
+			} p.g("div");
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("a").a("id", "rechargerToutesTransactionGenPage", id).a("href", "/transaction").a("class", "").a("onclick", "patchTransactionBancaireVals([], {}, function() { ajouterLueur($('#rechargerToutesTransactionGenPage", id, "')); }, function() { ajouterErreur($('#rechargerToutesTransactionGenPage", id, "')); }); return false; ").f();
+					p.e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
+					p.sx("recharger toutes les transactions");
+				} p.g("a");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("span").f();
+					p.sx("rechercher transactions : ");
+				} p.g("span");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("div").a("class", "w3-cell-row ").f();
 
-					e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
-					{ e("form").a("action", "").a("id", "suggereFormTransactionBancaire").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
+					p.e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
+					{ p.e("form").a("action", "").a("id", "suggereFormTransactionBancaire", id).a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); window.location.href='/transaction?q=objetSuggere:' + encodeURIComponent($('#suggereTransactionBancaire", id, "').val()); return false; ").f();
+						p.e("input")
 							.a("type", "text")
 							.a("placeholder", "rechercher transactions")
 							.a("class", "suggereTransactionBancaire w3-input w3-border w3-cell w3-cell-middle ")
 							.a("name", "suggereTransactionBancaire")
-							.a("id", "suggereTransactionBancaire")
+							.a("id", "suggereTransactionBancaire", id)
 							.a("autocomplete", "off")
-							.a("oninput", "suggereTransactionBancaireObjetSuggere( [ { 'name': 'q', 'value': 'objetSuggere:' + $(this).val() } ], $('#suggereListTransactionBancaire')); ")
+							.a("oninput", "suggereTransactionBancaireObjetSuggere( [ { 'name': 'q', 'value': 'objetSuggere:' + $(this).val() } ], $('#suggereListTransactionBancaire", id, "'), ", p.getRequeteSite_().getRequetePk(), "); ")
 							.fg();
 
-					} g("form");
-				} g("div");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-				{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "suggereListTransactionBancaire").f();
-				} g("ul");
-			} g("div");
-		} g("div");
+					} p.g("form");
+				} p.g("div");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+				{ p.e("ul").a("class", "w3-ul w3-hoverable ").a("id", "suggereListTransactionBancaire", id).f();
+				} p.g("ul");
+			} p.g("div");
+		} p.g("div");
 	}
 
 }

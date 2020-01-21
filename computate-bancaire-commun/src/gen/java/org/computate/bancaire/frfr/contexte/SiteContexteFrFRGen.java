@@ -1,25 +1,28 @@
 package org.computate.bancaire.frfr.contexte;
 
-import org.computate.bancaire.frfr.cluster.Cluster;
-import java.math.MathContext;
-import io.vertx.core.Vertx;
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.OAuth2AuthHandler;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
 import java.text.NumberFormat;
 import io.vertx.core.WorkerExecutor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory;
+import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
+import org.computate.bancaire.frfr.cluster.Cluster;
+import java.math.MathContext;
+import io.vertx.core.Vertx;
+import io.vertx.ext.web.handler.OAuth2AuthHandler;
+import org.apache.commons.text.StringEscapeUtils;
 import java.util.Objects;
 import io.vertx.core.json.JsonArray;
 import org.computate.bancaire.frfr.couverture.Couverture;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
 import java.lang.Object;
-import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory;
-import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
+import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.sql.SQLClient;
 import org.computate.bancaire.frfr.config.ConfigSite;
 
@@ -361,6 +364,43 @@ public abstract class SiteContexteFrFRGen<DEV> extends Object {
 		return (SiteContexteFrFR)this;
 	}
 
+	////////////////
+	// mailClient //
+	////////////////
+
+	/**	L'entité « mailClient »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected MailClient mailClient;
+	@JsonIgnore
+	public Couverture<MailClient> mailClientCouverture = new Couverture<MailClient>().p(this).c(MailClient.class).var("mailClient").o(mailClient);
+
+	/**	<br/>L'entité « mailClient »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.contexte.SiteContexteFrFR&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:mailClient">Trouver l'entité mailClient dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _mailClient(Couverture<MailClient> c);
+
+	public MailClient getMailClient() {
+		return mailClient;
+	}
+
+	public void setMailClient(MailClient mailClient) {
+		this.mailClient = mailClient;
+		this.mailClientCouverture.dejaInitialise = true;
+	}
+	protected SiteContexteFrFR mailClientInit() {
+		if(!mailClientCouverture.dejaInitialise) {
+			_mailClient(mailClientCouverture);
+			if(mailClient == null)
+				setMailClient(mailClientCouverture.o);
+		}
+		mailClientCouverture.dejaInitialise(true);
+		return (SiteContexteFrFR)this;
+	}
+
 	/////////////////////////
 	// clientSolrComputate //
 	/////////////////////////
@@ -426,6 +466,7 @@ public abstract class SiteContexteFrFRGen<DEV> extends Object {
 		configSiteInit();
 		clientSqlInit();
 		clientSolrInit();
+		mailClientInit();
 		clientSolrComputateInit();
 	}
 
@@ -471,6 +512,8 @@ public abstract class SiteContexteFrFRGen<DEV> extends Object {
 				return oSiteContexteFrFR.clientSql;
 			case "clientSolr":
 				return oSiteContexteFrFR.clientSolr;
+			case "mailClient":
+				return oSiteContexteFrFR.mailClient;
 			case "clientSolrComputate":
 				return oSiteContexteFrFR.clientSolrComputate;
 			default:

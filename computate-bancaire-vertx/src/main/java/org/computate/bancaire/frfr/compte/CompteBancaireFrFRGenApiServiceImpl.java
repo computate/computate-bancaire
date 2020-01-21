@@ -4,7 +4,9 @@ import org.computate.bancaire.frfr.config.ConfigSite;
 import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
 import org.computate.bancaire.frfr.contexte.SiteContexteFrFR;
 import org.computate.bancaire.frfr.utilisateur.UtilisateurSite;
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import org.computate.bancaire.frfr.recherche.ResultatRecherche;
+import io.vertx.core.WorkerExecutor;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -69,6 +71,7 @@ import java.util.stream.Stream;
 import java.net.URLDecoder;
 import java.time.ZonedDateTime;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.commons.collections.CollectionUtils;
 import org.computate.bancaire.frfr.recherche.ListeRecherche;
 import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 
@@ -99,6 +102,11 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 				if(a.succeeded()) {
 					creerPOSTCompteBancaire(requeteSite, b -> {
 						if(b.succeeded()) {
+						RequetePatch requetePatch = new RequetePatch();
+							requetePatch.setRows(1);
+							requetePatch.setNumFound(1L);
+							requetePatch.initLoinRequetePatch(requeteSite);
+							requeteSite.setRequetePatch_(requetePatch);
 							CompteBancaire compteBancaire = b.result();
 							sqlPOSTCompteBancaire(compteBancaire, c -> {
 								if(c.succeeded()) {
@@ -115,6 +123,7 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 																		if(a.succeeded()) {
 																			connexionSql.close(i -> {
 																				if(a.succeeded()) {
+																					requeteSite.getVertx().eventBus().publish("websocketCompteBancaire", JsonObject.mapFrom(requetePatch).toString());
 																					gestionnaireEvenements.handle(Future.succeededFuture(g.result()));
 																				} else {
 																					erreurCompteBancaire(requeteSite, gestionnaireEvenements, i);
@@ -234,7 +243,7 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 	public void reponse200POSTCompteBancaire(CompteBancaire o, Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
 		try {
 			RequeteSiteFrFR requeteSite = o.getRequeteSite_();
-			JsonObject json = new JsonObject();
+			JsonObject json = JsonObject.mapFrom(o);
 			gestionnaireEvenements.handle(Future.succeededFuture(OperationResponse.completedWithJson(json)));
 		} catch(Exception e) {
 			gestionnaireEvenements.handle(Future.failedFuture(e));
@@ -251,42 +260,81 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 				if(a.succeeded()) {
 					utilisateurCompteBancaire(requeteSite, b -> {
 						if(b.succeeded()) {
-							rechercheCompteBancaire(requeteSite, false, true, null, c -> {
+							SQLConnection connexionSql = requeteSite.getConnexionSql();
+							connexionSql.close(c -> {
 								if(c.succeeded()) {
-									ListeRecherche<CompteBancaire> listeCompteBancaire = c.result();
-									SimpleOrderedMap facets = (SimpleOrderedMap)listeCompteBancaire.getQueryResponse().getResponse().get("facets");
-									Date date = (Date)facets.get("max_modifie");
-									String dateStr;
-									if(date == null)
-										dateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(ZonedDateTime.now().toInstant(), ZoneId.of("UTC")).minusNanos(1000));
-									else
-										dateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC")));
-									listePATCHCompteBancaire(listeCompteBancaire, dateStr, d -> {
+									rechercheCompteBancaire(requeteSite, false, true, null, d -> {
 										if(d.succeeded()) {
-											SQLConnection connexionSql = requeteSite.getConnexionSql();
-											if(connexionSql == null) {
-												gestionnaireEvenements.handle(Future.succeededFuture(d.result()));
-											} else {
-												connexionSql.commit(e -> {
-													if(e.succeeded()) {
-														connexionSql.close(f -> {
-															if(f.succeeded()) {
-																gestionnaireEvenements.handle(Future.succeededFuture(d.result()));
-															} else {
-																erreurCompteBancaire(requeteSite, gestionnaireEvenements, f);
-															}
-														});
-													} else {
-														gestionnaireEvenements.handle(Future.succeededFuture(d.result()));
-													}
-												});
+											ListeRecherche<CompteBancaire> listeCompteBancaire = d.result();
+											SimpleOrderedMap facets = (SimpleOrderedMap)Optional.ofNullable(listeCompteBancaire.getQueryResponse()).map(QueryResponse::getResponse).map(r -> r.get("facets")).orElse(null);
+											Date date = null;
+											if(facets != null)
+												date = (Date)facets.get("max_modifie");
+											String dt;
+											if(date == null)
+												dt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(ZonedDateTime.now().toInstant(), ZoneId.of("UTC")).minusNanos(1000));
+											else
+												dt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC")));
+											listeCompteBancaire.addFilterQuery(String.format("modifie_indexed_date:[* TO %s]", dt));
+
+											RequetePatch requetePatch = new RequetePatch();
+											requetePatch.setRows(listeCompteBancaire.getRows());
+											requetePatch.setNumFound(Optional.ofNullable(listeCompteBancaire.getQueryResponse()).map(QueryResponse::getResults).map(SolrDocumentList::getNumFound).orElse(new Long(listeCompteBancaire.size())));
+											requetePatch.initLoinRequetePatch(requeteSite);
+											requeteSite.setRequetePatch_(requetePatch);
+											if(listeCompteBancaire.size() == 1) {
+												CompteBancaire o = listeCompteBancaire.get(0);
+												requetePatch.setPk(o.getPk());
+												requetePatch.setOriginal(o);
+												requetePatchCompteBancaire(o);
 											}
+											WorkerExecutor executeurTravailleur = siteContexte.getExecuteurTravailleur();
+											executeurTravailleur.executeBlocking(
+												blockingCodeHandler -> {
+													sqlCompteBancaire(requeteSite, e -> {
+														if(e.succeeded()) {
+															try {
+																listePATCHCompteBancaire(requetePatch, listeCompteBancaire, dt, f -> {
+																	if(f.succeeded()) {
+																		SQLConnection connexionSql2 = requeteSite.getConnexionSql();
+																		if(connexionSql2 == null) {
+																			blockingCodeHandler.handle(Future.succeededFuture(f.result()));
+																		} else {
+																			connexionSql2.commit(g -> {
+																				if(f.succeeded()) {
+																					connexionSql2.close(h -> {
+																						if(g.succeeded()) {
+																							blockingCodeHandler.handle(Future.succeededFuture(h.result()));
+																						} else {
+																							blockingCodeHandler.handle(Future.failedFuture(h.cause()));
+																						}
+																					});
+																				} else {
+																					blockingCodeHandler.handle(Future.failedFuture(g.cause()));
+																				}
+																			});
+																		}
+																	} else {
+																		blockingCodeHandler.handle(Future.failedFuture(f.cause()));
+																	}
+																});
+															} catch(Exception ex) {
+																blockingCodeHandler.handle(Future.failedFuture(ex));
+															}
+														} else {
+															blockingCodeHandler.handle(Future.failedFuture(e.cause()));
+														}
+													});
+												}, resultHandler -> {
+												}
+											);
+											reponse200PATCHCompteBancaire(requetePatch, gestionnaireEvenements);
 										} else {
-											erreurCompteBancaire(requeteSite, gestionnaireEvenements, d);
+											erreurCompteBancaire(requeteSite, gestionnaireEvenements, c);
 										}
 									});
 								} else {
-									erreurCompteBancaire(requeteSite, gestionnaireEvenements, c);
+									erreurCompteBancaire(requeteSite, gestionnaireEvenements, b);
 								}
 							});
 						} else {
@@ -302,7 +350,7 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 		}
 	}
 
-	public void listePATCHCompteBancaire(ListeRecherche<CompteBancaire> listeCompteBancaire, String dt, Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
+	public void listePATCHCompteBancaire(RequetePatch requetePatch, ListeRecherche<CompteBancaire> listeCompteBancaire, String dt, Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
 		List<Future> futures = new ArrayList<>();
 		RequeteSiteFrFR requeteSite = listeCompteBancaire.getRequeteSite_();
 		listeCompteBancaire.getList().forEach(o -> {
@@ -317,15 +365,25 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 		});
 		CompositeFuture.all(futures).setHandler( a -> {
 			if(a.succeeded()) {
+				requetePatch.setNumPATCH(requetePatch.getNumPATCH() + listeCompteBancaire.size());
 				if(listeCompteBancaire.next(dt)) {
-					listePATCHCompteBancaire(listeCompteBancaire, dt, gestionnaireEvenements);
+					requeteSite.getVertx().eventBus().publish("websocketCompteBancaire", JsonObject.mapFrom(requetePatch).toString());
+					listePATCHCompteBancaire(requetePatch, listeCompteBancaire, dt, gestionnaireEvenements);
 				} else {
-					reponse200PATCHCompteBancaire(listeCompteBancaire, gestionnaireEvenements);
+					reponse200PATCHCompteBancaire(requetePatch, gestionnaireEvenements);
 				}
 			} else {
 				erreurCompteBancaire(listeCompteBancaire.getRequeteSite_(), gestionnaireEvenements, a);
 			}
 		});
+	}
+
+	public void requetePatchCompteBancaire(CompteBancaire o) {
+		RequetePatch requetePatch = o.getRequeteSite_().getRequetePatch_();
+		if(requetePatch != null) {
+			List<Long> pks = requetePatch.getPks();
+			List<String> classes = requetePatch.getClasses();
+		}
 	}
 
 	public Future<CompteBancaire> futurePATCHCompteBancaire(CompteBancaire o,  Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
@@ -340,6 +398,8 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 								if(c.succeeded()) {
 									indexerCompteBancaire(compteBancaire, d -> {
 										if(d.succeeded()) {
+											requetePatchCompteBancaire(compteBancaire);
+											compteBancaire.requetePatchCompteBancaire();
 											future.complete(o);
 											gestionnaireEvenements.handle(Future.succeededFuture(d.result()));
 										} else {
@@ -380,91 +440,91 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 			for(String methodeNom : methodeNoms) {
 				switch(methodeNom) {
 					case "setCree":
-						o2.setCree(requeteJson.getString(methodeNom));
-						if(o2.getCree() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "cree"));
 						} else {
+							o2.setCree(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("cree", o2.jsonCree(), pk));
 						}
 						break;
 					case "setModifie":
-						o2.setModifie(requeteJson.getString(methodeNom));
-						if(o2.getModifie() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "modifie"));
 						} else {
+							o2.setModifie(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("modifie", o2.jsonModifie(), pk));
 						}
 						break;
 					case "setArchive":
-						o2.setArchive(requeteJson.getBoolean(methodeNom));
-						if(o2.getArchive() == null) {
+						if(requeteJson.getBoolean(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "archive"));
 						} else {
+							o2.setArchive(requeteJson.getBoolean(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("archive", o2.jsonArchive(), pk));
 						}
 						break;
 					case "setSupprime":
-						o2.setSupprime(requeteJson.getBoolean(methodeNom));
-						if(o2.getSupprime() == null) {
+						if(requeteJson.getBoolean(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "supprime"));
 						} else {
+							o2.setSupprime(requeteJson.getBoolean(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("supprime", o2.jsonSupprime(), pk));
 						}
 						break;
 					case "setCompteNumero":
-						o2.setCompteNumero(requeteJson.getString(methodeNom));
-						if(o2.getCompteNumero() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "compteNumero"));
 						} else {
+							o2.setCompteNumero(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("compteNumero", o2.jsonCompteNumero(), pk));
 						}
 						break;
 					case "setCompteNumeroTelephone":
-						o2.setCompteNumeroTelephone(requeteJson.getString(methodeNom));
-						if(o2.getCompteNumeroTelephone() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "compteNumeroTelephone"));
 						} else {
+							o2.setCompteNumeroTelephone(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("compteNumeroTelephone", o2.jsonCompteNumeroTelephone(), pk));
 						}
 						break;
 					case "setCompteAdministrateurNom":
-						o2.setCompteAdministrateurNom(requeteJson.getString(methodeNom));
-						if(o2.getCompteAdministrateurNom() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "compteAdministrateurNom"));
 						} else {
+							o2.setCompteAdministrateurNom(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("compteAdministrateurNom", o2.jsonCompteAdministrateurNom(), pk));
 						}
 						break;
 					case "setCompteEmplacement":
-						o2.setCompteEmplacement(requeteJson.getString(methodeNom));
-						if(o2.getCompteEmplacement() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "compteEmplacement"));
 						} else {
+							o2.setCompteEmplacement(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("compteEmplacement", o2.jsonCompteEmplacement(), pk));
 						}
 						break;
 					case "setCompteAddresse":
-						o2.setCompteAddresse(requeteJson.getString(methodeNom));
-						if(o2.getCompteAddresse() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "compteAddresse"));
 						} else {
+							o2.setCompteAddresse(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("compteAddresse", o2.jsonCompteAddresse(), pk));
 						}
@@ -490,10 +550,10 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 		}
 	}
 
-	public void reponse200PATCHCompteBancaire(ListeRecherche<CompteBancaire> listeCompteBancaire, Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
+	public void reponse200PATCHCompteBancaire(RequetePatch requetePatch, Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
 		try {
-			RequeteSiteFrFR requeteSite = listeCompteBancaire.getRequeteSite_();
-			JsonObject json = new JsonObject();
+			RequeteSiteFrFR requeteSite = requetePatch.getRequeteSite_();
+			JsonObject json = JsonObject.mapFrom(requetePatch);
 			gestionnaireEvenements.handle(Future.succeededFuture(OperationResponse.completedWithJson(json)));
 		} catch(Exception e) {
 			gestionnaireEvenements.handle(Future.failedFuture(e));
@@ -753,83 +813,22 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 			ToutEcrivain w = ToutEcrivain.creer(listeCompteBancaire.getRequeteSite_(), buffer);
 			ComptePage page = new ComptePage();
 			SolrDocument pageDocumentSolr = new SolrDocument();
+			CaseInsensitiveHeaders requeteEnTetes = new CaseInsensitiveHeaders();
+			requeteSite.setRequeteEnTetes(requeteEnTetes);
 
 			pageDocumentSolr.setField("pageUri_frFR_stored_string", "/compte");
 			page.setPageDocumentSolr(pageDocumentSolr);
 			page.setW(w);
+			if(listeCompteBancaire.size() == 1)
+				requeteSite.setRequetePk(listeCompteBancaire.get(0).getPk());
+			requeteSite.setW(w);
 			page.setListeCompteBancaire(listeCompteBancaire);
+			page.setRequeteSite_(requeteSite);
 			page.initLoinComptePage(requeteSite);
 			page.html();
-			gestionnaireEvenements.handle(Future.succeededFuture(new OperationResponse(200, "OK", buffer, new CaseInsensitiveHeaders())));
+			gestionnaireEvenements.handle(Future.succeededFuture(new OperationResponse(200, "OK", buffer, requeteEnTetes)));
 		} catch(Exception e) {
 			gestionnaireEvenements.handle(Future.failedFuture(e));
-		}
-	}
-
-	public String varIndexeCompteBancaire(String entiteVar) {
-		switch(entiteVar) {
-			case "pk":
-				return "pk_indexed_long";
-			case "id":
-				return "id_indexed_string";
-			case "cree":
-				return "cree_indexed_date";
-			case "modifie":
-				return "modifie_indexed_date";
-			case "archive":
-				return "archive_indexed_boolean";
-			case "supprime":
-				return "supprime_indexed_boolean";
-			case "classeNomCanonique":
-				return "classeNomCanonique_indexed_string";
-			case "classeNomSimple":
-				return "classeNomSimple_indexed_string";
-			case "classeNomsCanoniques":
-				return "classeNomsCanoniques_indexed_strings";
-			case "compteCle":
-				return "compteCle_indexed_long";
-			case "transactionCles":
-				return "transactionCles_indexed_longs";
-			case "compteNumero":
-				return "compteNumero_indexed_string";
-			case "compteNumeroTelephone":
-				return "compteNumeroTelephone_indexed_string";
-			case "compteAdministrateurNom":
-				return "compteAdministrateurNom_indexed_string";
-			case "compteEmplacement":
-				return "compteEmplacement_indexed_string";
-			case "compteAddresse":
-				return "compteAddresse_indexed_string";
-			case "objetSuggere":
-				return "objetSuggere_indexed_string";
-			case "compteNumeroCourt":
-				return "compteNumeroCourt_indexed_string";
-			case "compteNomComplet":
-				return "compteNomComplet_indexed_string";
-			case "compteId":
-				return "compteId_indexed_string";
-			case "pageUrl":
-				return "pageUrl_indexed_string";
-			default:
-				throw new RuntimeException(String.format("\"%s\" n'est pas une entité indexé. ", entiteVar));
-		}
-	}
-
-	public String varRechercheCompteBancaire(String entiteVar) {
-		switch(entiteVar) {
-			case "objetSuggere":
-				return "objetSuggere_suggested";
-			default:
-				throw new RuntimeException(String.format("\"%s\" n'est pas une entité indexé. ", entiteVar));
-		}
-	}
-
-	public String varSuggereCompteBancaire(String entiteVar) {
-		switch(entiteVar) {
-			case "objetSuggere":
-				return "objetSuggere_suggested";
-			default:
-				throw new RuntimeException(String.format("\"%s\" n'est pas une entité indexé. ", entiteVar));
 		}
 	}
 
@@ -940,6 +939,7 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 								JsonArray creerLigne = creerAsync.result().getResults().stream().findFirst().orElseGet(() -> null);
 								Long pkUtilisateur = creerLigne.getLong(0);
 								UtilisateurSite utilisateurSite = new UtilisateurSite();
+								utilisateurSite.setRequeteSite_(requeteSite);
 								utilisateurSite.setPk(pkUtilisateur);
 
 								connexionSql.queryWithParams(
@@ -977,6 +977,7 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 						} else {
 							Long pkUtilisateur = utilisateurValeurs.getLong(0);
 							UtilisateurSite utilisateurSite = new UtilisateurSite();
+								utilisateurSite.setRequeteSite_(requeteSite);
 							utilisateurSite.setPk(pkUtilisateur);
 
 							connexionSql.queryWithParams(
@@ -1029,16 +1030,7 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 			listeRecherche.setC(CompteBancaire.class);
 			if(entiteListe != null)
 				listeRecherche.addFields(entiteListe);
-			listeRecherche.addSort("archive_indexed_boolean", ORDER.asc);
-			listeRecherche.addSort("supprime_indexed_boolean", ORDER.asc);
-			listeRecherche.addSort("cree_indexed_date", ORDER.desc);
-			listeRecherche.addFilterQuery("classeNomsCanoniques_indexed_strings:" + ClientUtils.escapeQueryChars("org.computate.bancaire.frfr.compte.CompteBancaire"));
 			listeRecherche.set("json.facet", "{max_modifie:'max(modifie_indexed_date)'}");
-			UtilisateurSite utilisateurSite = requeteSite.getUtilisateurSite();
-			if(utilisateurSite != null && !utilisateurSite.getVoirSupprime())
-				listeRecherche.addFilterQuery("supprime_indexed_boolean:false");
-			if(utilisateurSite != null && !utilisateurSite.getVoirArchive())
-				listeRecherche.addFilterQuery("archive_indexed_boolean:false");
 
 			String id = operationRequete.getParams().getJsonObject("path").getString("id");
 			if(id != null) {
@@ -1061,7 +1053,7 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 						switch(paramNom) {
 							case "q":
 								entiteVar = StringUtils.trim(StringUtils.substringBefore((String)paramObjet, ":"));
-								varIndexe = "*".equals(entiteVar) ? entiteVar : varRechercheCompteBancaire(entiteVar);
+								varIndexe = "*".equals(entiteVar) ? entiteVar : CompteBancaire.varRechercheCompteBancaire(entiteVar);
 								valeurIndexe = URLDecoder.decode(StringUtils.trim(StringUtils.substringAfter((String)paramObjet, ":")), "UTF-8");
 								valeurIndexe = StringUtils.isEmpty(valeurIndexe) ? "*" : valeurIndexe;
 								listeRecherche.setQuery(varIndexe + ":" + ("*".equals(valeurIndexe) ? valeurIndexe : ClientUtils.escapeQueryChars(valeurIndexe)));
@@ -1075,13 +1067,13 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 							case "fq":
 								entiteVar = StringUtils.trim(StringUtils.substringBefore((String)paramObjet, ":"));
 								valeurIndexe = URLDecoder.decode(StringUtils.trim(StringUtils.substringAfter((String)paramObjet, ":")), "UTF-8");
-								varIndexe = varIndexeCompteBancaire(entiteVar);
+								varIndexe = CompteBancaire.varIndexeCompteBancaire(entiteVar);
 								listeRecherche.addFilterQuery(varIndexe + ":" + ClientUtils.escapeQueryChars(valeurIndexe));
 								break;
 							case "sort":
 								entiteVar = StringUtils.trim(StringUtils.substringBefore((String)paramObjet, " "));
 								valeurTri = StringUtils.trim(StringUtils.substringAfter((String)paramObjet, " "));
-								varIndexe = varIndexeCompteBancaire(entiteVar);
+								varIndexe = CompteBancaire.varIndexeCompteBancaire(entiteVar);
 								listeRecherche.addSort(varIndexe, ORDER.valueOf(valeurTri));
 								break;
 							case "start":
@@ -1098,6 +1090,8 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 					gestionnaireEvenements.handle(Future.failedFuture(e));
 				}
 			});
+			if(listeRecherche.getSorts().size() == 0)
+				listeRecherche.addSort("cree_indexed_date", ORDER.desc);
 			listeRecherche.initLoinPourClasse(requeteSite);
 			gestionnaireEvenements.handle(Future.succeededFuture(listeRecherche));
 		} catch(Exception e) {
@@ -1118,7 +1112,11 @@ public class CompteBancaireFrFRGenApiServiceImpl implements CompteBancaireFrFRGe
 				if(definirAsync.succeeded()) {
 					try {
 						for(JsonArray definition : definirAsync.result().getResults()) {
-							o.definirPourClasse(definition.getString(0), definition.getString(1));
+							try {
+								o.definirPourClasse(definition.getString(0), definition.getString(1));
+							} catch(Exception e) {
+								LOGGER.error(e);
+							}
 						}
 						gestionnaireEvenements.handle(Future.succeededFuture());
 					} catch(Exception e) {

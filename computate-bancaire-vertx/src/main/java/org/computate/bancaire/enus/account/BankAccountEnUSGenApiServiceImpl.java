@@ -4,7 +4,9 @@ import org.computate.bancaire.enus.config.SiteConfig;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import org.computate.bancaire.enus.contexte.SiteContextEnUS;
 import org.computate.bancaire.enus.user.SiteUser;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 import org.computate.bancaire.enus.search.SearchResult;
+import io.vertx.core.WorkerExecutor;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -69,6 +71,7 @@ import java.util.stream.Stream;
 import java.net.URLDecoder;
 import java.time.ZonedDateTime;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.commons.collections.CollectionUtils;
 import org.computate.bancaire.enus.search.SearchList;
 import org.computate.bancaire.enus.writer.AllWriter;
 
@@ -99,6 +102,11 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 				if(a.succeeded()) {
 					createPOSTBankAccount(siteRequest, b -> {
 						if(b.succeeded()) {
+						PatchRequest patchRequest = new PatchRequest();
+							patchRequest.setRows(1);
+							patchRequest.setNumFound(1L);
+							patchRequest.initDeepPatchRequest(siteRequest);
+							siteRequest.setPatchRequest_(patchRequest);
 							BankAccount bankAccount = b.result();
 							sqlPOSTBankAccount(bankAccount, c -> {
 								if(c.succeeded()) {
@@ -115,6 +123,7 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 																		if(a.succeeded()) {
 																			sqlConnection.close(i -> {
 																				if(a.succeeded()) {
+																					siteRequest.getVertx().eventBus().publish("websocketBankAccount", JsonObject.mapFrom(patchRequest).toString());
 																					eventHandler.handle(Future.succeededFuture(g.result()));
 																				} else {
 																					errorBankAccount(siteRequest, eventHandler, i);
@@ -234,7 +243,7 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 	public void response200POSTBankAccount(BankAccount o, Handler<AsyncResult<OperationResponse>> eventHandler) {
 		try {
 			SiteRequestEnUS siteRequest = o.getSiteRequest_();
-			JsonObject json = new JsonObject();
+			JsonObject json = JsonObject.mapFrom(o);
 			eventHandler.handle(Future.succeededFuture(OperationResponse.completedWithJson(json)));
 		} catch(Exception e) {
 			eventHandler.handle(Future.failedFuture(e));
@@ -251,42 +260,81 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 				if(a.succeeded()) {
 					userBankAccount(siteRequest, b -> {
 						if(b.succeeded()) {
-							aSearchBankAccount(siteRequest, false, true, null, c -> {
+							SQLConnection sqlConnection = siteRequest.getSqlConnection();
+							sqlConnection.close(c -> {
 								if(c.succeeded()) {
-									SearchList<BankAccount> listBankAccount = c.result();
-									SimpleOrderedMap facets = (SimpleOrderedMap)listBankAccount.getQueryResponse().getResponse().get("facets");
-									Date date = (Date)facets.get("max_modified");
-									String dateStr;
-									if(date == null)
-										dateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(ZonedDateTime.now().toInstant(), ZoneId.of("UTC")).minusNanos(1000));
-									else
-										dateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC")));
-									listPATCHBankAccount(listBankAccount, dateStr, d -> {
+									aSearchBankAccount(siteRequest, false, true, null, d -> {
 										if(d.succeeded()) {
-											SQLConnection sqlConnection = siteRequest.getSqlConnection();
-											if(sqlConnection == null) {
-												eventHandler.handle(Future.succeededFuture(d.result()));
-											} else {
-												sqlConnection.commit(e -> {
-													if(e.succeeded()) {
-														sqlConnection.close(f -> {
-															if(f.succeeded()) {
-																eventHandler.handle(Future.succeededFuture(d.result()));
-															} else {
-																errorBankAccount(siteRequest, eventHandler, f);
-															}
-														});
-													} else {
-														eventHandler.handle(Future.succeededFuture(d.result()));
-													}
-												});
+											SearchList<BankAccount> listBankAccount = d.result();
+											SimpleOrderedMap facets = (SimpleOrderedMap)Optional.ofNullable(listBankAccount.getQueryResponse()).map(QueryResponse::getResponse).map(r -> r.get("facets")).orElse(null);
+											Date date = null;
+											if(facets != null)
+												date = (Date)facets.get("max_modified");
+											String dt;
+											if(date == null)
+												dt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(ZonedDateTime.now().toInstant(), ZoneId.of("UTC")).minusNanos(1000));
+											else
+												dt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC")));
+											listBankAccount.addFilterQuery(String.format("modified_indexed_date:[* TO %s]", dt));
+
+											PatchRequest patchRequest = new PatchRequest();
+											patchRequest.setRows(listBankAccount.getRows());
+											patchRequest.setNumFound(Optional.ofNullable(listBankAccount.getQueryResponse()).map(QueryResponse::getResults).map(SolrDocumentList::getNumFound).orElse(new Long(listBankAccount.size())));
+											patchRequest.initDeepPatchRequest(siteRequest);
+											siteRequest.setPatchRequest_(patchRequest);
+											if(listBankAccount.size() == 1) {
+												BankAccount o = listBankAccount.get(0);
+												patchRequest.setPk(o.getPk());
+												patchRequest.setOriginal(o);
+												patchRequestBankAccount(o);
 											}
+											WorkerExecutor workerExecutor = siteContext.getWorkerExecutor();
+											workerExecutor.executeBlocking(
+												blockingCodeHandler -> {
+													sqlBankAccount(siteRequest, e -> {
+														if(e.succeeded()) {
+															try {
+																listPATCHBankAccount(patchRequest, listBankAccount, dt, f -> {
+																	if(f.succeeded()) {
+																		SQLConnection sqlConnection2 = siteRequest.getSqlConnection();
+																		if(sqlConnection2 == null) {
+																			blockingCodeHandler.handle(Future.succeededFuture(f.result()));
+																		} else {
+																			sqlConnection2.commit(g -> {
+																				if(f.succeeded()) {
+																					sqlConnection2.close(h -> {
+																						if(g.succeeded()) {
+																							blockingCodeHandler.handle(Future.succeededFuture(h.result()));
+																						} else {
+																							blockingCodeHandler.handle(Future.failedFuture(h.cause()));
+																						}
+																					});
+																				} else {
+																					blockingCodeHandler.handle(Future.failedFuture(g.cause()));
+																				}
+																			});
+																		}
+																	} else {
+																		blockingCodeHandler.handle(Future.failedFuture(f.cause()));
+																	}
+																});
+															} catch(Exception ex) {
+																blockingCodeHandler.handle(Future.failedFuture(ex));
+															}
+														} else {
+															blockingCodeHandler.handle(Future.failedFuture(e.cause()));
+														}
+													});
+												}, resultHandler -> {
+												}
+											);
+											response200PATCHBankAccount(patchRequest, eventHandler);
 										} else {
-											errorBankAccount(siteRequest, eventHandler, d);
+											errorBankAccount(siteRequest, eventHandler, c);
 										}
 									});
 								} else {
-									errorBankAccount(siteRequest, eventHandler, c);
+									errorBankAccount(siteRequest, eventHandler, b);
 								}
 							});
 						} else {
@@ -302,7 +350,7 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 		}
 	}
 
-	public void listPATCHBankAccount(SearchList<BankAccount> listBankAccount, String dt, Handler<AsyncResult<OperationResponse>> eventHandler) {
+	public void listPATCHBankAccount(PatchRequest patchRequest, SearchList<BankAccount> listBankAccount, String dt, Handler<AsyncResult<OperationResponse>> eventHandler) {
 		List<Future> futures = new ArrayList<>();
 		SiteRequestEnUS siteRequest = listBankAccount.getSiteRequest_();
 		listBankAccount.getList().forEach(o -> {
@@ -317,15 +365,25 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 		});
 		CompositeFuture.all(futures).setHandler( a -> {
 			if(a.succeeded()) {
+				patchRequest.setNumPATCH(patchRequest.getNumPATCH() + listBankAccount.size());
 				if(listBankAccount.next(dt)) {
-					listPATCHBankAccount(listBankAccount, dt, eventHandler);
+					siteRequest.getVertx().eventBus().publish("websocketBankAccount", JsonObject.mapFrom(patchRequest).toString());
+					listPATCHBankAccount(patchRequest, listBankAccount, dt, eventHandler);
 				} else {
-					response200PATCHBankAccount(listBankAccount, eventHandler);
+					response200PATCHBankAccount(patchRequest, eventHandler);
 				}
 			} else {
 				errorBankAccount(listBankAccount.getSiteRequest_(), eventHandler, a);
 			}
 		});
+	}
+
+	public void patchRequestBankAccount(BankAccount o) {
+		PatchRequest patchRequest = o.getSiteRequest_().getPatchRequest_();
+		if(patchRequest != null) {
+			List<Long> pks = patchRequest.getPks();
+			List<String> classes = patchRequest.getClasses();
+		}
 	}
 
 	public Future<BankAccount> futurePATCHBankAccount(BankAccount o,  Handler<AsyncResult<OperationResponse>> eventHandler) {
@@ -340,6 +398,8 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 								if(c.succeeded()) {
 									indexBankAccount(bankAccount, d -> {
 										if(d.succeeded()) {
+											patchRequestBankAccount(bankAccount);
+											bankAccount.patchRequestBankAccount();
 											future.complete(o);
 											eventHandler.handle(Future.succeededFuture(d.result()));
 										} else {
@@ -380,91 +440,91 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 			for(String methodName : methodNames) {
 				switch(methodName) {
 					case "setCreated":
-						o2.setCreated(requestJson.getString(methodName));
-						if(o2.getCreated() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "created"));
 						} else {
+							o2.setCreated(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("created", o2.jsonCreated(), pk));
 						}
 						break;
 					case "setModified":
-						o2.setModified(requestJson.getString(methodName));
-						if(o2.getModified() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "modified"));
 						} else {
+							o2.setModified(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("modified", o2.jsonModified(), pk));
 						}
 						break;
 					case "setArchived":
-						o2.setArchived(requestJson.getBoolean(methodName));
-						if(o2.getArchived() == null) {
+						if(requestJson.getBoolean(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "archived"));
 						} else {
+							o2.setArchived(requestJson.getBoolean(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("archived", o2.jsonArchived(), pk));
 						}
 						break;
 					case "setDeleted":
-						o2.setDeleted(requestJson.getBoolean(methodName));
-						if(o2.getDeleted() == null) {
+						if(requestJson.getBoolean(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "deleted"));
 						} else {
+							o2.setDeleted(requestJson.getBoolean(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("deleted", o2.jsonDeleted(), pk));
 						}
 						break;
 					case "setAccountNumber":
-						o2.setAccountNumber(requestJson.getString(methodName));
-						if(o2.getAccountNumber() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "accountNumber"));
 						} else {
+							o2.setAccountNumber(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("accountNumber", o2.jsonAccountNumber(), pk));
 						}
 						break;
 					case "setAccountPhoneNumber":
-						o2.setAccountPhoneNumber(requestJson.getString(methodName));
-						if(o2.getAccountPhoneNumber() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "accountPhoneNumber"));
 						} else {
+							o2.setAccountPhoneNumber(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("accountPhoneNumber", o2.jsonAccountPhoneNumber(), pk));
 						}
 						break;
 					case "setAccountAdministratorName":
-						o2.setAccountAdministratorName(requestJson.getString(methodName));
-						if(o2.getAccountAdministratorName() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "accountAdministratorName"));
 						} else {
+							o2.setAccountAdministratorName(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("accountAdministratorName", o2.jsonAccountAdministratorName(), pk));
 						}
 						break;
 					case "setAccountLocation":
-						o2.setAccountLocation(requestJson.getString(methodName));
-						if(o2.getAccountLocation() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "accountLocation"));
 						} else {
+							o2.setAccountLocation(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("accountLocation", o2.jsonAccountLocation(), pk));
 						}
 						break;
 					case "setAccountAddress":
-						o2.setAccountAddress(requestJson.getString(methodName));
-						if(o2.getAccountAddress() == null) {
+						if(requestJson.getString(methodName) == null) {
 							patchSql.append(SiteContextEnUS.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "accountAddress"));
 						} else {
+							o2.setAccountAddress(requestJson.getString(methodName));
 							patchSql.append(SiteContextEnUS.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("accountAddress", o2.jsonAccountAddress(), pk));
 						}
@@ -490,10 +550,10 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 		}
 	}
 
-	public void response200PATCHBankAccount(SearchList<BankAccount> listBankAccount, Handler<AsyncResult<OperationResponse>> eventHandler) {
+	public void response200PATCHBankAccount(PatchRequest patchRequest, Handler<AsyncResult<OperationResponse>> eventHandler) {
 		try {
-			SiteRequestEnUS siteRequest = listBankAccount.getSiteRequest_();
-			JsonObject json = new JsonObject();
+			SiteRequestEnUS siteRequest = patchRequest.getSiteRequest_();
+			JsonObject json = JsonObject.mapFrom(patchRequest);
 			eventHandler.handle(Future.succeededFuture(OperationResponse.completedWithJson(json)));
 		} catch(Exception e) {
 			eventHandler.handle(Future.failedFuture(e));
@@ -753,83 +813,22 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 			AllWriter w = AllWriter.create(listBankAccount.getSiteRequest_(), buffer);
 			AccountPage page = new AccountPage();
 			SolrDocument pageSolrDocument = new SolrDocument();
+			CaseInsensitiveHeaders requestHeaders = new CaseInsensitiveHeaders();
+			siteRequest.setRequestHeaders(requestHeaders);
 
 			pageSolrDocument.setField("pageUri_frFR_stored_string", "/account");
 			page.setPageSolrDocument(pageSolrDocument);
 			page.setW(w);
+			if(listBankAccount.size() == 1)
+				siteRequest.setRequestPk(listBankAccount.get(0).getPk());
+			siteRequest.setW(w);
 			page.setListBankAccount(listBankAccount);
+			page.setSiteRequest_(siteRequest);
 			page.initDeepAccountPage(siteRequest);
 			page.html();
-			eventHandler.handle(Future.succeededFuture(new OperationResponse(200, "OK", buffer, new CaseInsensitiveHeaders())));
+			eventHandler.handle(Future.succeededFuture(new OperationResponse(200, "OK", buffer, requestHeaders)));
 		} catch(Exception e) {
 			eventHandler.handle(Future.failedFuture(e));
-		}
-	}
-
-	public String varIndexedBankAccount(String entityVar) {
-		switch(entityVar) {
-			case "pk":
-				return "pk_indexed_long";
-			case "id":
-				return "id_indexed_string";
-			case "created":
-				return "created_indexed_date";
-			case "modified":
-				return "modified_indexed_date";
-			case "archived":
-				return "archived_indexed_boolean";
-			case "deleted":
-				return "deleted_indexed_boolean";
-			case "classCanonicalName":
-				return "classCanonicalName_indexed_string";
-			case "classSimpleName":
-				return "classSimpleName_indexed_string";
-			case "classCanonicalNames":
-				return "classCanonicalNames_indexed_strings";
-			case "accountKey":
-				return "accountKey_indexed_long";
-			case "yearKeys":
-				return "yearKeys_indexed_longs";
-			case "accountNumber":
-				return "accountNumber_indexed_string";
-			case "accountPhoneNumber":
-				return "accountPhoneNumber_indexed_string";
-			case "accountAdministratorName":
-				return "accountAdministratorName_indexed_string";
-			case "accountLocation":
-				return "accountLocation_indexed_string";
-			case "accountAddress":
-				return "accountAddress_indexed_string";
-			case "objectSuggest":
-				return "objectSuggest_indexed_string";
-			case "accountShortName":
-				return "accountShortName_indexed_string";
-			case "accountCompleteName":
-				return "accountCompleteName_indexed_string";
-			case "accountId":
-				return "accountId_indexed_string";
-			case "pageUrl":
-				return "pageUrl_indexed_string";
-			default:
-				throw new RuntimeException(String.format("\"%s\" is not an indexed entity. ", entityVar));
-		}
-	}
-
-	public String varSearchBankAccount(String entityVar) {
-		switch(entityVar) {
-			case "objectSuggest":
-				return "objectSuggest_suggested";
-			default:
-				throw new RuntimeException(String.format("\"%s\" is not an indexed entity. ", entityVar));
-		}
-	}
-
-	public String varSuggereBankAccount(String entityVar) {
-		switch(entityVar) {
-			case "objectSuggest":
-				return "objectSuggest_suggested";
-			default:
-				throw new RuntimeException(String.format("\"%s\" is not an indexed entity. ", entityVar));
 		}
 	}
 
@@ -940,6 +939,7 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 								JsonArray createLine = createAsync.result().getResults().stream().findFirst().orElseGet(() -> null);
 								Long pkUser = createLine.getLong(0);
 								SiteUser siteUser = new SiteUser();
+								siteUser.setSiteRequest_(siteRequest);
 								siteUser.setPk(pkUser);
 
 								sqlConnection.queryWithParams(
@@ -977,6 +977,7 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 						} else {
 							Long pkUser = userValues.getLong(0);
 							SiteUser siteUser = new SiteUser();
+								siteUser.setSiteRequest_(siteRequest);
 							siteUser.setPk(pkUser);
 
 							sqlConnection.queryWithParams(
@@ -1029,16 +1030,7 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 			listSearch.setC(BankAccount.class);
 			if(entityList != null)
 				listSearch.addFields(entityList);
-			listSearch.addSort("archived_indexed_boolean", ORDER.asc);
-			listSearch.addSort("deleted_indexed_boolean", ORDER.asc);
-			listSearch.addSort("created_indexed_date", ORDER.desc);
-			listSearch.addFilterQuery("classCanonicalNames_indexed_strings:" + ClientUtils.escapeQueryChars("org.computate.bancaire.enus.account.BankAccount"));
 			listSearch.set("json.facet", "{max_modified:'max(modified_indexed_date)'}");
-			SiteUser siteUser = siteRequest.getSiteUser();
-			if(siteUser != null && !siteUser.getSeeDeleted())
-				listSearch.addFilterQuery("deleted_indexed_boolean:false");
-			if(siteUser != null && !siteUser.getSeeArchived())
-				listSearch.addFilterQuery("archived_indexed_boolean:false");
 
 			String id = operationRequest.getParams().getJsonObject("path").getString("id");
 			if(id != null) {
@@ -1061,7 +1053,7 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 						switch(paramName) {
 							case "q":
 								entityVar = StringUtils.trim(StringUtils.substringBefore((String)paramObject, ":"));
-								varIndexed = "*".equals(entityVar) ? entityVar : varSearchBankAccount(entityVar);
+								varIndexed = "*".equals(entityVar) ? entityVar : BankAccount.varSearchBankAccount(entityVar);
 								valueIndexed = URLDecoder.decode(StringUtils.trim(StringUtils.substringAfter((String)paramObject, ":")), "UTF-8");
 								valueIndexed = StringUtils.isEmpty(valueIndexed) ? "*" : valueIndexed;
 								listSearch.setQuery(varIndexed + ":" + ("*".equals(valueIndexed) ? valueIndexed : ClientUtils.escapeQueryChars(valueIndexed)));
@@ -1075,13 +1067,13 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 							case "fq":
 								entityVar = StringUtils.trim(StringUtils.substringBefore((String)paramObject, ":"));
 								valueIndexed = URLDecoder.decode(StringUtils.trim(StringUtils.substringAfter((String)paramObject, ":")), "UTF-8");
-								varIndexed = varIndexedBankAccount(entityVar);
+								varIndexed = BankAccount.varIndexedBankAccount(entityVar);
 								listSearch.addFilterQuery(varIndexed + ":" + ClientUtils.escapeQueryChars(valueIndexed));
 								break;
 							case "sort":
 								entityVar = StringUtils.trim(StringUtils.substringBefore((String)paramObject, " "));
 								valueSort = StringUtils.trim(StringUtils.substringAfter((String)paramObject, " "));
-								varIndexed = varIndexedBankAccount(entityVar);
+								varIndexed = BankAccount.varIndexedBankAccount(entityVar);
 								listSearch.addSort(varIndexed, ORDER.valueOf(valueSort));
 								break;
 							case "start":
@@ -1098,6 +1090,8 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 					eventHandler.handle(Future.failedFuture(e));
 				}
 			});
+			if(listSearch.getSorts().size() == 0)
+				listSearch.addSort("created_indexed_date", ORDER.desc);
 			listSearch.initDeepForClass(siteRequest);
 			eventHandler.handle(Future.succeededFuture(listSearch));
 		} catch(Exception e) {
@@ -1118,7 +1112,11 @@ public class BankAccountEnUSGenApiServiceImpl implements BankAccountEnUSGenApiSe
 				if(defineAsync.succeeded()) {
 					try {
 						for(JsonArray definition : defineAsync.result().getResults()) {
-							o.defineForClass(definition.getString(0), definition.getString(1));
+							try {
+								o.defineForClass(definition.getString(0), definition.getString(1));
+							} catch(Exception e) {
+								LOGGER.error(e);
+							}
 						}
 						eventHandler.handle(Future.succeededFuture());
 					} catch(Exception e) {

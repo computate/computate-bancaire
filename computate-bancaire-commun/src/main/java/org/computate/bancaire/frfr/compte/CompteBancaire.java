@@ -1,4 +1,4 @@
-package org.computate.bancaire.frfr.compte;
+package org.computate.bancaire.frfr.compte;  
 
 import java.text.Normalizer;
 import java.util.List;
@@ -44,6 +44,9 @@ import org.computate.bancaire.frfr.couverture.Couverture;
  * Couleur: gray
  * IconeGroupe: duotone
  * IconeNom: money-check
+ * 
+ * Role.frFR: SiteAdmin
+ * Role.enUS: SiteAdmin
  */                   
 public class CompteBancaire extends CompteBancaireGen<Cluster> {
 

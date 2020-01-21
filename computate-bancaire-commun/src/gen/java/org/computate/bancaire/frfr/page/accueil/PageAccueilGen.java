@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.page.accueil;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import org.computate.bancaire.frfr.cluster.Cluster;
 import java.math.MathContext;
 import org.apache.commons.text.StringEscapeUtils;
@@ -12,6 +13,7 @@ import io.vertx.core.json.JsonArray;
 import org.computate.bancaire.frfr.couverture.Couverture;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
 import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 import java.lang.String;
 
@@ -159,8 +161,8 @@ public abstract class PageAccueilGen<DEV> extends MiseEnPage {
 	}
 
 	public void initLoinPageAccueil() {
-		super.initLoinMiseEnPage(requeteSite_);
 		initPageAccueil();
+		super.initLoinMiseEnPage(requeteSite_);
 	}
 
 	public void initPageAccueil() {
@@ -346,6 +348,18 @@ public abstract class PageAccueilGen<DEV> extends MiseEnPage {
 	}
 
 	public void htmlBodyPageAccueil() {
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchPageAccueil() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		PageAccueil original = (PageAccueil)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
+			super.requetePatchMiseEnPage();
+		}
 	}
 
 	//////////////

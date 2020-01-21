@@ -1,9 +1,9 @@
 package org.computate.bancaire.enus.vertx;
 
-import org.computate.bancaire.enus.contexte.SiteContextEnUS;
-import org.computate.bancaire.enus.request.SiteRequestEnUS;
-import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.frfr.vertx.AppliOpenApi3Gen;
+import org.computate.bancaire.enus.contexte.SiteContextEnUS;
+import org.computate.bancaire.enus.wrap.Wrap;
+import org.computate.bancaire.enus.request.SiteRequestEnUS;
 
 public class AppOpenApi3 extends AppOpenApi3Gen<AppSwagger2> {
 

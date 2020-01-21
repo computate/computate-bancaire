@@ -4,7 +4,9 @@ import org.computate.bancaire.frfr.config.ConfigSite;
 import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
 import org.computate.bancaire.frfr.contexte.SiteContexteFrFR;
 import org.computate.bancaire.frfr.utilisateur.UtilisateurSite;
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import org.computate.bancaire.frfr.recherche.ResultatRecherche;
+import io.vertx.core.WorkerExecutor;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -69,6 +71,7 @@ import java.util.stream.Stream;
 import java.net.URLDecoder;
 import java.time.ZonedDateTime;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.commons.collections.CollectionUtils;
 import org.computate.bancaire.frfr.recherche.ListeRecherche;
 import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 
@@ -99,6 +102,11 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 				if(a.succeeded()) {
 					creerPOSTAjustementBancaire(requeteSite, b -> {
 						if(b.succeeded()) {
+						RequetePatch requetePatch = new RequetePatch();
+							requetePatch.setRows(1);
+							requetePatch.setNumFound(1L);
+							requetePatch.initLoinRequetePatch(requeteSite);
+							requeteSite.setRequetePatch_(requetePatch);
 							AjustementBancaire ajustementBancaire = b.result();
 							sqlPOSTAjustementBancaire(ajustementBancaire, c -> {
 								if(c.succeeded()) {
@@ -115,6 +123,7 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 																		if(a.succeeded()) {
 																			connexionSql.close(i -> {
 																				if(a.succeeded()) {
+																					requeteSite.getVertx().eventBus().publish("websocketAjustementBancaire", JsonObject.mapFrom(requetePatch).toString());
 																					gestionnaireEvenements.handle(Future.succeededFuture(g.result()));
 																				} else {
 																					erreurAjustementBancaire(requeteSite, gestionnaireEvenements, i);
@@ -238,7 +247,7 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 	public void reponse200POSTAjustementBancaire(AjustementBancaire o, Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
 		try {
 			RequeteSiteFrFR requeteSite = o.getRequeteSite_();
-			JsonObject json = new JsonObject();
+			JsonObject json = JsonObject.mapFrom(o);
 			gestionnaireEvenements.handle(Future.succeededFuture(OperationResponse.completedWithJson(json)));
 		} catch(Exception e) {
 			gestionnaireEvenements.handle(Future.failedFuture(e));
@@ -255,42 +264,81 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 				if(a.succeeded()) {
 					utilisateurAjustementBancaire(requeteSite, b -> {
 						if(b.succeeded()) {
-							rechercheAjustementBancaire(requeteSite, false, true, null, c -> {
+							SQLConnection connexionSql = requeteSite.getConnexionSql();
+							connexionSql.close(c -> {
 								if(c.succeeded()) {
-									ListeRecherche<AjustementBancaire> listeAjustementBancaire = c.result();
-									SimpleOrderedMap facets = (SimpleOrderedMap)listeAjustementBancaire.getQueryResponse().getResponse().get("facets");
-									Date date = (Date)facets.get("max_modifie");
-									String dateStr;
-									if(date == null)
-										dateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(ZonedDateTime.now().toInstant(), ZoneId.of("UTC")).minusNanos(1000));
-									else
-										dateStr = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC")));
-									listePATCHAjustementBancaire(listeAjustementBancaire, dateStr, d -> {
+									rechercheAjustementBancaire(requeteSite, false, true, null, d -> {
 										if(d.succeeded()) {
-											SQLConnection connexionSql = requeteSite.getConnexionSql();
-											if(connexionSql == null) {
-												gestionnaireEvenements.handle(Future.succeededFuture(d.result()));
-											} else {
-												connexionSql.commit(e -> {
-													if(e.succeeded()) {
-														connexionSql.close(f -> {
-															if(f.succeeded()) {
-																gestionnaireEvenements.handle(Future.succeededFuture(d.result()));
-															} else {
-																erreurAjustementBancaire(requeteSite, gestionnaireEvenements, f);
-															}
-														});
-													} else {
-														gestionnaireEvenements.handle(Future.succeededFuture(d.result()));
-													}
-												});
+											ListeRecherche<AjustementBancaire> listeAjustementBancaire = d.result();
+											SimpleOrderedMap facets = (SimpleOrderedMap)Optional.ofNullable(listeAjustementBancaire.getQueryResponse()).map(QueryResponse::getResponse).map(r -> r.get("facets")).orElse(null);
+											Date date = null;
+											if(facets != null)
+												date = (Date)facets.get("max_modifie");
+											String dt;
+											if(date == null)
+												dt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(ZonedDateTime.now().toInstant(), ZoneId.of("UTC")).minusNanos(1000));
+											else
+												dt = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC")));
+											listeAjustementBancaire.addFilterQuery(String.format("modifie_indexed_date:[* TO %s]", dt));
+
+											RequetePatch requetePatch = new RequetePatch();
+											requetePatch.setRows(listeAjustementBancaire.getRows());
+											requetePatch.setNumFound(Optional.ofNullable(listeAjustementBancaire.getQueryResponse()).map(QueryResponse::getResults).map(SolrDocumentList::getNumFound).orElse(new Long(listeAjustementBancaire.size())));
+											requetePatch.initLoinRequetePatch(requeteSite);
+											requeteSite.setRequetePatch_(requetePatch);
+											if(listeAjustementBancaire.size() == 1) {
+												AjustementBancaire o = listeAjustementBancaire.get(0);
+												requetePatch.setPk(o.getPk());
+												requetePatch.setOriginal(o);
+												requetePatchAjustementBancaire(o);
 											}
+											WorkerExecutor executeurTravailleur = siteContexte.getExecuteurTravailleur();
+											executeurTravailleur.executeBlocking(
+												blockingCodeHandler -> {
+													sqlAjustementBancaire(requeteSite, e -> {
+														if(e.succeeded()) {
+															try {
+																listePATCHAjustementBancaire(requetePatch, listeAjustementBancaire, dt, f -> {
+																	if(f.succeeded()) {
+																		SQLConnection connexionSql2 = requeteSite.getConnexionSql();
+																		if(connexionSql2 == null) {
+																			blockingCodeHandler.handle(Future.succeededFuture(f.result()));
+																		} else {
+																			connexionSql2.commit(g -> {
+																				if(f.succeeded()) {
+																					connexionSql2.close(h -> {
+																						if(g.succeeded()) {
+																							blockingCodeHandler.handle(Future.succeededFuture(h.result()));
+																						} else {
+																							blockingCodeHandler.handle(Future.failedFuture(h.cause()));
+																						}
+																					});
+																				} else {
+																					blockingCodeHandler.handle(Future.failedFuture(g.cause()));
+																				}
+																			});
+																		}
+																	} else {
+																		blockingCodeHandler.handle(Future.failedFuture(f.cause()));
+																	}
+																});
+															} catch(Exception ex) {
+																blockingCodeHandler.handle(Future.failedFuture(ex));
+															}
+														} else {
+															blockingCodeHandler.handle(Future.failedFuture(e.cause()));
+														}
+													});
+												}, resultHandler -> {
+												}
+											);
+											reponse200PATCHAjustementBancaire(requetePatch, gestionnaireEvenements);
 										} else {
-											erreurAjustementBancaire(requeteSite, gestionnaireEvenements, d);
+											erreurAjustementBancaire(requeteSite, gestionnaireEvenements, c);
 										}
 									});
 								} else {
-									erreurAjustementBancaire(requeteSite, gestionnaireEvenements, c);
+									erreurAjustementBancaire(requeteSite, gestionnaireEvenements, b);
 								}
 							});
 						} else {
@@ -306,7 +354,7 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 		}
 	}
 
-	public void listePATCHAjustementBancaire(ListeRecherche<AjustementBancaire> listeAjustementBancaire, String dt, Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
+	public void listePATCHAjustementBancaire(RequetePatch requetePatch, ListeRecherche<AjustementBancaire> listeAjustementBancaire, String dt, Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
 		List<Future> futures = new ArrayList<>();
 		RequeteSiteFrFR requeteSite = listeAjustementBancaire.getRequeteSite_();
 		listeAjustementBancaire.getList().forEach(o -> {
@@ -321,15 +369,25 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 		});
 		CompositeFuture.all(futures).setHandler( a -> {
 			if(a.succeeded()) {
+				requetePatch.setNumPATCH(requetePatch.getNumPATCH() + listeAjustementBancaire.size());
 				if(listeAjustementBancaire.next(dt)) {
-					listePATCHAjustementBancaire(listeAjustementBancaire, dt, gestionnaireEvenements);
+					requeteSite.getVertx().eventBus().publish("websocketAjustementBancaire", JsonObject.mapFrom(requetePatch).toString());
+					listePATCHAjustementBancaire(requetePatch, listeAjustementBancaire, dt, gestionnaireEvenements);
 				} else {
-					reponse200PATCHAjustementBancaire(listeAjustementBancaire, gestionnaireEvenements);
+					reponse200PATCHAjustementBancaire(requetePatch, gestionnaireEvenements);
 				}
 			} else {
 				erreurAjustementBancaire(listeAjustementBancaire.getRequeteSite_(), gestionnaireEvenements, a);
 			}
 		});
+	}
+
+	public void requetePatchAjustementBancaire(AjustementBancaire o) {
+		RequetePatch requetePatch = o.getRequeteSite_().getRequetePatch_();
+		if(requetePatch != null) {
+			List<Long> pks = requetePatch.getPks();
+			List<String> classes = requetePatch.getClasses();
+		}
 	}
 
 	public Future<AjustementBancaire> futurePATCHAjustementBancaire(AjustementBancaire o,  Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
@@ -344,6 +402,8 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 								if(c.succeeded()) {
 									indexerAjustementBancaire(ajustementBancaire, d -> {
 										if(d.succeeded()) {
+											requetePatchAjustementBancaire(ajustementBancaire);
+											ajustementBancaire.requetePatchAjustementBancaire();
 											future.complete(o);
 											gestionnaireEvenements.handle(Future.succeededFuture(d.result()));
 										} else {
@@ -384,41 +444,41 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 			for(String methodeNom : methodeNoms) {
 				switch(methodeNom) {
 					case "setCree":
-						o2.setCree(requeteJson.getString(methodeNom));
-						if(o2.getCree() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "cree"));
 						} else {
+							o2.setCree(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("cree", o2.jsonCree(), pk));
 						}
 						break;
 					case "setModifie":
-						o2.setModifie(requeteJson.getString(methodeNom));
-						if(o2.getModifie() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "modifie"));
 						} else {
+							o2.setModifie(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("modifie", o2.jsonModifie(), pk));
 						}
 						break;
 					case "setArchive":
-						o2.setArchive(requeteJson.getBoolean(methodeNom));
-						if(o2.getArchive() == null) {
+						if(requeteJson.getBoolean(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "archive"));
 						} else {
+							o2.setArchive(requeteJson.getBoolean(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("archive", o2.jsonArchive(), pk));
 						}
 						break;
 					case "setSupprime":
-						o2.setSupprime(requeteJson.getBoolean(methodeNom));
-						if(o2.getSupprime() == null) {
+						if(requeteJson.getBoolean(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "supprime"));
 						} else {
+							o2.setSupprime(requeteJson.getBoolean(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("supprime", o2.jsonSupprime(), pk));
 						}
@@ -452,41 +512,41 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 						});
 						break;
 					case "setAgentPasserOutre":
-						o2.setAgentPasserOutre(requeteJson.getBoolean(methodeNom));
-						if(o2.getAgentPasserOutre() == null) {
+						if(requeteJson.getBoolean(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "agentPasserOutre"));
 						} else {
+							o2.setAgentPasserOutre(requeteJson.getBoolean(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("agentPasserOutre", o2.jsonAgentPasserOutre(), pk));
 						}
 						break;
 					case "setDroitEligible":
-						o2.setDroitEligible(requeteJson.getBoolean(methodeNom));
-						if(o2.getDroitEligible() == null) {
+						if(requeteJson.getBoolean(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "droitEligible"));
 						} else {
+							o2.setDroitEligible(requeteJson.getBoolean(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("droitEligible", o2.jsonDroitEligible(), pk));
 						}
 						break;
 					case "setPartenaireNom":
-						o2.setPartenaireNom(requeteJson.getString(methodeNom));
-						if(o2.getPartenaireNom() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "partenaireNom"));
 						} else {
+							o2.setPartenaireNom(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("partenaireNom", o2.jsonPartenaireNom(), pk));
 						}
 						break;
 					case "setAjustementNomAffichage":
-						o2.setAjustementNomAffichage(requeteJson.getString(methodeNom));
-						if(o2.getAjustementNomAffichage() == null) {
+						if(requeteJson.getString(methodeNom) == null) {
 							patchSql.append(SiteContexteFrFR.SQL_removeD);
 							patchSqlParams.addAll(Arrays.asList(pk, "ajustementNomAffichage"));
 						} else {
+							o2.setAjustementNomAffichage(requeteJson.getString(methodeNom));
 							patchSql.append(SiteContexteFrFR.SQL_setD);
 							patchSqlParams.addAll(Arrays.asList("ajustementNomAffichage", o2.jsonAjustementNomAffichage(), pk));
 						}
@@ -512,10 +572,10 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 		}
 	}
 
-	public void reponse200PATCHAjustementBancaire(ListeRecherche<AjustementBancaire> listeAjustementBancaire, Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
+	public void reponse200PATCHAjustementBancaire(RequetePatch requetePatch, Handler<AsyncResult<OperationResponse>> gestionnaireEvenements) {
 		try {
-			RequeteSiteFrFR requeteSite = listeAjustementBancaire.getRequeteSite_();
-			JsonObject json = new JsonObject();
+			RequeteSiteFrFR requeteSite = requetePatch.getRequeteSite_();
+			JsonObject json = JsonObject.mapFrom(requetePatch);
 			gestionnaireEvenements.handle(Future.succeededFuture(OperationResponse.completedWithJson(json)));
 		} catch(Exception e) {
 			gestionnaireEvenements.handle(Future.failedFuture(e));
@@ -775,101 +835,22 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 			ToutEcrivain w = ToutEcrivain.creer(listeAjustementBancaire.getRequeteSite_(), buffer);
 			AjustementPage page = new AjustementPage();
 			SolrDocument pageDocumentSolr = new SolrDocument();
+			CaseInsensitiveHeaders requeteEnTetes = new CaseInsensitiveHeaders();
+			requeteSite.setRequeteEnTetes(requeteEnTetes);
 
 			pageDocumentSolr.setField("pageUri_frFR_stored_string", "/ajustement");
 			page.setPageDocumentSolr(pageDocumentSolr);
 			page.setW(w);
+			if(listeAjustementBancaire.size() == 1)
+				requeteSite.setRequetePk(listeAjustementBancaire.get(0).getPk());
+			requeteSite.setW(w);
 			page.setListeAjustementBancaire(listeAjustementBancaire);
+			page.setRequeteSite_(requeteSite);
 			page.initLoinAjustementPage(requeteSite);
 			page.html();
-			gestionnaireEvenements.handle(Future.succeededFuture(new OperationResponse(200, "OK", buffer, new CaseInsensitiveHeaders())));
+			gestionnaireEvenements.handle(Future.succeededFuture(new OperationResponse(200, "OK", buffer, requeteEnTetes)));
 		} catch(Exception e) {
 			gestionnaireEvenements.handle(Future.failedFuture(e));
-		}
-	}
-
-	public String varIndexeAjustementBancaire(String entiteVar) {
-		switch(entiteVar) {
-			case "pk":
-				return "pk_indexed_long";
-			case "id":
-				return "id_indexed_string";
-			case "cree":
-				return "cree_indexed_date";
-			case "modifie":
-				return "modifie_indexed_date";
-			case "archive":
-				return "archive_indexed_boolean";
-			case "supprime":
-				return "supprime_indexed_boolean";
-			case "classeNomCanonique":
-				return "classeNomCanonique_indexed_string";
-			case "classeNomSimple":
-				return "classeNomSimple_indexed_string";
-			case "classeNomsCanoniques":
-				return "classeNomsCanoniques_indexed_strings";
-			case "ajustementCle":
-				return "ajustementCle_indexed_long";
-			case "compteCle":
-				return "compteCle_indexed_long";
-			case "compteNomComplet":
-				return "compteNomComplet_indexed_string";
-			case "compteNumero":
-				return "compteNumero_indexed_string";
-			case "transactionCle":
-				return "transactionCle_indexed_long";
-			case "transactionIdReference":
-				return "transactionIdReference_indexed_string";
-			case "transactionCode":
-				return "transactionCode_indexed_string";
-			case "transactionMontant":
-				return "transactionMontant_indexed_double";
-			case "transactionDateHeure":
-				return "transactionDateHeure_indexed_date";
-			case "transactionDate":
-				return "transactionDate_indexed_date";
-			case "transactionFrais":
-				return "transactionFrais_indexed_boolean";
-			case "agentZones":
-				return "agentZones_indexed_strings";
-			case "agentRoles":
-				return "agentRoles_indexed_strings";
-			case "agentPasserOutre":
-				return "agentPasserOutre_indexed_boolean";
-			case "droitEligible":
-				return "droitEligible_indexed_boolean";
-			case "partenaireNom":
-				return "partenaireNom_indexed_string";
-			case "ajustementNomAffichage":
-				return "ajustementNomAffichage_indexed_string";
-			case "ajustementNomComplet":
-				return "ajustementNomComplet_indexed_string";
-			case "ajustementId":
-				return "ajustementId_indexed_string";
-			case "pageUrl":
-				return "pageUrl_indexed_string";
-			case "objetSuggere":
-				return "objetSuggere_indexed_string";
-			default:
-				throw new RuntimeException(String.format("\"%s\" n'est pas une entité indexé. ", entiteVar));
-		}
-	}
-
-	public String varRechercheAjustementBancaire(String entiteVar) {
-		switch(entiteVar) {
-			case "objetSuggere":
-				return "objetSuggere_suggested";
-			default:
-				throw new RuntimeException(String.format("\"%s\" n'est pas une entité indexé. ", entiteVar));
-		}
-	}
-
-	public String varSuggereAjustementBancaire(String entiteVar) {
-		switch(entiteVar) {
-			case "objetSuggere":
-				return "objetSuggere_suggested";
-			default:
-				throw new RuntimeException(String.format("\"%s\" n'est pas une entité indexé. ", entiteVar));
 		}
 	}
 
@@ -980,6 +961,7 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 								JsonArray creerLigne = creerAsync.result().getResults().stream().findFirst().orElseGet(() -> null);
 								Long pkUtilisateur = creerLigne.getLong(0);
 								UtilisateurSite utilisateurSite = new UtilisateurSite();
+								utilisateurSite.setRequeteSite_(requeteSite);
 								utilisateurSite.setPk(pkUtilisateur);
 
 								connexionSql.queryWithParams(
@@ -1017,6 +999,7 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 						} else {
 							Long pkUtilisateur = utilisateurValeurs.getLong(0);
 							UtilisateurSite utilisateurSite = new UtilisateurSite();
+								utilisateurSite.setRequeteSite_(requeteSite);
 							utilisateurSite.setPk(pkUtilisateur);
 
 							connexionSql.queryWithParams(
@@ -1069,16 +1052,7 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 			listeRecherche.setC(AjustementBancaire.class);
 			if(entiteListe != null)
 				listeRecherche.addFields(entiteListe);
-			listeRecherche.addSort("archive_indexed_boolean", ORDER.asc);
-			listeRecherche.addSort("supprime_indexed_boolean", ORDER.asc);
-			listeRecherche.addSort("cree_indexed_date", ORDER.desc);
-			listeRecherche.addFilterQuery("classeNomsCanoniques_indexed_strings:" + ClientUtils.escapeQueryChars("org.computate.bancaire.frfr.ajustement.AjustementBancaire"));
 			listeRecherche.set("json.facet", "{max_modifie:'max(modifie_indexed_date)'}");
-			UtilisateurSite utilisateurSite = requeteSite.getUtilisateurSite();
-			if(utilisateurSite != null && !utilisateurSite.getVoirSupprime())
-				listeRecherche.addFilterQuery("supprime_indexed_boolean:false");
-			if(utilisateurSite != null && !utilisateurSite.getVoirArchive())
-				listeRecherche.addFilterQuery("archive_indexed_boolean:false");
 
 			String id = operationRequete.getParams().getJsonObject("path").getString("id");
 			if(id != null) {
@@ -1101,7 +1075,7 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 						switch(paramNom) {
 							case "q":
 								entiteVar = StringUtils.trim(StringUtils.substringBefore((String)paramObjet, ":"));
-								varIndexe = "*".equals(entiteVar) ? entiteVar : varRechercheAjustementBancaire(entiteVar);
+								varIndexe = "*".equals(entiteVar) ? entiteVar : AjustementBancaire.varRechercheAjustementBancaire(entiteVar);
 								valeurIndexe = URLDecoder.decode(StringUtils.trim(StringUtils.substringAfter((String)paramObjet, ":")), "UTF-8");
 								valeurIndexe = StringUtils.isEmpty(valeurIndexe) ? "*" : valeurIndexe;
 								listeRecherche.setQuery(varIndexe + ":" + ("*".equals(valeurIndexe) ? valeurIndexe : ClientUtils.escapeQueryChars(valeurIndexe)));
@@ -1115,13 +1089,13 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 							case "fq":
 								entiteVar = StringUtils.trim(StringUtils.substringBefore((String)paramObjet, ":"));
 								valeurIndexe = URLDecoder.decode(StringUtils.trim(StringUtils.substringAfter((String)paramObjet, ":")), "UTF-8");
-								varIndexe = varIndexeAjustementBancaire(entiteVar);
+								varIndexe = AjustementBancaire.varIndexeAjustementBancaire(entiteVar);
 								listeRecherche.addFilterQuery(varIndexe + ":" + ClientUtils.escapeQueryChars(valeurIndexe));
 								break;
 							case "sort":
 								entiteVar = StringUtils.trim(StringUtils.substringBefore((String)paramObjet, " "));
 								valeurTri = StringUtils.trim(StringUtils.substringAfter((String)paramObjet, " "));
-								varIndexe = varIndexeAjustementBancaire(entiteVar);
+								varIndexe = AjustementBancaire.varIndexeAjustementBancaire(entiteVar);
 								listeRecherche.addSort(varIndexe, ORDER.valueOf(valeurTri));
 								break;
 							case "start":
@@ -1138,6 +1112,8 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 					gestionnaireEvenements.handle(Future.failedFuture(e));
 				}
 			});
+			if(listeRecherche.getSorts().size() == 0)
+				listeRecherche.addSort("cree_indexed_date", ORDER.desc);
 			listeRecherche.initLoinPourClasse(requeteSite);
 			gestionnaireEvenements.handle(Future.succeededFuture(listeRecherche));
 		} catch(Exception e) {
@@ -1158,7 +1134,11 @@ public class AjustementBancaireFrFRGenApiServiceImpl implements AjustementBancai
 				if(definirAsync.succeeded()) {
 					try {
 						for(JsonArray definition : definirAsync.result().getResults()) {
-							o.definirPourClasse(definition.getString(0), definition.getString(1));
+							try {
+								o.definirPourClasse(definition.getString(0), definition.getString(1));
+							} catch(Exception e) {
+								LOGGER.error(e);
+							}
 						}
 						gestionnaireEvenements.handle(Future.succeededFuture());
 					} catch(Exception e) {

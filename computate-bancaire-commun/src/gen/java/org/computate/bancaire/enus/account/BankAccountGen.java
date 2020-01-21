@@ -1,5 +1,6 @@
 package org.computate.bancaire.enus.account;
 
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 import java.lang.Double;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,7 @@ import org.computate.bancaire.enus.wrap.Wrap;
 import org.apache.solr.client.solrj.SolrQuery;
 import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
 import io.vertx.ext.sql.SQLClient;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -130,47 +132,6 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return accountKey == null ? "" : StringEscapeUtils.escapeHtml4(strAccountKey());
 	}
 
-	public void htmAccountKey(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "AccountKey\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "AccountKey() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAccountKey\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAccountKey()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"accountKey\"");
-							r.s(" value=\"", htmAccountKey(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmAccountKey());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////
 	// yearKeys //
 	//////////////
@@ -256,45 +217,30 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return yearKeys == null ? "" : StringEscapeUtils.escapeHtml4(strYearKeys());
 	}
 
-	public void htmYearKeys(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "YearKeys\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "YearKeys() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setYearKeys\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageYearKeys()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"yearKeys\"");
-							r.s(" value=\"", htmYearKeys(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmYearKeys());
+	public void inputYearKeys(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+	}
+
+	public void htmYearKeys(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classApiMethodMethod)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("class", "").f().sx("transactions").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strYearKeys()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	///////////////////
@@ -358,45 +304,58 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return accountNumber == null ? "" : StringEscapeUtils.escapeHtml4(strAccountNumber());
 	}
 
-	public void htmAccountNumber(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "AccountNumber\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "AccountNumber() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAccountNumber\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAccountNumber()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"accountNumber\"");
-							r.s(" value=\"", htmAccountNumber(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputAccountNumber(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "account number")
+			.a("id", classApiMethodMethod, "_accountNumber");
+			if("Page".equals(classApiMethodMethod) || "PATCH".equals(classApiMethodMethod)) {
+				a("class", "setAccountNumber inputBankAccount", pk, "AccountNumber w3-input w3-border ");
+				a("name", "setAccountNumber");
 			} else {
-				r.s(htmAccountNumber());
+				a("class", "valueAccountNumber w3-input w3-border inputBankAccount", pk, "AccountNumber w3-input w3-border ");
+				a("name", "accountNumber");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classApiMethodMethod)) {
+				a("onclick", "removeGlow($(this)); ");
+				a("onchange", "patchBankAccountVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setAccountNumber', $(this).val(), function() { addGlow($('#", classApiMethodMethod, "_accountNumber')); }, function() { addError($('#", classApiMethodMethod, "_accountNumber')); }); ");
+			}
+			a("value", strAccountNumber())
+		.fg();
+
+	}
+
+	public void htmAccountNumber(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggestBankAccountAccountNumber").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("for", classApiMethodMethod, "_accountNumber").a("class", "").f().sx("account number").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputAccountNumber(classApiMethodMethod);
+							} g("div");
+							if("Page".equals(classApiMethodMethod)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
+									.a("onclick", "removeGlow($('#", classApiMethodMethod, "_accountNumber')); $('#", classApiMethodMethod, "_accountNumber').val(null); patchBankAccountVal([{ name: 'fq', value: 'pk:' + $('#BankAccountForm :input[name=pk]').val() }], 'setAccountNumber', null, function() { addGlow($('#", classApiMethodMethod, "_accountNumber')); }, function() { addError($('#", classApiMethodMethod, "_accountNumber')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	////////////////////////
@@ -460,45 +419,58 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return accountPhoneNumber == null ? "" : StringEscapeUtils.escapeHtml4(strAccountPhoneNumber());
 	}
 
-	public void htmAccountPhoneNumber(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "AccountPhoneNumber\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "AccountPhoneNumber() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAccountPhoneNumber\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAccountPhoneNumber()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"accountPhoneNumber\"");
-							r.s(" value=\"", htmAccountPhoneNumber(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputAccountPhoneNumber(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "phone number")
+			.a("id", classApiMethodMethod, "_accountPhoneNumber");
+			if("Page".equals(classApiMethodMethod) || "PATCH".equals(classApiMethodMethod)) {
+				a("class", "setAccountPhoneNumber inputBankAccount", pk, "AccountPhoneNumber w3-input w3-border ");
+				a("name", "setAccountPhoneNumber");
 			} else {
-				r.s(htmAccountPhoneNumber());
+				a("class", "valueAccountPhoneNumber w3-input w3-border inputBankAccount", pk, "AccountPhoneNumber w3-input w3-border ");
+				a("name", "accountPhoneNumber");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classApiMethodMethod)) {
+				a("onclick", "removeGlow($(this)); ");
+				a("onchange", "patchBankAccountVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setAccountPhoneNumber', $(this).val(), function() { addGlow($('#", classApiMethodMethod, "_accountPhoneNumber')); }, function() { addError($('#", classApiMethodMethod, "_accountPhoneNumber')); }); ");
+			}
+			a("value", strAccountPhoneNumber())
+		.fg();
+
+	}
+
+	public void htmAccountPhoneNumber(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggestBankAccountAccountPhoneNumber").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("for", classApiMethodMethod, "_accountPhoneNumber").a("class", "").f().sx("phone number").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputAccountPhoneNumber(classApiMethodMethod);
+							} g("div");
+							if("Page".equals(classApiMethodMethod)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
+									.a("onclick", "removeGlow($('#", classApiMethodMethod, "_accountPhoneNumber')); $('#", classApiMethodMethod, "_accountPhoneNumber').val(null); patchBankAccountVal([{ name: 'fq', value: 'pk:' + $('#BankAccountForm :input[name=pk]').val() }], 'setAccountPhoneNumber', null, function() { addGlow($('#", classApiMethodMethod, "_accountPhoneNumber')); }, function() { addError($('#", classApiMethodMethod, "_accountPhoneNumber')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	//////////////////////////////
@@ -562,45 +534,58 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return accountAdministratorName == null ? "" : StringEscapeUtils.escapeHtml4(strAccountAdministratorName());
 	}
 
-	public void htmAccountAdministratorName(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "AccountAdministratorName\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "AccountAdministratorName() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAccountAdministratorName\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAccountAdministratorName()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"accountAdministratorName\"");
-							r.s(" value=\"", htmAccountAdministratorName(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputAccountAdministratorName(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "administrator of the account")
+			.a("id", classApiMethodMethod, "_accountAdministratorName");
+			if("Page".equals(classApiMethodMethod) || "PATCH".equals(classApiMethodMethod)) {
+				a("class", "setAccountAdministratorName inputBankAccount", pk, "AccountAdministratorName w3-input w3-border ");
+				a("name", "setAccountAdministratorName");
 			} else {
-				r.s(htmAccountAdministratorName());
+				a("class", "valueAccountAdministratorName w3-input w3-border inputBankAccount", pk, "AccountAdministratorName w3-input w3-border ");
+				a("name", "accountAdministratorName");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classApiMethodMethod)) {
+				a("onclick", "removeGlow($(this)); ");
+				a("onchange", "patchBankAccountVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setAccountAdministratorName', $(this).val(), function() { addGlow($('#", classApiMethodMethod, "_accountAdministratorName')); }, function() { addError($('#", classApiMethodMethod, "_accountAdministratorName')); }); ");
+			}
+			a("value", strAccountAdministratorName())
+		.fg();
+
+	}
+
+	public void htmAccountAdministratorName(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggestBankAccountAccountAdministratorName").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("for", classApiMethodMethod, "_accountAdministratorName").a("class", "").f().sx("administrator of the account").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputAccountAdministratorName(classApiMethodMethod);
+							} g("div");
+							if("Page".equals(classApiMethodMethod)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
+									.a("onclick", "removeGlow($('#", classApiMethodMethod, "_accountAdministratorName')); $('#", classApiMethodMethod, "_accountAdministratorName').val(null); patchBankAccountVal([{ name: 'fq', value: 'pk:' + $('#BankAccountForm :input[name=pk]').val() }], 'setAccountAdministratorName', null, function() { addGlow($('#", classApiMethodMethod, "_accountAdministratorName')); }, function() { addError($('#", classApiMethodMethod, "_accountAdministratorName')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	/////////////////////
@@ -664,45 +649,58 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return accountLocation == null ? "" : StringEscapeUtils.escapeHtml4(strAccountLocation());
 	}
 
-	public void htmAccountLocation(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "AccountLocation\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "AccountLocation() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAccountLocation\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAccountLocation()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"accountLocation\"");
-							r.s(" value=\"", htmAccountLocation(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputAccountLocation(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "location")
+			.a("id", classApiMethodMethod, "_accountLocation");
+			if("Page".equals(classApiMethodMethod) || "PATCH".equals(classApiMethodMethod)) {
+				a("class", "setAccountLocation inputBankAccount", pk, "AccountLocation w3-input w3-border ");
+				a("name", "setAccountLocation");
 			} else {
-				r.s(htmAccountLocation());
+				a("class", "valueAccountLocation w3-input w3-border inputBankAccount", pk, "AccountLocation w3-input w3-border ");
+				a("name", "accountLocation");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classApiMethodMethod)) {
+				a("onclick", "removeGlow($(this)); ");
+				a("onchange", "patchBankAccountVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setAccountLocation', $(this).val(), function() { addGlow($('#", classApiMethodMethod, "_accountLocation')); }, function() { addError($('#", classApiMethodMethod, "_accountLocation')); }); ");
+			}
+			a("value", strAccountLocation())
+		.fg();
+
+	}
+
+	public void htmAccountLocation(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggestBankAccountAccountLocation").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("for", classApiMethodMethod, "_accountLocation").a("class", "").f().sx("location").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputAccountLocation(classApiMethodMethod);
+							} g("div");
+							if("Page".equals(classApiMethodMethod)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
+									.a("onclick", "removeGlow($('#", classApiMethodMethod, "_accountLocation')); $('#", classApiMethodMethod, "_accountLocation').val(null); patchBankAccountVal([{ name: 'fq', value: 'pk:' + $('#BankAccountForm :input[name=pk]').val() }], 'setAccountLocation', null, function() { addGlow($('#", classApiMethodMethod, "_accountLocation')); }, function() { addError($('#", classApiMethodMethod, "_accountLocation')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	////////////////////
@@ -766,45 +764,56 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return accountAddress == null ? "" : StringEscapeUtils.escapeHtml4(strAccountAddress());
 	}
 
-	public void htmAccountAddress(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "AccountAddress\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "AccountAddress() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAccountAddress\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAccountAddress()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"accountAddress\"");
-							r.s(" value=\"", htmAccountAddress(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputAccountAddress(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		e("textarea")
+			.a("placeholder", "address")
+			.a("id", classApiMethodMethod, "_accountAddress");
+			if("Page".equals(classApiMethodMethod) || "PATCH".equals(classApiMethodMethod)) {
+				a("class", "setAccountAddress inputBankAccount", pk, "AccountAddress w3-input w3-border ");
+				a("name", "setAccountAddress");
 			} else {
-				r.s(htmAccountAddress());
+				a("class", "valueAccountAddress w3-input w3-border inputBankAccount", pk, "AccountAddress w3-input w3-border ");
+				a("name", "accountAddress");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classApiMethodMethod)) {
+				a("onclick", "removeGlow($(this)); ");
+				a("onchange", "patchBankAccountVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setAccountAddress', $(this).val(), function() { addGlow($('#", classApiMethodMethod, "_accountAddress')); }, function() { addError($('#", classApiMethodMethod, "_accountAddress')); }); ");
+			}
+		f().sx(strAccountAddress()).g("textarea");
+
+	}
+
+	public void htmAccountAddress(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggestBankAccountAccountAddress").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("for", classApiMethodMethod, "_accountAddress").a("class", "").f().sx("address").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputAccountAddress(classApiMethodMethod);
+							} g("div");
+							if("Page".equals(classApiMethodMethod)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
+									.a("onclick", "removeGlow($('#", classApiMethodMethod, "_accountAddress')); $('#", classApiMethodMethod, "_accountAddress').val(null); patchBankAccountVal([{ name: 'fq', value: 'pk:' + $('#BankAccountForm :input[name=pk]').val() }], 'setAccountAddress', null, function() { addGlow($('#", classApiMethodMethod, "_accountAddress')); }, function() { addError($('#", classApiMethodMethod, "_accountAddress')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	/////////////////////////
@@ -874,47 +883,6 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return objectSuggestWeight == null ? "" : StringEscapeUtils.escapeHtml4(strObjectSuggestWeight());
 	}
 
-	public void htmObjectSuggestWeight(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "ObjectSuggestWeight\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "ObjectSuggestWeight() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setObjectSuggestWeight\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageObjectSuggestWeight()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"objectSuggestWeight\"");
-							r.s(" value=\"", htmObjectSuggestWeight(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmObjectSuggestWeight());
-			}
-			r.l("</div>");
-		}
-	}
-
 	///////////////////
 	// objectSuggest //
 	///////////////////
@@ -974,47 +942,6 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 
 	public String htmObjectSuggest() {
 		return objectSuggest == null ? "" : StringEscapeUtils.escapeHtml4(strObjectSuggest());
-	}
-
-	public void htmObjectSuggest(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "ObjectSuggest\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "ObjectSuggest() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setObjectSuggest\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageObjectSuggest()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"objectSuggest\"");
-							r.s(" value=\"", htmObjectSuggest(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmObjectSuggest());
-			}
-			r.l("</div>");
-		}
 	}
 
 	//////////////////////
@@ -1078,47 +1005,6 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return accountShortName == null ? "" : StringEscapeUtils.escapeHtml4(strAccountShortName());
 	}
 
-	public void htmAccountShortName(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "AccountShortName\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "AccountShortName() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAccountShortName\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAccountShortName()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"accountShortName\"");
-							r.s(" value=\"", htmAccountShortName(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmAccountShortName());
-			}
-			r.l("</div>");
-		}
-	}
-
 	/////////////////////////
 	// accountCompleteName //
 	/////////////////////////
@@ -1180,45 +1066,30 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return accountCompleteName == null ? "" : StringEscapeUtils.escapeHtml4(strAccountCompleteName());
 	}
 
-	public void htmAccountCompleteName(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "AccountCompleteName\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "AccountCompleteName() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAccountCompleteName\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAccountCompleteName()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"accountCompleteName\"");
-							r.s(" value=\"", htmAccountCompleteName(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmAccountCompleteName());
+	public void inputAccountCompleteName(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+	}
+
+	public void htmAccountCompleteName(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classApiMethodMethod)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("class", "").f().sx("name").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strAccountCompleteName()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	///////////////
@@ -1282,45 +1153,30 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return accountId == null ? "" : StringEscapeUtils.escapeHtml4(strAccountId());
 	}
 
-	public void htmAccountId(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "AccountId\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "AccountId() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setAccountId\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageAccountId()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"accountId\"");
-							r.s(" value=\"", htmAccountId(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmAccountId());
+	public void inputAccountId(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+	}
+
+	public void htmAccountId(String classApiMethodMethod) {
+		BankAccount s = (BankAccount)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classApiMethodMethod)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("class", "").f().sx("ID").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strAccountId()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	/////////////
@@ -1384,47 +1240,6 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return pageUrl == null ? "" : StringEscapeUtils.escapeHtml4(strPageUrl());
 	}
 
-	public void htmPageUrl(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "PageUrl\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "PageUrl() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setPageUrl\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichagePageUrl()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"pageUrl\"");
-							r.s(" value=\"", htmPageUrl(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmPageUrl());
-			}
-			r.l("</div>");
-		}
-	}
-
 	////////////
 	// pageH1 //
 	////////////
@@ -1486,47 +1301,6 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		return pageH1 == null ? "" : StringEscapeUtils.escapeHtml4(strPageH1());
 	}
 
-	public void htmPageH1(AllWriter r, Boolean patchRights) {
-		if(pk!= null) {
-			r.s("<div id=\"patchBankAccount", strPk(), "PageH1\">");
-			if(patchRights) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchBankAccount", strPk(), "PageH1() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setPageH1\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichagePageH1()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"pageH1\"");
-							r.s(" value=\"", htmPageH1(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmPageH1());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////
 	// initDeep //
 	//////////////
@@ -1543,8 +1317,8 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 	}
 
 	public void initDeepBankAccount() {
-		super.initDeepCluster(siteRequest_);
 		initBankAccount();
+		super.initDeepCluster(siteRequest_);
 	}
 
 	public void initBankAccount() {
@@ -1840,7 +1614,7 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 			SolrInputDocument document = new SolrInputDocument();
 			indexBankAccount(document);
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -1852,7 +1626,7 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 			indexBankAccount(document);
 			SolrClient clientSolr = siteRequest_.getSiteContext_().getSolrClient();
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -1896,7 +1670,6 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 		}
 		if(objectSuggest != null) {
 			document.addField("objectSuggest_suggested", objectSuggest);
-			document.addField("objectSuggest_indexed_string", objectSuggest);
 		}
 		if(accountShortName != null) {
 			document.addField("accountShortName_indexed_string", accountShortName);
@@ -1929,9 +1702,58 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 			initDeepBankAccount(siteRequest);
 			SolrClient solrClient = siteContext.getSolrClient();
 			solrClient.deleteById(id.toString());
-			solrClient.commit();
+			solrClient.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
+		}
+	}
+
+	public static String varIndexedBankAccount(String entityVar) {
+		switch(entityVar) {
+			case "accountKey":
+				return "accountKey_indexed_long";
+			case "yearKeys":
+				return "yearKeys_indexed_longs";
+			case "accountNumber":
+				return "accountNumber_indexed_string";
+			case "accountPhoneNumber":
+				return "accountPhoneNumber_indexed_string";
+			case "accountAdministratorName":
+				return "accountAdministratorName_indexed_string";
+			case "accountLocation":
+				return "accountLocation_indexed_string";
+			case "accountAddress":
+				return "accountAddress_indexed_string";
+			case "objectSuggest":
+				return "objectSuggest_indexed_string";
+			case "accountShortName":
+				return "accountShortName_indexed_string";
+			case "accountCompleteName":
+				return "accountCompleteName_indexed_string";
+			case "accountId":
+				return "accountId_indexed_string";
+			case "pageUrl":
+				return "pageUrl_indexed_string";
+			default:
+				return Cluster.varIndexedCluster(entityVar);
+		}
+	}
+
+	public static String varSearchBankAccount(String entityVar) {
+		switch(entityVar) {
+			case "objectSuggest":
+				return "objectSuggest_suggested";
+			default:
+				return Cluster.varSearchCluster(entityVar);
+		}
+	}
+
+	public static String varSuggestBankAccount(String entityVar) {
+		switch(entityVar) {
+			case "objectSuggest":
+				return "objectSuggest_suggested";
+			default:
+				return Cluster.varSuggestCluster(entityVar);
 		}
 	}
 
@@ -2004,6 +1826,28 @@ public abstract class BankAccountGen<DEV> extends Cluster {
 	}
 
 	public void htmlBodyBankAccount() {
+	}
+
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestBankAccount() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		BankAccount original = (BankAccount)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
+			if(!Objects.equals(accountNumber, original.getAccountNumber()))
+				patchRequest.addVars("accountNumber");
+			if(!Objects.equals(accountPhoneNumber, original.getAccountPhoneNumber()))
+				patchRequest.addVars("accountPhoneNumber");
+			if(!Objects.equals(accountAdministratorName, original.getAccountAdministratorName()))
+				patchRequest.addVars("accountAdministratorName");
+			if(!Objects.equals(accountLocation, original.getAccountLocation()))
+				patchRequest.addVars("accountLocation");
+			if(!Objects.equals(accountAddress, original.getAccountAddress()))
+				patchRequest.addVars("accountAddress");
+			super.patchRequestCluster();
+		}
 	}
 
 	//////////////

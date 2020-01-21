@@ -1,29 +1,27 @@
 package org.computate.bancaire.frfr.ecrivain;
 
+import org.computate.bancaire.frfr.ecrivain.TousEcrivains;
+import org.computate.bancaire.frfr.cluster.Cluster;
 import java.math.MathContext;
-
 import org.apache.commons.text.StringEscapeUtils;
 import org.computate.bancaire.frfr.vertx.AppliSwagger2;
-import org.computate.bancaire.frfr.cluster.Cluster;
-import org.computate.bancaire.frfr.config.ConfigSite;
-import org.computate.bancaire.frfr.contexte.SiteContexteFrFR;
-import org.computate.bancaire.frfr.couverture.Couverture;
-import org.computate.bancaire.frfr.ecrivain.TousEcrivains;
-import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
-import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
 import org.apache.commons.lang3.StringUtils;
 import java.lang.Integer;
+import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
 import java.text.NumberFormat;
+import org.computate.bancaire.frfr.contexte.SiteContexteFrFR;
 import java.util.Objects;
 import io.vertx.core.json.JsonArray;
 import org.apache.solr.common.SolrDocument;
-
 import java.util.List;
+import org.computate.bancaire.frfr.couverture.Couverture;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
 import java.lang.Boolean;
 import java.lang.Object;
+import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 import java.lang.String;
+import org.computate.bancaire.frfr.config.ConfigSite;
 
 /**	
  * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.ecrivain.ApiEcrivain&fq=classeEtendGen_indexed_boolean:true">Trouver la classe  dans Solr</a>

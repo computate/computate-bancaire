@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.compte;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import java.lang.Double;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,7 @@ import org.computate.bancaire.frfr.couverture.Couverture;
 import org.apache.solr.client.solrj.SolrQuery;
 import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
 import io.vertx.ext.sql.SQLClient;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -129,47 +131,6 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return compteCle == null ? "" : StringEscapeUtils.escapeHtml4(strCompteCle());
 	}
 
-	public void htmCompteCle(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "CompteCle\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "CompteCle() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteCle\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteCle()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteCle\"");
-							r.s(" value=\"", htmCompteCle(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCompteCle());
-			}
-			r.l("</div>");
-		}
-	}
-
 	/////////////////////
 	// transactionCles //
 	/////////////////////
@@ -255,45 +216,30 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return transactionCles == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionCles());
 	}
 
-	public void htmTransactionCles(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "TransactionCles\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "TransactionCles() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionCles\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionCles()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionCles\"");
-							r.s(" value=\"", htmTransactionCles(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmTransactionCles());
+	public void inputTransactionCles(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+	}
+
+	public void htmTransactionCles(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("class", "").f().sx("transactions").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strTransactionCles()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	//////////////////
@@ -357,45 +303,59 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return compteNumero == null ? "" : StringEscapeUtils.escapeHtml4(strCompteNumero());
 	}
 
-	public void htmCompteNumero(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "CompteNumero\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "CompteNumero() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteNumero\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteNumero()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteNumero\"");
-							r.s(" value=\"", htmCompteNumero(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputCompteNumero(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "numéro de compte")
+			.a("title", "Description.enUS: ")
+			.a("id", classeApiMethodeMethode, "_compteNumero");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setCompteNumero inputCompteBancaire", pk, "CompteNumero w3-input w3-border ");
+				a("name", "setCompteNumero");
 			} else {
-				r.s(htmCompteNumero());
+				a("class", "valeurCompteNumero w3-input w3-border inputCompteBancaire", pk, "CompteNumero w3-input w3-border ");
+				a("name", "compteNumero");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchCompteBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setCompteNumero', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_compteNumero')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_compteNumero')); }); ");
+			}
+			a("value", strCompteNumero())
+		.fg();
+
+	}
+
+	public void htmCompteNumero(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereCompteBancaireCompteNumero").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("for", classeApiMethodeMethode, "_compteNumero").a("class", "").f().sx("numéro de compte").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputCompteNumero(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_compteNumero')); $('#", classeApiMethodeMethode, "_compteNumero').val(null); patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=pk]').val() }], 'setCompteNumero', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_compteNumero')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_compteNumero')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	///////////////////////////
@@ -459,45 +419,59 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return compteNumeroTelephone == null ? "" : StringEscapeUtils.escapeHtml4(strCompteNumeroTelephone());
 	}
 
-	public void htmCompteNumeroTelephone(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "CompteNumeroTelephone\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "CompteNumeroTelephone() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteNumeroTelephone\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteNumeroTelephone()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteNumeroTelephone\"");
-							r.s(" value=\"", htmCompteNumeroTelephone(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputCompteNumeroTelephone(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "numéro de téléphone")
+			.a("title", "Description.enUS: ")
+			.a("id", classeApiMethodeMethode, "_compteNumeroTelephone");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setCompteNumeroTelephone inputCompteBancaire", pk, "CompteNumeroTelephone w3-input w3-border ");
+				a("name", "setCompteNumeroTelephone");
 			} else {
-				r.s(htmCompteNumeroTelephone());
+				a("class", "valeurCompteNumeroTelephone w3-input w3-border inputCompteBancaire", pk, "CompteNumeroTelephone w3-input w3-border ");
+				a("name", "compteNumeroTelephone");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchCompteBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setCompteNumeroTelephone', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_compteNumeroTelephone')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_compteNumeroTelephone')); }); ");
+			}
+			a("value", strCompteNumeroTelephone())
+		.fg();
+
+	}
+
+	public void htmCompteNumeroTelephone(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereCompteBancaireCompteNumeroTelephone").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("for", classeApiMethodeMethode, "_compteNumeroTelephone").a("class", "").f().sx("numéro de téléphone").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputCompteNumeroTelephone(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_compteNumeroTelephone')); $('#", classeApiMethodeMethode, "_compteNumeroTelephone').val(null); patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=pk]').val() }], 'setCompteNumeroTelephone', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_compteNumeroTelephone')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_compteNumeroTelephone')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	/////////////////////////////
@@ -561,45 +535,59 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return compteAdministrateurNom == null ? "" : StringEscapeUtils.escapeHtml4(strCompteAdministrateurNom());
 	}
 
-	public void htmCompteAdministrateurNom(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "CompteAdministrateurNom\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "CompteAdministrateurNom() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteAdministrateurNom\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteAdministrateurNom()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteAdministrateurNom\"");
-							r.s(" value=\"", htmCompteAdministrateurNom(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputCompteAdministrateurNom(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "administrateur de l'école")
+			.a("title", "Description.enUS: ")
+			.a("id", classeApiMethodeMethode, "_compteAdministrateurNom");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setCompteAdministrateurNom inputCompteBancaire", pk, "CompteAdministrateurNom w3-input w3-border ");
+				a("name", "setCompteAdministrateurNom");
 			} else {
-				r.s(htmCompteAdministrateurNom());
+				a("class", "valeurCompteAdministrateurNom w3-input w3-border inputCompteBancaire", pk, "CompteAdministrateurNom w3-input w3-border ");
+				a("name", "compteAdministrateurNom");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchCompteBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setCompteAdministrateurNom', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_compteAdministrateurNom')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_compteAdministrateurNom')); }); ");
+			}
+			a("value", strCompteAdministrateurNom())
+		.fg();
+
+	}
+
+	public void htmCompteAdministrateurNom(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereCompteBancaireCompteAdministrateurNom").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("for", classeApiMethodeMethode, "_compteAdministrateurNom").a("class", "").f().sx("administrateur de l'école").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputCompteAdministrateurNom(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_compteAdministrateurNom')); $('#", classeApiMethodeMethode, "_compteAdministrateurNom').val(null); patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=pk]').val() }], 'setCompteAdministrateurNom', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_compteAdministrateurNom')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_compteAdministrateurNom')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	///////////////////////
@@ -663,45 +651,59 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return compteEmplacement == null ? "" : StringEscapeUtils.escapeHtml4(strCompteEmplacement());
 	}
 
-	public void htmCompteEmplacement(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "CompteEmplacement\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "CompteEmplacement() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteEmplacement\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteEmplacement()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteEmplacement\"");
-							r.s(" value=\"", htmCompteEmplacement(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputCompteEmplacement(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "l'emplacement")
+			.a("title", "Description.enUS: ")
+			.a("id", classeApiMethodeMethode, "_compteEmplacement");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setCompteEmplacement inputCompteBancaire", pk, "CompteEmplacement w3-input w3-border ");
+				a("name", "setCompteEmplacement");
 			} else {
-				r.s(htmCompteEmplacement());
+				a("class", "valeurCompteEmplacement w3-input w3-border inputCompteBancaire", pk, "CompteEmplacement w3-input w3-border ");
+				a("name", "compteEmplacement");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchCompteBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setCompteEmplacement', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_compteEmplacement')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_compteEmplacement')); }); ");
+			}
+			a("value", strCompteEmplacement())
+		.fg();
+
+	}
+
+	public void htmCompteEmplacement(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereCompteBancaireCompteEmplacement").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("for", classeApiMethodeMethode, "_compteEmplacement").a("class", "").f().sx("l'emplacement").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputCompteEmplacement(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_compteEmplacement')); $('#", classeApiMethodeMethode, "_compteEmplacement').val(null); patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=pk]').val() }], 'setCompteEmplacement', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_compteEmplacement')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_compteEmplacement')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	////////////////////
@@ -765,45 +767,57 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return compteAddresse == null ? "" : StringEscapeUtils.escapeHtml4(strCompteAddresse());
 	}
 
-	public void htmCompteAddresse(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "CompteAddresse\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "CompteAddresse() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteAddresse\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteAddresse()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteAddresse\"");
-							r.s(" value=\"", htmCompteAddresse(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputCompteAddresse(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		e("textarea")
+			.a("placeholder", "addresse")
+			.a("title", "Description.enUS: ")
+			.a("id", classeApiMethodeMethode, "_compteAddresse");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setCompteAddresse inputCompteBancaire", pk, "CompteAddresse w3-input w3-border ");
+				a("name", "setCompteAddresse");
 			} else {
-				r.s(htmCompteAddresse());
+				a("class", "valeurCompteAddresse w3-input w3-border inputCompteBancaire", pk, "CompteAddresse w3-input w3-border ");
+				a("name", "compteAddresse");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchCompteBancaireVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setCompteAddresse', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_compteAddresse')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_compteAddresse')); }); ");
+			}
+		f().sx(strCompteAddresse()).g("textarea");
+
+	}
+
+	public void htmCompteAddresse(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereCompteBancaireCompteAddresse").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("for", classeApiMethodeMethode, "_compteAddresse").a("class", "").f().sx("addresse").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputCompteAddresse(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_compteAddresse')); $('#", classeApiMethodeMethode, "_compteAddresse').val(null); patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=pk]').val() }], 'setCompteAddresse', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_compteAddresse')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_compteAddresse')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	///////////////////////
@@ -873,47 +887,6 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return objetSuggerePoids == null ? "" : StringEscapeUtils.escapeHtml4(strObjetSuggerePoids());
 	}
 
-	public void htmObjetSuggerePoids(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "ObjetSuggerePoids\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "ObjetSuggerePoids() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setObjetSuggerePoids\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageObjetSuggerePoids()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"objetSuggerePoids\"");
-							r.s(" value=\"", htmObjetSuggerePoids(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmObjetSuggerePoids());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////////
 	// objetSuggere //
 	//////////////////
@@ -973,47 +946,6 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 
 	public String htmObjetSuggere() {
 		return objetSuggere == null ? "" : StringEscapeUtils.escapeHtml4(strObjetSuggere());
-	}
-
-	public void htmObjetSuggere(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "ObjetSuggere\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "ObjetSuggere() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setObjetSuggere\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageObjetSuggere()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"objetSuggere\"");
-							r.s(" value=\"", htmObjetSuggere(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmObjetSuggere());
-			}
-			r.l("</div>");
-		}
 	}
 
 	///////////////////////
@@ -1077,47 +1009,6 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return compteNumeroCourt == null ? "" : StringEscapeUtils.escapeHtml4(strCompteNumeroCourt());
 	}
 
-	public void htmCompteNumeroCourt(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "CompteNumeroCourt\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "CompteNumeroCourt() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteNumeroCourt\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteNumeroCourt()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteNumeroCourt\"");
-							r.s(" value=\"", htmCompteNumeroCourt(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCompteNumeroCourt());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////////////
 	// compteNomComplet //
 	//////////////////////
@@ -1179,45 +1070,30 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return compteNomComplet == null ? "" : StringEscapeUtils.escapeHtml4(strCompteNomComplet());
 	}
 
-	public void htmCompteNomComplet(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "CompteNomComplet\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "CompteNomComplet() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteNomComplet\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteNomComplet()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteNomComplet\"");
-							r.s(" value=\"", htmCompteNomComplet(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCompteNomComplet());
+	public void inputCompteNomComplet(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+	}
+
+	public void htmCompteNomComplet(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("class", "").f().sx("nom").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strCompteNomComplet()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	//////////////
@@ -1281,45 +1157,30 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return compteId == null ? "" : StringEscapeUtils.escapeHtml4(strCompteId());
 	}
 
-	public void htmCompteId(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "CompteId\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "CompteId() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCompteId\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCompteId()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"compteId\"");
-							r.s(" value=\"", htmCompteId(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCompteId());
+	public void inputCompteId(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+	}
+
+	public void htmCompteId(String classeApiMethodeMethode) {
+		CompteBancaire s = (CompteBancaire)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-gray ").f();
+							e("label").a("class", "").f().sx("ID").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strCompteId()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	/////////////
@@ -1383,47 +1244,6 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return pageUrl == null ? "" : StringEscapeUtils.escapeHtml4(strPageUrl());
 	}
 
-	public void htmPageUrl(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "PageUrl\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "PageUrl() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setPageUrl\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichagePageUrl()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"pageUrl\"");
-							r.s(" value=\"", htmPageUrl(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmPageUrl());
-			}
-			r.l("</div>");
-		}
-	}
-
 	////////////
 	// pageH1 //
 	////////////
@@ -1485,47 +1305,6 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		return pageH1 == null ? "" : StringEscapeUtils.escapeHtml4(strPageH1());
 	}
 
-	public void htmPageH1(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCompteBancaire", strPk(), "PageH1\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCompteBancaire", strPk(), "PageH1() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setPageH1\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichagePageH1()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"pageH1\"");
-							r.s(" value=\"", htmPageH1(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmPageH1());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////
 	// initLoin //
 	//////////////
@@ -1542,8 +1321,8 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 	}
 
 	public void initLoinCompteBancaire() {
-		super.initLoinCluster(requeteSite_);
 		initCompteBancaire();
+		super.initLoinCluster(requeteSite_);
 	}
 
 	public void initCompteBancaire() {
@@ -1839,7 +1618,7 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 			SolrInputDocument document = new SolrInputDocument();
 			indexerCompteBancaire(document);
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -1851,7 +1630,7 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 			indexerCompteBancaire(document);
 			SolrClient clientSolr = requeteSite_.getSiteContexte_().getClientSolr();
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -1895,7 +1674,6 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 		}
 		if(objetSuggere != null) {
 			document.addField("objetSuggere_suggested", objetSuggere);
-			document.addField("objetSuggere_indexed_string", objetSuggere);
 		}
 		if(compteNumeroCourt != null) {
 			document.addField("compteNumeroCourt_indexed_string", compteNumeroCourt);
@@ -1928,9 +1706,58 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 			initLoinCompteBancaire(requeteSite);
 			SolrClient clientSolr = siteContexte.getClientSolr();
 			clientSolr.deleteById(id.toString());
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
+		}
+	}
+
+	public static String varIndexeCompteBancaire(String entiteVar) {
+		switch(entiteVar) {
+			case "compteCle":
+				return "compteCle_indexed_long";
+			case "transactionCles":
+				return "transactionCles_indexed_longs";
+			case "compteNumero":
+				return "compteNumero_indexed_string";
+			case "compteNumeroTelephone":
+				return "compteNumeroTelephone_indexed_string";
+			case "compteAdministrateurNom":
+				return "compteAdministrateurNom_indexed_string";
+			case "compteEmplacement":
+				return "compteEmplacement_indexed_string";
+			case "compteAddresse":
+				return "compteAddresse_indexed_string";
+			case "objetSuggere":
+				return "objetSuggere_indexed_string";
+			case "compteNumeroCourt":
+				return "compteNumeroCourt_indexed_string";
+			case "compteNomComplet":
+				return "compteNomComplet_indexed_string";
+			case "compteId":
+				return "compteId_indexed_string";
+			case "pageUrl":
+				return "pageUrl_indexed_string";
+			default:
+				return Cluster.varIndexeCluster(entiteVar);
+		}
+	}
+
+	public static String varRechercheCompteBancaire(String entiteVar) {
+		switch(entiteVar) {
+			case "objetSuggere":
+				return "objetSuggere_suggested";
+			default:
+				return Cluster.varRechercheCluster(entiteVar);
+		}
+	}
+
+	public static String varSuggereCompteBancaire(String entiteVar) {
+		switch(entiteVar) {
+			case "objetSuggere":
+				return "objetSuggere_suggested";
+			default:
+				return Cluster.varSuggereCluster(entiteVar);
 		}
 	}
 
@@ -2003,6 +1830,28 @@ public abstract class CompteBancaireGen<DEV> extends Cluster {
 	}
 
 	public void htmlBodyCompteBancaire() {
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchCompteBancaire() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		CompteBancaire original = (CompteBancaire)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
+			if(!Objects.equals(compteNumero, original.getCompteNumero()))
+				requetePatch.addVars("compteNumero");
+			if(!Objects.equals(compteNumeroTelephone, original.getCompteNumeroTelephone()))
+				requetePatch.addVars("compteNumeroTelephone");
+			if(!Objects.equals(compteAdministrateurNom, original.getCompteAdministrateurNom()))
+				requetePatch.addVars("compteAdministrateurNom");
+			if(!Objects.equals(compteEmplacement, original.getCompteEmplacement()))
+				requetePatch.addVars("compteEmplacement");
+			if(!Objects.equals(compteAddresse, original.getCompteAddresse()))
+				requetePatch.addVars("compteAddresse");
+			super.requetePatchCluster();
+		}
 	}
 
 	//////////////

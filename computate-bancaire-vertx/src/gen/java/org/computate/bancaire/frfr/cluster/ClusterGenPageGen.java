@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.cluster;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import org.computate.bancaire.frfr.cluster.Cluster;
 import java.math.MathContext;
 import org.apache.commons.text.StringEscapeUtils;
@@ -13,6 +14,7 @@ import org.computate.bancaire.frfr.couverture.Couverture;
 import org.computate.bancaire.frfr.recherche.ListeRecherche;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
 import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 
 /**	
@@ -115,8 +117,8 @@ public abstract class ClusterGenPageGen<DEV> extends MiseEnPage {
 	}
 
 	public void initLoinClusterGenPage() {
-		super.initLoinMiseEnPage(requeteSite_);
 		initClusterGenPage();
+		super.initLoinMiseEnPage(requeteSite_);
 	}
 
 	public void initClusterGenPage() {
@@ -306,6 +308,18 @@ public abstract class ClusterGenPageGen<DEV> extends MiseEnPage {
 	}
 
 	public void htmlStyleClusterGenPage() {
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchClusterGenPage() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		ClusterGenPage original = (ClusterGenPage)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
+			super.requetePatchMiseEnPage();
+		}
 	}
 
 	//////////////

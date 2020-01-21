@@ -1,4 +1,4 @@
-package org.computate.bancaire.frfr.page;          
+package org.computate.bancaire.frfr.page;           
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -6,20 +6,22 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.solr.common.SolrDocument;
+import org.computate.bancaire.enUS.html.part.HtmlPart;
 import org.computate.bancaire.frfr.config.ConfigSite;
 import org.computate.bancaire.frfr.couverture.Couverture;
 import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
-import org.computate.bancaire.frfr.page.MiseEnPage;
-
 import org.computate.bancaire.frfr.page.part.PagePart;
 import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
 import org.computate.bancaire.frfr.utilisateur.UtilisateurSite;
@@ -81,6 +83,15 @@ public class MiseEnPage extends MiseEnPageGen<Object> {
 	 * r.enUS: Locale.US
 	 */
 	public static DateTimeFormatter FORMATDateHeureZoneeAffichage = DateTimeFormatter.ofPattern("EEEE d MMMM yyyy H'h'mm:ss.SSS zz VV", Locale.FRANCE);
+
+	/**
+	 * Var.enUS: FORMATTimeDisplay
+	 * r: H'h'mm
+	 * r.enUS: h:mm a
+	 * r: Locale.FRANCE
+	 * r.enUS: Locale.US
+	 */
+	public static DateTimeFormatter FORMATHeureAffichage = DateTimeFormatter.ofPattern("H'h'mm", Locale.FRANCE);
 
 	protected void _pageParts(List<PagePart> l) {
 	}
@@ -556,10 +567,13 @@ public class MiseEnPage extends MiseEnPageGen<Object> {
 	@Override public void htmlScriptsMiseEnPage() {
 		e("script").a("src", statiqueUrlBase, "/js/jquery-1.12.4.min.js").f().g("script");
 		e("script").a("src", statiqueUrlBase, "/js/site-frFR.js").f().g("script");
-		e("script").a("src", statiqueUrlBase, "/js/UtilisateurSiteFrFRPage.js").f().g("script");
+		e("script").a("src", statiqueUrlBase, "/js/sockjs.js").f().g("script");
+		e("script").a("src", statiqueUrlBase, "/js/vertx-eventbus.js").f().g("script");
+		e("script").a("src", statiqueUrlBase, "/js/frFR/UtilisateurSitePage.js").f().g("script");
 		e("script").a("src", statiqueUrlBase, "/js/moment.min.js").f().g("script");
 		e("script").a("src", statiqueUrlBase, "/js/jqDatePicker.js").f().g("script");
 		e("script").a("src", statiqueUrlBase, "/js/jquery.serialize-object.js").f().g("script");
+		e("script").a("src", statiqueUrlBase, "/js/jSignature.min.js").f().g("script");
 		e("script").a("src", "https://kit.fontawesome.com/59d19567d5.js").f().g("script");
 	}
 
@@ -643,7 +657,7 @@ public class MiseEnPage extends MiseEnPageGen<Object> {
 					e("div").a("class", "site-section-above ").f();
 						e("div").a("class", "w3-content w3-center w3-black ").f();
 							e("div").a("class", "").f();
-								menu();
+								menu("Menu1");
 							g("div"); 
 						g("div");
 						e("div").a("id", "site-section-primary").a("class", "site-section-primary w3-text-black w3-padding-bottom-32 ").f();
@@ -662,7 +676,7 @@ public class MiseEnPage extends MiseEnPageGen<Object> {
 				g("div");
 				e("div").a("class", "w3-row site-section-contact ").f();
 					e("div").a("class", "w3-content w3-center  w3-cell-row w3-margin-bottom-32 ").f();
-						menu();
+						menu("Menu2");
 						e("div").a("class", "w3-container ").f();
 							e("div").a("class", "w3-container w3-text-black w3-margin-top ").f();
 								e("h6").a("id", "h2-contactez-nous").a("class",  "w3-xlarge ").f();
@@ -683,6 +697,20 @@ public class MiseEnPage extends MiseEnPageGen<Object> {
 	}
 
 	/** 
+	 * r: UtilisateurSite
+	 * r.enUS: SiteUser
+	 * r: voir archivé
+	 * r.enUS: see archived
+	 * r: voirArchive
+	 * r.enUS: seeArchived
+	 * r: VoirArchive
+	 * r.enUS: SeeArchived
+	 * r: voir supprimé
+	 * r.enUS: see deleted
+	 * r: voirSupprime
+	 * r.enUS: seeDeleted
+	 * r: VoirSupprime
+	 * r.enUS: SeeDeleted
 	 * r: langue
 	 * r.enUS: language
 	 * r: accueil
@@ -713,12 +741,56 @@ public class MiseEnPage extends MiseEnPageGen<Object> {
 	 * r.enUS: "Logout"
 	 * r: "Connexion"
 	 * r.enUS: "Login"
-	 * r: "Écoles"
-	 * r.enUS: "Schools"
-	 * r: htmlSuggereEcoleGenPage
-	 * r.enUS: htmlSuggestSchoolGenPage
+	 * r: "écoles"
+	 * r.enUS: "schools"
+	 * r: "années"
+	 * r.enUS: "years"
+	 * r: "saisons"
+	 * r.enUS: "seasons"
+	 * r: "sessions"
+	 * r.enUS: "sessions"
+	 * r: "âges"
+	 * r.enUS: "ages"
+	 * r: "blocs"
+	 * r.enUS: "blocks"
+	 * r: "inscriptions"
+	 * r.enUS: "enrollments"
+	 * r: "paiements"
+	 * r.enUS: "payments"
+	 * r: "mères"
+	 * r.enUS: "moms"
+	 * r: "pères"
+	 * r.enUS: "dads"
+	 * r: "gardiens"
+	 * r.enUS: "guardians"
+	 * r: "enfants"
+	 * r.enUS: "children"
+	 * r: EcoleGenPage.htmlSuggereEcoleGenPage
+	 * r.enUS: SchoolGenPage.htmlSuggestSchoolGenPage
+	 * r: AnneeGenPage.htmlSuggereAnneeGenPage
+	 * r.enUS: YearGenPage.htmlSuggestYearGenPage
+	 * r: SaisonGenPage.htmlSuggereSaisonGenPage
+	 * r.enUS: SeasonGenPage.htmlSuggestSeasonGenPage
+	 * r: SessionGenPage.htmlSuggereSessionGenPage
+	 * r.enUS: SessionGenPage.htmlSuggestSessionGenPage
+	 * r: AgeGenPage.htmlSuggereAgeGenPage
+	 * r.enUS: AgeGenPage.htmlSuggestAgeGenPage
+	 * r: BlocGenPage.htmlSuggereBlocGenPage
+	 * r.enUS: BlockGenPage.htmlSuggestBlockGenPage
+	 * r: InscriptionGenPage.htmlSuggereInscriptionGenPage
+	 * r.enUS: EnrollmentGenPage.htmlSuggestEnrollmentGenPage
+	 * r: PaiementGenPage.htmlSuggerePaiementGenPage
+	 * r.enUS: PaymentGenPage.htmlSuggestPaymentGenPage
+	 * r: MereGenPage.htmlSuggereMereGenPage
+	 * r.enUS: MomGenPage.htmlSuggestMomGenPage
+	 * r: PereGenPage.htmlSuggerePereGenPage
+	 * r.enUS: DadGenPage.htmlSuggestDadGenPage
+	 * r: GardienGenPage.htmlSuggereGardienGenPage
+	 * r.enUS: GuardianGenPage.htmlSuggestGuardianGenPage
+	 * r: EnfantGenPage.htmlSuggereEnfantGenPage
+	 * r.enUS: ChildGenPage.htmlSuggestChildGenPage
 	 */ 
-	public void menu()  {
+	public void menu(String id)  {
 		e("div").a("class", "w3-bar w3-text-white w3-padding-bottom-8 w3-padding-top-8 ").a("style", "padding-left: 16px; padding-right: 16px; ").f();
 			e("div").a("class", "site-bar-item w3-bar-item ").f();
 				e("a").a("class", "").a("href", pageAccueilUri).f();
@@ -727,15 +799,7 @@ public class MiseEnPage extends MiseEnPageGen<Object> {
 					g("span");
 				g("a");
 			g("div");
-			{ e("div").a("class", "w3-dropdown-hover ").f();
-				{ e("div").a("class", "w3-button w3-hover-yellow ").f();
-						e("i").a("class", "fad fa-school w3-padding-small ").f().g("i");
-						sx("Écoles");
-				} g("div");
-				{ e("div").a("class", "w3-dropdown-content w3-card-4 w3-padding ").f();
-					htmlSuggereEcoleGenPage();
-				} g("div");
-			} g("div");
+
 			if(requeteSite_.getUtilisateurId() == null) {
 				e("div").a("class", "site-bar-item w3-bar-item ").f();
 					e("a").a("class", "w3-padding ").a("href", pageUtilisateurUri).f(); 
@@ -746,13 +810,44 @@ public class MiseEnPage extends MiseEnPageGen<Object> {
 				g("div");
 			}
 			if(requeteSite_.getUtilisateurId() != null) {
-				e("div").a("class", "site-bar-item w3-bar-item ").f();
-					e("a").a("class", "w3-padding ").a("href", pageUtilisateurUri).f(); 
-						e("span").a("class", "site-menu-item").f();
+
+				{ e("div").a("class", "w3-dropdown-hover ").f();
+					{ e("div").a("class", "w3-button w3-hover-green ").f();
+							e("i").a("class", "far fa-user-cog w3-padding-small ").f().g("i");
 							sx(requeteSite_.getUtilisateurNom());
-						g("span");
-					g("a");
-				g("div");
+					} g("div");
+					{ e("div").a("class", "w3-dropdown-content w3-card-4 w3-padding ").f();
+						UtilisateurSite o = requeteSite_.getUtilisateurSite();
+						{ e("div").a("class", "w3-cell-row ").f();
+							e("label").a("for", "Page_voirArchive").a("class", "").f().sx("voir archivé").g("label");
+							e("input")
+								.a("type", "checkbox")
+								.a("value", "true")
+								.a("class", "setVoirArchive")
+								.a("name", "setVoirArchive")
+								.a("id", "Page_voirArchive")
+								.a("onchange", "patchSiteUserVal([{ name: 'fq', value: 'pk:' + $('#SiteUserForm :input[name=\"pk\"]').val() }], 'setVoirArchive', $(this).prop('checked'), function() { addGlow($('#Page_voirArchive')); }, function() { addError($('#Page_voirArchive')); }); ")
+								;
+								if(o.getVoirArchive() != null && o.getVoirArchive())
+									a("checked", "checked");
+							fg();
+						} g("div");
+						{ e("div").a("class", "w3-cell-row ").f();
+							e("label").a("for", "Page_voirSupprime").a("class", "").f().sx("voir supprimé").g("label");
+							e("input")
+								.a("type", "checkbox")
+								.a("value", "true")
+								.a("class", "setVoirSupprime")
+								.a("name", "setVoirSupprime")
+								.a("id", "Page_voirSupprime")
+								.a("onchange", "patchSiteUserVal([{ name: 'fq', value: 'pk:' + $('#SiteUserForm :input[name=\"pk\"]').val() }], 'setVoirSupprime', $(this).prop('checked'), function() { addGlow($('#Page_voirSupprime')); }, function() { addError($('#Page_voirSupprime')); }); ")
+								;
+								if(o.getVoirSupprime() != null && o.getVoirSupprime())
+									a("checked", "checked");
+							fg();
+						} g("div");
+					} g("div");
+				} g("div");
 				e("div").a("class", "site-bar-item w3-bar-item ").f();
 					e("a").a("class", "w3-padding ").a("href", pageDeconnexionUri).f();
 						e("span").a("class", "site-menu-item").f();
@@ -765,93 +860,6 @@ public class MiseEnPage extends MiseEnPageGen<Object> {
 	} 
 
 	/**
-	 * Var.enUS: htmlSuggestSchoolGenPage
-	 * r: "/ecole"
-	 * r.enUS: "/school"
-	 * r: "voir toutes les écoles"
-	 * r.enUS: "see all the schools"
-	 * r: "rechargerEcoleGenPage"
-	 * r.enUS: "refreshSchoolGenPage"
-	 * r: "recharger toutes les écoles"
-	 * r.enUS: "refresh all the schools"
-	 * r: "rechercher écoles : "
-	 * r.enUS: "search schools: "
-	 * r: "suggereFormEcole"
-	 * r.enUS: "suggestFormSchool"
-	 * r: "rechercher écoles"
-	 * r.enUS: "search schools"
-	 * r: "suggereEcole w3-input w3-border w3-cell w3-cell-middle "
-	 * r.enUS: "suggestSchool w3-input w3-border w3-cell w3-cell-middle "
-	 * r: "suggereEcole"
-	 * r.enUS: "suggestSchool"
-	 * r: patchEcoleVals
-	 * r.enUS: patchSchoolVals
-	 * r: ajouterLueur
-	 * r.enUS: addGlow
-	 * r: rechargerEcoleGenPage
-	 * r.enUS: refreshSchoolGenPage
-	 * r: ajouterErreur
-	 * r.enUS: addError
-	 * r: suggereEcoleObjetSuggere
-	 * r.enUS: suggestSchoolObjectSuggest
-	 * r: 'objetSuggere:'
-	 * r.enUS: 'objectSuggest:'
-	 * r: '#suggereListEcole'
-	 * r.enUS: '#suggestListSchool'
-	 * r: "suggereListEcole"
-	 * r.enUS: "suggestListSchool"
-	**/
-	public void htmlSuggereEcoleGenPage() {
-		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("href", "/ecole").a("class", "").f();
-					e("i").a("class", "fad fa-school w3-padding-small ").f().g("i");
-					sx("voir toutes les écoles");
-				} g("a");
-			} g("div");
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("id", "rechargerEcoleGenPage").a("href", "/ecole").a("class", "").a("onclick", "patchEcoleVals([], {}, function() { ajouterLueur($('#rechargerEcoleGenPage')); }, function() { ajouterErreur($('#rechargerEcoleGenPage')); }); return false; ").f();
-					e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
-					sx("recharger toutes les écoles");
-				} g("a");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("span").f();
-					sx("rechercher écoles : ");
-				} g("span");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("div").a("class", "w3-cell-row ").f();
-
-					e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
-					{ e("form").a("action", "").a("id", "suggereFormEcole").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "text")
-							.a("placeholder", "rechercher écoles")
-							.a("class", "suggereEcole w3-input w3-border w3-cell w3-cell-middle ")
-							.a("name", "suggereEcole")
-							.a("id", "suggereEcole")
-							.a("autocomplete", "off")
-							.a("oninput", "suggereEcoleObjetSuggere( [ { 'name': 'q', 'value': 'objetSuggere:' + $(this).val() } ], $('#suggereListEcole')); ")
-							.fg();
-
-					} g("form");
-				} g("div");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-				{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "suggereListEcole").f();
-				} g("ul");
-			} g("div");
-		} g("div");
-	}
-
-	/**  
 	 * var.enUS: sharePage
 	 * remplacer.enUS: toutXml
 	 * allXml
@@ -1297,5 +1305,223 @@ public class MiseEnPage extends MiseEnPageGen<Object> {
 				} g("form");
 			} g("div");
 		} g("div");
+	}
+
+	/**
+	 * r: obtenirPourClasse
+	 * r.enUS: obtainForClass
+	 * r: pageTypeContenu
+	 * r.enUS: pageContentType
+	 * r: requeteSite
+	 * r.enUS: siteRequest
+	 * r: RequetePk
+	 * r.enUS: RequestPk
+	 * r: ConfigSite
+	 * r.enUS: SiteConfig
+	 * r: StatiqueUrlBase
+	 * r.enUS: StaticBaseUrl
+	 */
+	public Integer htmlPageLayout2(List<HtmlPart> htmlPartList, HtmlPart htmlPartParent, Integer start, Integer size) {
+
+		Integer i;
+
+		Double parentSort1 = null;
+		Double parentSort2 = null;
+		Double parentSort3 = null;
+		Double parentSort4 = null;
+		Double parentSort5 = null;
+		Double parentSort6 = null;
+		Double parentSort7 = null;
+		Double parentSort8 = null;
+		Double parentSort9 = null;
+		Double parentSort10 = null;
+
+		if(htmlPartParent != null) {
+			parentSort1 = htmlPartParent.getSort1();
+			parentSort2 = htmlPartParent.getSort2();
+			parentSort3 = htmlPartParent.getSort3();
+			parentSort4 = htmlPartParent.getSort4();
+			parentSort5 = htmlPartParent.getSort5();
+			parentSort6 = htmlPartParent.getSort6();
+			parentSort7 = htmlPartParent.getSort7();
+			parentSort8 = htmlPartParent.getSort8();
+			parentSort9 = htmlPartParent.getSort9();
+			parentSort10 = htmlPartParent.getSort10();
+		}
+
+		for(i = Math.abs(start); i < size; i++) {
+			HtmlPart htmlPart = htmlPartList.get(i);
+
+			Double sort1 = htmlPart.getSort1();
+			Double sort2 = htmlPart.getSort2();
+			Double sort3 = htmlPart.getSort3();
+			Double sort4 = htmlPart.getSort4();
+			Double sort5 = htmlPart.getSort5();
+			Double sort6 = htmlPart.getSort6();
+			Double sort7 = htmlPart.getSort7();
+			Double sort8 = htmlPart.getSort8();
+			Double sort9 = htmlPart.getSort9();
+			Double sort10 = htmlPart.getSort10();
+
+			if(htmlPartParent != null) {
+				if(parentSort2 != null && (sort1 == null || parentSort1.compareTo(sort1) != 0))
+					return i;
+				if(parentSort3 != null && (sort2 == null || parentSort2.compareTo(sort2) != 0))
+					return i;
+				if(parentSort4 != null && (sort3 == null || parentSort3.compareTo(sort3) != 0))
+					return i;
+				if(parentSort5 != null && (sort4 == null || parentSort4.compareTo(sort4) != 0))
+					return i;
+				if(parentSort6 != null && (sort5 == null || parentSort5.compareTo(sort5) != 0))
+					return i;
+				if(parentSort7 != null && (sort6 == null || parentSort6.compareTo(sort6) != 0))
+					return i;
+				if(parentSort8 != null && (sort7 == null || parentSort7.compareTo(sort7) != 0))
+					return i;
+				if(parentSort9 != null && (sort8 == null || parentSort8.compareTo(sort8) != 0))
+					return i;
+				if(parentSort10 != null && (sort9 == null || parentSort9.compareTo(sort9) != 0))
+					return i;
+			}
+
+			if(start >= 0) {
+	
+				String htmlVar = htmlPart.getHtmlVar();
+				String htmlVarSpan = htmlPart.getHtmlVarSpan();
+				String htmlVarInput = htmlPart.getHtmlVarInput();
+				String htmlVarForm = htmlPart.getHtmlVarForm();
+				String htmlVarForEach = htmlPart.getHtmlVarForEach();
+				Boolean pdfExclude = htmlPart.getPdfExclude();
+				Boolean htmlExclude = htmlPart.getHtmlExclude();
+
+				if(htmlVarSpan != null)
+					htmlVar = htmlVarSpan;
+	
+				if(
+						"application/pdf".equals(pageTypeContenu) && BooleanUtils.isNotTrue(pdfExclude)
+						|| !"application/pdf".equals(pageTypeContenu) && BooleanUtils.isNotTrue(htmlExclude)
+						) {
+					s(htmlPart.getHtmlBefore());
+					if(htmlVar != null) {
+	
+						Object parent = StringUtils.contains(htmlVar, ".") ? obtenirPourClasse(StringUtils.substringBeforeLast(htmlVar, ".")) : null;
+						if(parent == null)
+							parent = this;
+						String var = StringUtils.substringAfterLast(htmlVar, ".");
+						if(StringUtils.isBlank(var))
+							var = htmlVar;
+	
+						if(htmlVarForEach != null) {
+		
+							Object parentForEach = StringUtils.contains(htmlVarForEach, ".") ? obtenirPourClasse(StringUtils.substringBeforeLast(htmlVarForEach, ".")) : null;
+							if(parentForEach == null)
+								parentForEach = this;
+							String varForEach = StringUtils.substringAfterLast(htmlVarForEach, ".");
+							if(StringUtils.isBlank(varForEach))
+								varForEach = htmlVarForEach;
+		
+							try {
+								Collection<?> collection = (Collection<?>)MethodUtils.invokeMethod(parentForEach, "get" + StringUtils.capitalize(varForEach), new Object[] {});
+								List<?> list = collection.stream().collect(Collectors.toList());
+								Integer forStart = i + 1;
+		
+								for(Object o : list) {
+									try {
+										MethodUtils.invokeExactMethod(parent, "set" + StringUtils.capitalize(var), o);
+										i = htmlPageLayout2(htmlPartList, htmlPart, forStart, size);
+									} catch (Exception e) {
+										throw new RuntimeException(String.format("Could not call method %s of var %s and object: %s", "set" + StringUtils.capitalize(var), htmlVar, parent), e);
+									}
+								}
+								if(list.size() == 0) {
+									i = htmlPageLayout2(htmlPartList, htmlPart, -forStart, size);
+								}
+								i = i - 1;
+							} catch (RuntimeException e) {
+								throw e;
+							} catch (Exception e) {
+								throw new RuntimeException(String.format("Could not call method %s of object: %s", "get" + StringUtils.capitalize(varForEach), parentForEach), e);
+							}
+						}
+						else {
+							try {
+								String s = (String)MethodUtils.invokeExactMethod(parent, "str" + StringUtils.capitalize(var));
+								if(htmlVarSpan != null) {
+									Long pk = (Long)MethodUtils.invokeExactMethod(parent, "getPk");
+									e("span").a("class", "var", parent.getClass().getSimpleName(), pk, StringUtils.capitalize(var), " ").f().s(s).g("span");
+								}
+								else {
+									s(s);
+								}
+							} catch (Exception e) {
+								s(obtenirPourClasse(htmlVar));
+							}
+						}
+					}
+					if(htmlVarForm != null) {
+						Object parent = StringUtils.contains(htmlVarForm, ".") ? obtenirPourClasse(StringUtils.substringBeforeLast(htmlVarForm, ".")) : null;
+						if(parent == null)
+							parent = this;
+						String var = StringUtils.substringAfterLast(htmlVarForm, ".");
+						if(StringUtils.isBlank(var))
+							var = htmlVarForm;
+	
+	//					Object o = obtenirPourClasse(StringUtils.substringBeforeLast(htmlVarForm, "."));
+	//					String var = StringUtils.substringAfterLast(htmlVarForm, ".");
+						try {
+							MethodUtils.invokeExactMethod(parent, "htm" + StringUtils.capitalize(var), "Page");
+						} catch (RuntimeException e) {
+							throw e;
+						} catch (Exception e) {
+							throw new RuntimeException(String.format("Could not call method %s of var %s and object: %s", "htm" + StringUtils.capitalize(var), htmlVarInput, parent), e);
+						}
+					}
+					if(htmlVarInput != null) {
+						Object parent = StringUtils.contains(htmlVarInput, ".") ? obtenirPourClasse(StringUtils.substringBeforeLast(htmlVarInput, ".")) : null;
+						if(parent == null)
+							parent = this;
+						String var = StringUtils.substringAfterLast(htmlVarInput, ".");
+						if(StringUtils.isBlank(var))
+							var = htmlVarInput;
+	
+						try {
+	//					Object o = obtenirPourClasse(StringUtils.substringBeforeLast(htmlVarInput, "."));
+	//					String var = StringUtils.substringAfterLast(htmlVarInput, ".");
+							if("application/pdf".equals(pageTypeContenu)) {
+								Object o = obtenirPourClasse(htmlVarInput);
+								if(o instanceof Boolean) {
+									e("img").a("class", "").a("style", "width: 1em; height: 1em; position: relative; top: 3px; ").a("src", requeteSite_.getConfigSite_().getStatiqueUrlBase(), ((Boolean)o) ? "/png/check-square-o.png" : "/png/square-o.png").fg();
+								}
+								else if (o instanceof String && o.toString().startsWith("data:image")) {
+									e("img").a("class", "").a("style", "").a("src", o.toString()).fg();
+								}
+								else {
+									e("span").a("style", "border-bottom: 1px solid black; display: block; ").f();
+									String s = (String)MethodUtils.invokeExactMethod(parent, "str" + StringUtils.capitalize(var));
+									s(s);
+									g("span");
+								}
+							}
+							else {
+								try {
+									MethodUtils.invokeExactMethod(parent, "input" + StringUtils.capitalize(var), "Page");
+								} catch (RuntimeException e) {
+									throw e;
+								} catch (Exception e) {
+									throw new RuntimeException(String.format("Could not call method %s of var %s and object: %s", "input" + StringUtils.capitalize(var), htmlVarInput, parent), e);
+								}
+							}
+						} catch (RuntimeException e) {
+							throw e;
+						} catch (Exception e) {
+							throw new RuntimeException(String.format("Could not call method %s of var %s and object: %s", "htm" + StringUtils.capitalize(var), htmlVarInput, parent), e);
+						}
+					}
+					s(htmlPart.getHtmlAfter());
+				}
+			}
+		}
+
+		return i;
 	}
 }

@@ -28,6 +28,7 @@ import java.util.List;
 
 /**
  * Traduire: false
+ * NomCanonique.enUS: org.computate.bancaire.enus.cluster.ClusterGenPage
  **/
 public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 
@@ -56,7 +57,9 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 	}
 
 	@Override protected void _pageTitre(Couverture<String> c) {
-		if(cluster != null)
+		if(cluster != null && cluster.getObjetTitre() != null)
+			c.o(cluster.getObjetTitre());
+		else if(cluster != null)
 			c.o("");
 		else if(listeCluster == null || listeCluster.size() == 0)
 			c.o("aucun cluster trouvé");
@@ -89,218 +92,61 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 
 	@Override public void htmlScriptClusterGenPage() {
 		l("$(document).ready(function() {");
+		tl(1, "window.eventBus = new EventBus('/eventbus');");
+		tl(1, "var pk = ", requeteSite_.getRequetePk(), ";");
+		tl(1, "websocketCluster(websocketClusterInner);");
 		l("});");
 	}
 
 	public void htmlFormPageCluster(Cluster o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-green ").f();
-							e("label").a("class", "").f().sx("clé primaire").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strPk()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-green ").f();
-							e("label").a("class", "").f().sx("crée").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strCree()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-green ").f();
-							e("label").a("class", "").f().sx("modifié").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strModifie()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
+			o.htmPk("Page");
+			o.htmCree("Page");
+			o.htmModifie("Page");
+			o.htmObjetId("Page");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmArchive("Page");
+			o.htmSupprime("Page");
 		} g("div");
 	}
 
 	public void htmlFormPOSTCluster(Cluster o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-green ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-green ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-green ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("POST");
+			o.htmCree("POST");
+			o.htmModifie("POST");
+			o.htmObjetId("POST");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmArchive("POST");
+			o.htmSupprime("POST");
 		} g("div");
 	}
 
 	public void htmlFormPATCHCluster(Cluster o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-green ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-green ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-green ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("PATCH");
+			o.htmCree("PATCH");
+			o.htmModifie("PATCH");
+			o.htmObjetId("PATCH");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmArchive("PATCH");
+			o.htmSupprime("PATCH");
 		} g("div");
 	}
 
 	public void htmlFormRechercheCluster(Cluster o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-green ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-green ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-green ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("Recherche");
+			o.htmCree("Recherche");
+			o.htmModifie("Recherche");
+			o.htmObjetId("Recherche");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmArchive("Recherche");
+			o.htmSupprime("Recherche");
 		} g("div");
 	}
 
@@ -311,7 +157,7 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 		if(listeCluster == null || listeCluster.size() == 0) {
 
 			{ e("h1").f();
-				{ e("a").a("href", "/cluster").a("class", "w3-bar-item w3-btn w3-center w3-block w3-green w3-hover-green ").f();
+				{ e("a").a("href", "/cluster").a("class", "w3-bar-item w3-btn w3-center w3-block w3-gray w3-hover-gray ").f();
 					if(contexteIconeClassesCss != null)
 						e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
 					e("span").a("class", " ").f().sx("clusters").g("span");
@@ -319,7 +165,7 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 			} g("h1");
 			e("div").a("class", "w3-padding-16 w3-card-4 w3-light-grey ").f();
 			{ e("h2").f();
-				{ e("span").a("class", "w3-bar-item w3-padding w3-center w3-block w3-green ").f();
+				{ e("span").a("class", "w3-bar-item w3-padding w3-center w3-block w3-gray ").f();
 					if(contexteIconeClassesCss != null)
 						e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
 					e("span").a("class", " ").f().sx("aucun cluster trouvé").g("span");
@@ -330,7 +176,7 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 			requeteSite_.setRequetePk(o.getPk());
 			if(StringUtils.isNotEmpty(pageH1)) {
 				{ e("h1").f();
-					{ e("a").a("href", "/cluster").a("class", "w3-bar-item w3-btn w3-center w3-block w3-green w3-hover-green ").f();
+					{ e("a").a("href", "/cluster").a("class", "w3-bar-item w3-btn w3-center w3-block w3-gray w3-hover-gray ").f();
 						if(contexteIconeClassesCss != null)
 							e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
 						e("span").a("class", " ").f().sx(pageH1).g("span");
@@ -340,29 +186,72 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 			e("div").a("class", "w3-padding-16 w3-card-4 w3-light-grey ").f();
 			if(StringUtils.isNotEmpty(pageH2)) {
 				{ e("h2").f();
-					{ e("span").a("class", "w3-bar-item w3-padding w3-center w3-block w3-green ").f();
+					{ e("span").a("class", "w3-bar-item w3-padding w3-center w3-block w3-gray ").f();
 						e("span").a("class", " ").f().sx(pageH2).g("span");
 					} g("span");
 				} g("h2");
 			}
 			if(StringUtils.isNotEmpty(pageH3)) {
 				{ e("h3").f();
-					{ e("span").a("class", "w3-bar-item w3-padding w3-center w3-block w3-green ").f();
+					{ e("span").a("class", "w3-bar-item w3-padding w3-center w3-block w3-gray ").f();
 						e("span").a("class", " ").f().sx(pageH3).g("span");
 					} g("span");
 				} g("h3");
 			}
 		} else {
 
-			{ e("h1").f();
-				if(contexteIconeClassesCss != null)
-					e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
-				e("span").a("class", " ").f().sx("clusters").g("span");
-			} g("h1");
-			e("div").a("class", "w3-padding-16 w3-card-4 w3-light-grey ").f();
+				{ e("h1").f();
+					{ e("a").a("href", "/cluster").a("class", "w3-bar-item w3-btn w3-center w3-block w3-gray w3-hover-gray ").f();
+						if(contexteIconeClassesCss != null)
+							e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
+						e("span").a("class", " ").f().sx(pageH1).g("span");
+					} g("a");
+				} g("h1");
+			e("div").a("class", "").f();
+				{ e("div").f();
+					Long num = listeCluster.getQueryResponse().getResults().getNumFound();
+					String query = StringUtils.replace(listeCluster.getQuery(), "_suggested", "");
+					Integer rows1 = listeCluster.getRows();
+					Integer start1 = listeCluster.getStart();
+					Integer start2 = start1 - rows1;
+					Integer start3 = start1 + rows1;
+					Integer rows2 = rows1 / 2;
+					Integer rows3 = rows1 * 2;
+					start2 = start2 < 0 ? 0 : start2;
+
+					if(start1 == 0) {
+						e("i").a("class", "fas fa-arrow-square-left w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/cluster?q=", query, "&start=", start2, "&rows=", rows1).f();
+							e("i").a("class", "fas fa-arrow-square-left ").f().g("i");
+						} g("a");
+					}
+
+					if(rows1 <= 1) {
+						e("i").a("class", "fas fa-minus-square w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/cluster?q=", query, "&start=", start1, "&rows=", rows2).f();
+							e("i").a("class", "fas fa-minus-square ").f().g("i");
+						} g("a");
+					}
+
+					{ e("a").a("href", "/cluster?q=", query, "&start=", start1, "&rows=", rows3).f();
+						e("i").a("class", "fas fa-plus-square ").f().g("i");
+					} g("a");
+
+					if(start3 >= num) {
+						e("i").a("class", "fas fa-arrow-square-right w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/cluster?q=", query, "&start=", start3, "&rows=", rows1).f();
+							e("i").a("class", "fas fa-arrow-square-right ").f().g("i");
+						} g("a");
+					}
+						e("span").f().sx((start1 + 1), " - ", (start1 + rows1), " de ", num).g("span");
+				} g("div");
 			{ e("table").a("class", "w3-table w3-bordered w3-striped w3-border w3-hoverable ").f();
-				{ e("thead").f();
+				{ e("thead").a("class", "w3-gray w3-hover-gray ").f();
 					{ e("tr").f();
+						e("th").f().sx("crée").g("th");
 					} g("tr");
 				} g("thead");
 				{ e("tbody").f();
@@ -373,6 +262,13 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 						List<String> highlightList = highlights == null ? null : highlights.get(highlights.keySet().stream().findFirst().orElse(null));
 						String uri = "/cluster/" + o.getPk();
 						{ e("tr").f();
+							{ e("td").f();
+								{ e("a").a("href", uri).f();
+									{ e("span").f();
+										sx(o.strCree());
+									} g("span");
+								} g("a");
+							} g("td");
 						} g("tr");
 					}
 				} g("tbody");
@@ -392,6 +288,10 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 						.a("type", "hidden")
 						.a("value", o.getPk())
 						.fg();
+						e("input")
+						.a("name", "focusId")
+						.a("type", "hidden")
+						.fg();
 					} g("form");
 					htmlFormPageCluster(o);
 				}
@@ -400,34 +300,42 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 
 		}
 		htmlBodyFormsClusterGenPage();
-		htmlSuggereClusterGenPage();
+		htmlSuggereClusterGenPage(this, null);
 		g("div");
 	}
 
 	public void htmlBodyFormsClusterGenPage() {
-		e("div").f();
+		e("div").a("class", "w3-margin-top ").f();
 
+		{ e("button")
+			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
+				.a("id", "rechargerCeClusterGenPage")
+				.a("onclick", "patchClusterVals( [ {name: 'fq', value: 'pk:' + " + requeteSite_.getRequetePk() + " } ], {}, function() { ajouterLueur($('#rechargerCeClusterGenPage')); }, function() { ajouterErreur($('#rechargerCeClusterGenPage')); }); return false; ").f();
+				e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
+			sx("recharger ce cluster");
+		} g("button");
 
 		e("button")
-			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-green ")
+			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
 			.a("onclick", "$('#postClusterModale').show(); ")
 			.f().sx("Créer un cluster")
 		.g("button");
 		{ e("div").a("id", "postClusterModale").a("class", "w3-modal ").f();
 			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
-				{ e("header").a("class", "w3-container w3-green ").f();
+				{ e("header").a("class", "w3-container w3-gray ").f();
 					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#postClusterModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Créer un cluster").g("h2");
+					e("h2").a("class", "w3-padding ").f().sx("Créer un cluster").g("h2");
 				} g("header");
 				{ e("div").a("class", "w3-container ").f();
 					Cluster o = new Cluster();
+					o.setRequeteSite_(requeteSite_);
 
 					// Form POST
-					{ e("form").a("action", "").a("id", "postClusterForm").a("onsubmit", "event.preventDefault(); return false; ").f();
+					{ e("div").a("id", "postClusterForm").f();
 						htmlFormPOSTCluster(o);
-					} g("form");
+					} g("div");
 					e("button")
-						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-green ")
+						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
 						.a("onclick", "postCluster($('#postClusterForm')); ")
 						.f().sx("Créer un cluster")
 					.g("button");
@@ -438,25 +346,26 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 
 
 		e("button")
-			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-green ")
+			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
 			.a("onclick", "$('#patchClusterModale').show(); ")
 			.f().sx("Modifier des clusters")
 		.g("button");
 		{ e("div").a("id", "patchClusterModale").a("class", "w3-modal ").f();
 			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
-				{ e("header").a("class", "w3-container w3-green ").f();
+				{ e("header").a("class", "w3-container w3-gray ").f();
 					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#patchClusterModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Modifier des clusters").g("h2");
+					e("h2").a("class", "w3-padding ").f().sx("Modifier des clusters").g("h2");
 				} g("header");
 				{ e("div").a("class", "w3-container ").f();
 					Cluster o = new Cluster();
+					o.setRequeteSite_(requeteSite_);
 
 					// FormulaireFiltres PATCH
 					{ e("form").a("action", "").a("id", "patchClusterFormulaireFiltres").a("onsubmit", "event.preventDefault(); return false; ").f();
 						htmlFormRechercheCluster(o);
 					} g("form");
 					e("button")
-						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-green ")
+						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
 						.a("onclick", "rechercheCluster($('#patchClusterFormulaireFiltres')); ")
 						.f().sx("Rechercher des un cluster")
 					.g("button");
@@ -467,7 +376,7 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 						htmlFormPATCHCluster(o);
 					} g("form");
 					e("button")
-						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-green ")
+						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
 						.a("onclick", "patchCluster($('#patchClusterFormulaireFiltres'), $('#patchClusterFormulaireValeurs'), function() {}, function() {}); ")
 						.f().sx("Modifier des clusters")
 					.g("button");
@@ -477,34 +386,37 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 		} g("div");
 
 
-		e("button")
-			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-green ")
-			.a("onclick", "$('#deleteClusterModale').show(); ")
-			.f().sx("Supprimer des clusters")
-		.g("button");
-		{ e("div").a("id", "deleteClusterModale").a("class", "w3-modal ").f();
-			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
-				{ e("header").a("class", "w3-container w3-green ").f();
-					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#deleteClusterModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Supprimer des clusters").g("h2");
-				} g("header");
-				{ e("div").a("class", "w3-container ").f();
-					Cluster o = new Cluster();
+		if(listeCluster != null && listeCluster.size() == 1) {
+			e("button")
+				.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
+				.a("onclick", "$('#deleteClusterModale').show(); ")
+				.f().sx("Supprimer des clusters")
+			.g("button");
+			{ e("div").a("id", "deleteClusterModale").a("class", "w3-modal ").f();
+				{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
+					{ e("header").a("class", "w3-container w3-gray ").f();
+						e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#deleteClusterModale').hide(); ").f().sx("×").g("span");
+						e("h2").a("class", "w3-padding ").f().sx("Supprimer des clusters").g("h2");
+					} g("header");
+					{ e("div").a("class", "w3-container ").f();
+						Cluster o = new Cluster();
+						o.setRequeteSite_(requeteSite_);
 
-					// Form DELETE
-					{ e("form").a("action", "").a("id", "deleteClusterForm").a("onsubmit", "event.preventDefault(); return false; ").f();
-						htmlFormPATCHCluster(o);
-					} g("form");
-					e("button")
-						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-green ")
-						.a("onclick", "deleteCluster(); ")
-						.f().sx("Supprimer des clusters")
-					.g("button");
+						// Form DELETE
+						{ e("div").a("id", "deleteClusterForm").f();
+							htmlFormPATCHCluster(o);
+						} g("div");
+						e("button")
+							.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
+							.a("onclick", "deleteCluster(", o.getPk(), "); ")
+							.f().sx("Supprimer des clusters")
+						.g("button");
 
+					} g("div");
 				} g("div");
 			} g("div");
-		} g("div");
 
+		}
 		g("div");
 	}
 
@@ -536,63 +448,63 @@ public class ClusterGenPage extends ClusterGenPageGen<MiseEnPage> {
 	 * r.enUS: refreshClusterGenPage
 	 * r: ajouterErreur
 	 * r.enUS: addError
-	 * r: suggereCluster
-	 * r.enUS: suggestCluster
-	 * r: ':'
-	 * r.enUS: ':'
+	 * r: suggereClusterObjetSuggere
+	 * r.enUS: suggestClusterObjectSuggest
+	 * r: 'objetSuggere:'
+	 * r.enUS: 'objectSuggest:'
 	 * r: '#suggereListCluster'
 	 * r.enUS: '#suggestListCluster'
 	 * r: "suggereListCluster"
 	 * r.enUS: "suggestListCluster"
 	**/
-	public void htmlSuggereClusterGenPage() {
-		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("href", "/cluster").a("class", "").f();
-					e("i").a("class", "far fa-fort-awesome w3-padding-small ").f().g("i");
-					sx("voir tous les clusters");
-				} g("a");
-			} g("div");
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("id", "rechargerClusterGenPage").a("href", "/cluster").a("class", "").a("onclick", "patchClusterVals([], {}, function() { ajouterLueur($('#rechargerClusterGenPage')); }, function() { ajouterErreur($('#rechargerClusterGenPage')); }); return false; ").f();
-					e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
-					sx("recharger tous les clusters");
-				} g("a");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("span").f();
-					sx("rechercher clusters : ");
-				} g("span");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("div").a("class", "w3-cell-row ").f();
+	public static void htmlSuggereClusterGenPage(MiseEnPage p, String id) {
+		{ p.e("div").a("class", "w3-cell-row ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("a").a("href", "/cluster").a("class", "").f();
+					p.e("i").a("class", "far fa-fort-awesome w3-padding-small ").f().g("i");
+					p.sx("voir tous les clusters");
+				} p.g("a");
+			} p.g("div");
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("a").a("id", "rechargerTousClusterGenPage", id).a("href", "/cluster").a("class", "").a("onclick", "patchClusterVals([], {}, function() { ajouterLueur($('#rechargerTousClusterGenPage", id, "')); }, function() { ajouterErreur($('#rechargerTousClusterGenPage", id, "')); }); return false; ").f();
+					p.e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
+					p.sx("recharger tous les clusters");
+				} p.g("a");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("span").f();
+					p.sx("rechercher clusters : ");
+				} p.g("span");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("div").a("class", "w3-cell-row ").f();
 
-					e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
-					{ e("form").a("action", "").a("id", "suggereFormCluster").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
+					p.e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
+					{ p.e("form").a("action", "").a("id", "suggereFormCluster", id).a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); window.location.href='/cluster?q=objetSuggere:' + encodeURIComponent($('#suggereCluster", id, "').val()); return false; ").f();
+						p.e("input")
 							.a("type", "text")
 							.a("placeholder", "rechercher clusters")
 							.a("class", "suggereCluster w3-input w3-border w3-cell w3-cell-middle ")
 							.a("name", "suggereCluster")
-							.a("id", "suggereCluster")
+							.a("id", "suggereCluster", id)
 							.a("autocomplete", "off")
-							.a("oninput", "suggereCluster( [ { 'name': 'q', 'value': ':' + $(this).val() } ], $('#suggereListCluster')); ")
+							.a("oninput", "suggereClusterObjetSuggere( [ { 'name': 'q', 'value': 'objetSuggere:' + $(this).val() } ], $('#suggereListCluster", id, "'), ", p.getRequeteSite_().getRequetePk(), "); ")
 							.fg();
 
-					} g("form");
-				} g("div");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-				{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "suggereListCluster").f();
-				} g("ul");
-			} g("div");
-		} g("div");
+					} p.g("form");
+				} p.g("div");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+				{ p.e("ul").a("class", "w3-ul w3-hoverable ").a("id", "suggereListCluster", id).f();
+				} p.g("ul");
+			} p.g("div");
+		} p.g("div");
 	}
 
 }

@@ -1,8 +1,18 @@
 
 // POST //
 
-function postBankAdjustment($formValues) {
+async function postBankAdjustment($formValues, success, error) {
 	var vals = {};
+	if(success == null) {
+		success = function( data, textStatus, jQxhr ) {
+			addGlow($formValues.next('button'));
+		};
+	}
+	if(error == null) {
+		error = function( jqXhr, textStatus, errorThrown ) {
+			addError($formValues.next('button'));
+		};
+	}
 
 	var valuePk = $formValues.find('.valuePk').val();
 	if(valuePk != null && valuePk !== '')
@@ -16,9 +26,21 @@ function postBankAdjustment($formValues) {
 	if(valueModified != null && valueModified !== '')
 		vals['modified'] = valueModified;
 
+	var valueObjectId = $formValues.find('.valueObjectId').val();
+	if(valueObjectId != null && valueObjectId !== '')
+		vals['objectId'] = valueObjectId;
+
 	var valueAdjustmentId = $formValues.find('.valueAdjustmentId').val();
 	if(valueAdjustmentId != null && valueAdjustmentId !== '')
 		vals['adjustmentId'] = valueAdjustmentId;
+
+	var valueArchived = $formValues.find('.valueArchived').prop('checked');
+	if(valueArchived != null && valueArchived !== '')
+		vals['archived'] = valueArchived;
+
+	var valueDeleted = $formValues.find('.valueDeleted').prop('checked');
+	if(valueDeleted != null && valueDeleted !== '')
+		vals['deleted'] = valueDeleted;
 
 	var valueAccountKey = $formValues.find('.valueAccountKey').val();
 	if(valueAccountKey != null && valueAccountKey !== '')
@@ -81,7 +103,7 @@ function postBankAdjustmentVals(vals, success, error) {
 
 // PATCH //
 
-function patchBankAdjustment($formFilters, $formValues, success, error) {
+async function patchBankAdjustment($formFilters, $formValues, success, error) {
 	var filters = patchBankAdjustmentFilters($formFilters);
 
 	var vals = {};
@@ -119,6 +141,17 @@ function patchBankAdjustment($formFilters, $formValues, success, error) {
 	if(removeModified != null && removeModified !== '')
 		vals['removeModified'] = removeModified;
 
+	var removeObjectId = $formFilters.find('.removeObjectId').val() === 'true';
+	var setObjectId = removeObjectId ? null : $formValues.find('.setObjectId').val();
+	if(removeObjectId || setObjectId != null && setObjectId !== '')
+		vals['setObjectId'] = setObjectId;
+	var addObjectId = $formValues.find('.addObjectId').val();
+	if(addObjectId != null && addObjectId !== '')
+		vals['addObjectId'] = addObjectId;
+	var removeObjectId = $formValues.find('.removeObjectId').val();
+	if(removeObjectId != null && removeObjectId !== '')
+		vals['removeObjectId'] = removeObjectId;
+
 	var removeAdjustmentId = $formFilters.find('.removeAdjustmentId').val() === 'true';
 	var setAdjustmentId = removeAdjustmentId ? null : $formValues.find('.setAdjustmentId').val();
 	if(removeAdjustmentId || setAdjustmentId != null && setAdjustmentId !== '')
@@ -129,6 +162,28 @@ function patchBankAdjustment($formFilters, $formValues, success, error) {
 	var removeAdjustmentId = $formValues.find('.removeAdjustmentId').val();
 	if(removeAdjustmentId != null && removeAdjustmentId !== '')
 		vals['removeAdjustmentId'] = removeAdjustmentId;
+
+	var removeArchived = $formFilters.find('.removeArchived').val() === 'true';
+	var setArchived = removeArchived ? null : $formValues.find('.setArchived').prop('checked');
+	if(removeArchived || setArchived != null && setArchived !== '')
+		vals['setArchived'] = setArchived;
+	var addArchived = $formValues.find('.addArchived').prop('checked');
+	if(addArchived != null && addArchived !== '')
+		vals['addArchived'] = addArchived;
+	var removeArchived = $formValues.find('.removeArchived').prop('checked');
+	if(removeArchived != null && removeArchived !== '')
+		vals['removeArchived'] = removeArchived;
+
+	var removeDeleted = $formFilters.find('.removeDeleted').val() === 'true';
+	var setDeleted = removeDeleted ? null : $formValues.find('.setDeleted').prop('checked');
+	if(removeDeleted || setDeleted != null && setDeleted !== '')
+		vals['setDeleted'] = setDeleted;
+	var addDeleted = $formValues.find('.addDeleted').prop('checked');
+	if(addDeleted != null && addDeleted !== '')
+		vals['addDeleted'] = addDeleted;
+	var removeDeleted = $formValues.find('.removeDeleted').prop('checked');
+	if(removeDeleted != null && removeDeleted !== '')
+		vals['removeDeleted'] = removeDeleted;
 
 	var removeAccountKey = $formFilters.find('.removeAccountKey').val() === 'true';
 	var setAccountKey = removeAccountKey ? null : $formValues.find('.setAccountKey').val();
@@ -247,9 +302,21 @@ function patchBankAdjustmentFilters($formFilters) {
 	if(filterModified != null && filterModified !== '')
 		filters.push({ name: 'fq', value: 'modified:' + filterModified });
 
+	var filterObjectId = $formFilters.find('.valueObjectId').val();
+	if(filterObjectId != null && filterObjectId !== '')
+		filters.push({ name: 'fq', value: 'objectId:' + filterObjectId });
+
 	var filterAdjustmentId = $formFilters.find('.valueAdjustmentId').val();
 	if(filterAdjustmentId != null && filterAdjustmentId !== '')
 		filters.push({ name: 'fq', value: 'adjustmentId:' + filterAdjustmentId });
+
+	var filterArchived = $formFilters.find('.valueArchived').prop('checked');
+	if(filterArchived != null && filterArchived === true)
+		filters.push({ name: 'fq', value: 'archived:' + filterArchived });
+
+	var filterDeleted = $formFilters.find('.valueDeleted').prop('checked');
+	if(filterDeleted != null && filterDeleted === true)
+		filters.push({ name: 'fq', value: 'deleted:' + filterDeleted });
 
 	var filterAccountKey = $formFilters.find('.valueAccountKey').val();
 	if(filterAccountKey != null && filterAccountKey !== '')
@@ -287,14 +354,6 @@ function patchBankAdjustmentFilters($formFilters) {
 	if(filterId != null && filterId !== '')
 		filters.push({ name: 'fq', value: 'id:' + filterId });
 
-	var filterArchived = $formFilters.find('.valueArchived').prop('checked');
-	if(filterArchived != null && filterArchived === true)
-		filters.push({ name: 'fq', value: 'archived:' + filterArchived });
-
-	var filterDeleted = $formFilters.find('.valueDeleted').prop('checked');
-	if(filterDeleted != null && filterDeleted === true)
-		filters.push({ name: 'fq', value: 'deleted:' + filterDeleted });
-
 	var filterClassCanonicalName = $formFilters.find('.valueClassCanonicalName').val();
 	if(filterClassCanonicalName != null && filterClassCanonicalName !== '')
 		filters.push({ name: 'fq', value: 'classCanonicalName:' + filterClassCanonicalName });
@@ -306,6 +365,18 @@ function patchBankAdjustmentFilters($formFilters) {
 	var filterClassCanonicalNames = $formFilters.find('.valueClassCanonicalNames').val();
 	if(filterClassCanonicalNames != null && filterClassCanonicalNames !== '')
 		filters.push({ name: 'fq', value: 'classCanonicalNames:' + filterClassCanonicalNames });
+
+	var filterObjectTitle = $formFilters.find('.valueObjectTitle').val();
+	if(filterObjectTitle != null && filterObjectTitle !== '')
+		filters.push({ name: 'fq', value: 'objectTitle:' + filterObjectTitle });
+
+	var filterObjectSuggest = $formFilters.find('.valueObjectSuggest').val();
+	if(filterObjectSuggest != null && filterObjectSuggest !== '')
+		filters.push({ name: 'q', value: 'objectSuggest:' + filterObjectSuggest });
+
+	var filterPageUrl = $formFilters.find('.valuePageUrl').val();
+	if(filterPageUrl != null && filterPageUrl !== '')
+		filters.push({ name: 'fq', value: 'pageUrl:' + filterPageUrl });
 
 	var filterAdjustmentKey = $formFilters.find('.valueAdjustmentKey').val();
 	if(filterAdjustmentKey != null && filterAdjustmentKey !== '')
@@ -377,7 +448,7 @@ function patchBankAdjustmentVals(filters, vals, success, error) {
 
 // GET //
 
-function getBankAdjustment(pk) {
+async function getBankAdjustment(pk) {
 	$.ajax({
 		url: '/api/adjustment/' + id
 		, dataType: 'json'
@@ -390,7 +461,7 @@ function getBankAdjustment(pk) {
 
 // DELETE //
 
-function deleteBankAdjustment(pk) {
+async function deleteBankAdjustment(pk) {
 	$.ajax({
 		url: '/api/adjustment/' + id
 		, dataType: 'json'
@@ -404,7 +475,7 @@ function deleteBankAdjustment(pk) {
 
 // Search //
 
-function searchBankAdjustment($formFilters, success, error) {
+async function searchBankAdjustment($formFilters, success, error) {
 	var filters = searchBankAdjustmentFilters($formFilters);
 	if(success == null)
 		success = function( data, textStatus, jQxhr ) {};
@@ -429,9 +500,21 @@ function searchBankAdjustmentFilters($formFilters) {
 	if(filterModified != null && filterModified !== '')
 		filters.push({ name: 'fq', value: 'modified:' + filterModified });
 
+	var filterObjectId = $formFilters.find('.valueObjectId').val();
+	if(filterObjectId != null && filterObjectId !== '')
+		filters.push({ name: 'fq', value: 'objectId:' + filterObjectId });
+
 	var filterAdjustmentId = $formFilters.find('.valueAdjustmentId').val();
 	if(filterAdjustmentId != null && filterAdjustmentId !== '')
 		filters.push({ name: 'fq', value: 'adjustmentId:' + filterAdjustmentId });
+
+	var filterArchived = $formFilters.find('.valueArchived').prop('checked');
+	if(filterArchived != null && filterArchived === true)
+		filters.push({ name: 'fq', value: 'archived:' + filterArchived });
+
+	var filterDeleted = $formFilters.find('.valueDeleted').prop('checked');
+	if(filterDeleted != null && filterDeleted === true)
+		filters.push({ name: 'fq', value: 'deleted:' + filterDeleted });
 
 	var filterAccountKey = $formFilters.find('.valueAccountKey').val();
 	if(filterAccountKey != null && filterAccountKey !== '')
@@ -469,14 +552,6 @@ function searchBankAdjustmentFilters($formFilters) {
 	if(filterId != null && filterId !== '')
 		filters.push({ name: 'fq', value: 'id:' + filterId });
 
-	var filterArchived = $formFilters.find('.valueArchived').prop('checked');
-	if(filterArchived != null && filterArchived === true)
-		filters.push({ name: 'fq', value: 'archived:' + filterArchived });
-
-	var filterDeleted = $formFilters.find('.valueDeleted').prop('checked');
-	if(filterDeleted != null && filterDeleted === true)
-		filters.push({ name: 'fq', value: 'deleted:' + filterDeleted });
-
 	var filterClassCanonicalName = $formFilters.find('.valueClassCanonicalName').val();
 	if(filterClassCanonicalName != null && filterClassCanonicalName !== '')
 		filters.push({ name: 'fq', value: 'classCanonicalName:' + filterClassCanonicalName });
@@ -488,6 +563,18 @@ function searchBankAdjustmentFilters($formFilters) {
 	var filterClassCanonicalNames = $formFilters.find('.valueClassCanonicalNames').val();
 	if(filterClassCanonicalNames != null && filterClassCanonicalNames !== '')
 		filters.push({ name: 'fq', value: 'classCanonicalNames:' + filterClassCanonicalNames });
+
+	var filterObjectTitle = $formFilters.find('.valueObjectTitle').val();
+	if(filterObjectTitle != null && filterObjectTitle !== '')
+		filters.push({ name: 'fq', value: 'objectTitle:' + filterObjectTitle });
+
+	var filterObjectSuggest = $formFilters.find('.valueObjectSuggest').val();
+	if(filterObjectSuggest != null && filterObjectSuggest !== '')
+		filters.push({ name: 'q', value: 'objectSuggest:' + filterObjectSuggest });
+
+	var filterPageUrl = $formFilters.find('.valuePageUrl').val();
+	if(filterPageUrl != null && filterPageUrl !== '')
+		filters.push({ name: 'fq', value: 'pageUrl:' + filterPageUrl });
 
 	var filterAdjustmentKey = $formFilters.find('.valueAdjustmentKey').val();
 	if(filterAdjustmentKey != null && filterAdjustmentKey !== '')
@@ -557,7 +644,7 @@ function suggestBankAdjustmentObjectSuggest($formFilters, $list) {
 			var $i = $('<i>').attr('class', 'fad fa-cash-register w3-padding-small ');
 			var $span = $('<span>').attr('class', '').text(o['adjustmentCompleteName']);
 			var $li = $('<li>');
-			var $a = $('<a>').attr('href', o['pageUrl']);
+			var $a = $('<a>').attr('href', o['']);
 			$a.append($i);
 			$a.append($span);
 			$li.append($a);
@@ -566,4 +653,128 @@ function suggestBankAdjustmentObjectSuggest($formFilters, $list) {
 	};
 	error = function( jqXhr, textStatus, errorThrown ) {};
 	searchBankAdjustmentVals($formFilters, success, error);
+}
+
+function suggestBankAdjustmentObjectSuggest($formFilters, $list) {
+	success = function( data, textStatus, jQxhr ) {
+		$list.empty();
+		$.each(data['list'], function(i, o) {
+			var $i = $('<i>').attr('class', 'fad fa-cash-register w3-padding-small ');
+			var $span = $('<span>').attr('class', '').text(o['adjustmentCompleteName']);
+			var $li = $('<li>');
+			var $a = $('<a>').attr('href', o['']);
+			$a.append($i);
+			$a.append($span);
+			$li.append($a);
+			$list.append($li);
+		});
+	};
+	error = function( jqXhr, textStatus, errorThrown ) {};
+	searchBankAdjustmentVals($formFilters, success, error);
+}
+
+async function websocketBankAdjustment(success) {
+	window.eventBus.onopen = function () {
+
+		window.eventBus.registerHandler('websocketBankAdjustment', function (error, message) {
+			var json = JSON.parse(message['body']);
+			var id = json['id'];
+			var pk = json['pk'];
+			var pks = json['pks'];
+			var empty = json['empty'];
+			if(!empty) {
+				var numFound = json['numFound'];
+				var numPATCH = json['numPATCH'];
+				var percent = Math.floor( numPATCH / numFound * 100 ) + '%';
+				var $box = $('<div>').attr('class', 'w3-display-topright w3-quarter box-' + id + ' ').attr('id', 'box-' + id);
+				var $margin = $('<div>').attr('class', 'w3-margin ').attr('id', 'margin-' + id);
+				var $card = $('<div>').attr('class', 'w3-card ').attr('id', 'card-' + id);
+				var $header = $('<div>').attr('class', 'w3-container fa-yellow ').attr('id', 'header-' + id);
+				var $i = $('<i>').attr('class', 'fad fa-cash-register w3-margin-right ').attr('id', 'icon-' + id);
+				var $headerSpan = $('<span>').attr('class', '').text('modify adjustments');
+				var $x = $('<span>').attr('class', 'w3-button w3-display-topright ').attr('onclick', '$("#card-' + id + '").hide(); ').attr('id', 'x-' + id);
+				var $body = $('<div>').attr('class', 'w3-container w3-padding ').attr('id', 'text-' + id);
+				var $bar = $('<div>').attr('class', 'w3-light-gray ').attr('id', 'bar-' + id);
+				var $progress = $('<div>').attr('class', 'w3-yellow ').attr('style', 'height: 24px; width: ' + percent + '; ').attr('id', 'progress-' + id).text(numPATCH + '/' + numFound);
+				$card.append($header);
+				$header.append($i);
+				$header.append($headerSpan);
+				$header.append($x);
+				$body.append($bar);
+				$bar.append($progress);
+				$card.append($body);
+				$box.append($margin);
+				$margin.append($card);
+				$('.box-' + id).remove();
+				if(numPATCH < numFound)
+				$('.w3-content').append($box);
+				if(success)
+					success(json);
+			}
+		});
+	}
+}
+async function websocketBankAdjustmentInner(patchRequest) {
+	var pk = patchRequest['pk'];
+	var pks = patchRequest['pks'];
+	var classes = patchRequest['classes'];
+	var vars = patchRequest['vars'];
+	var empty = patchRequest['empty'];
+
+	if(pk != null) {
+		searchBankAdjustmentVals([ {name: 'fq', value: 'pk:' + pk} ], function( data, textStatus, jQxhr ) {
+			var o = data['list'][0];
+			if(vars.includes('created')) {
+				$('.inputBankAdjustment' + pk + 'Created').val(o['created']);
+				$('.varBankAdjustment' + pk + 'Created').text(o['created']);
+			}
+			if(vars.includes('modified')) {
+				$('.inputBankAdjustment' + pk + 'Modified').val(o['modified']);
+				$('.varBankAdjustment' + pk + 'Modified').text(o['modified']);
+			}
+			if(vars.includes('archived')) {
+				$('.inputBankAdjustment' + pk + 'Archived').val(o['archived']);
+				$('.varBankAdjustment' + pk + 'Archived').text(o['archived']);
+			}
+			if(vars.includes('deleted')) {
+				$('.inputBankAdjustment' + pk + 'Deleted').val(o['deleted']);
+				$('.varBankAdjustment' + pk + 'Deleted').text(o['deleted']);
+			}
+			if(vars.includes('adjustmentDisplayName')) {
+				$('.inputBankAdjustment' + pk + 'AdjustmentDisplayName').val(o['adjustmentDisplayName']);
+				$('.varBankAdjustment' + pk + 'AdjustmentDisplayName').text(o['adjustmentDisplayName']);
+			}
+			if(vars.includes('agentAreas')) {
+				$('.inputBankAdjustment' + pk + 'AgentAreas').val(o['agentAreas']);
+				$('.varBankAdjustment' + pk + 'AgentAreas').text(o['agentAreas']);
+			}
+			if(vars.includes('agentRoles')) {
+				$('.inputBankAdjustment' + pk + 'AgentRoles').val(o['agentRoles']);
+				$('.varBankAdjustment' + pk + 'AgentRoles').text(o['agentRoles']);
+			}
+			if(vars.includes('agentOverride')) {
+				$('.inputBankAdjustment' + pk + 'AgentOverride').val(o['agentOverride']);
+				$('.varBankAdjustment' + pk + 'AgentOverride').text(o['agentOverride']);
+			}
+			if(vars.includes('eligibleEntitlement')) {
+				$('.inputBankAdjustment' + pk + 'EligibleEntitlement').val(o['eligibleEntitlement']);
+				$('.varBankAdjustment' + pk + 'EligibleEntitlement').text(o['eligibleEntitlement']);
+			}
+			if(vars.includes('partnerName')) {
+				$('.inputBankAdjustment' + pk + 'PartnerName').val(o['partnerName']);
+				$('.varBankAdjustment' + pk + 'PartnerName').text(o['partnerName']);
+			}
+		});
+	}
+
+	if(!empty) {
+		if(pks) {
+			for(i=0; i < pks.length; i++) {
+				var pk2 = pks[i];
+				var c = classes[i];
+				await window['patch' + c + 'Vals']( [ {name: 'fq', value: 'pk:' + pk2} ], {});
+			}
+		}
+		await patchBankAdjustmentVals( [ {name: 'fq', value: 'pk:' + pk} ], {});
+	}
 }

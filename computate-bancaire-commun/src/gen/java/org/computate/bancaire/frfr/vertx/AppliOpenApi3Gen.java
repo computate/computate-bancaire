@@ -1,20 +1,18 @@
 package org.computate.bancaire.frfr.vertx;
 
+import org.computate.bancaire.frfr.cluster.Cluster;
 import java.math.MathContext;
-
 import org.apache.commons.text.StringEscapeUtils;
 import org.computate.bancaire.frfr.vertx.AppliSwagger2;
-import org.computate.bancaire.frfr.cluster.Cluster;
-import org.computate.bancaire.frfr.couverture.Couverture;
-import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
-import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
 import org.apache.commons.lang3.StringUtils;
-
+import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
 import java.text.NumberFormat;
 import java.util.Objects;
 import io.vertx.core.json.JsonArray;
+import org.computate.bancaire.frfr.couverture.Couverture;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 
 /**	
  * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.vertx.AppliOpenApi3&fq=classeEtendGen_indexed_boolean:true">Trouver la classe  dans Solr</a>
@@ -38,8 +36,8 @@ public abstract class AppliOpenApi3Gen<DEV> extends AppliSwagger2 {
 	}
 
 	public void initLoinAppliOpenApi3() {
-		super.initLoinAppliSwagger2(requeteSite_);
 		initAppliOpenApi3();
+		super.initLoinAppliSwagger2(requeteSite_);
 	}
 
 	public void initAppliOpenApi3() {

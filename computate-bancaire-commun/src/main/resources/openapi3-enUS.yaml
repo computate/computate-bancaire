@@ -61,7 +61,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -178,7 +178,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -294,7 +294,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -468,7 +468,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -845,7 +845,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -958,7 +958,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -1200,7 +1200,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -1313,7 +1313,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -1487,7 +1487,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -1600,7 +1600,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -1842,7 +1842,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -1955,7 +1955,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -2129,7 +2129,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -2242,7 +2242,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -2484,7 +2484,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -2597,7 +2597,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -2771,7 +2771,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -2884,7 +2884,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -3126,7 +3126,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -3239,7 +3239,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -3413,7 +3413,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -3526,7 +3526,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -3768,7 +3768,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -3881,7 +3881,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -4055,7 +4055,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -4168,7 +4168,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -4410,7 +4410,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -4523,7 +4523,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -4697,7 +4697,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -4810,7 +4810,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -5052,7 +5052,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -5165,7 +5165,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -5339,7 +5339,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -5452,7 +5452,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -5694,7 +5694,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -5807,7 +5807,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -5914,7 +5914,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -6027,7 +6027,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -6201,7 +6201,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -6314,7 +6314,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -6629,7 +6629,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -6745,7 +6745,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -6996,7 +6996,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -7112,7 +7112,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -7286,7 +7286,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -7399,7 +7399,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -7641,7 +7641,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -7754,7 +7754,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -7928,7 +7928,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -8041,7 +8041,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -8283,7 +8283,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -8396,7 +8396,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -8570,7 +8570,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       requestBody:
         description: >+
         required: true
@@ -8683,7 +8683,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -8925,7 +8925,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+
@@ -9038,7 +9038,7 @@ paths:
           schema:
             type: integer
             default: 10
-            minimum: 1
+            minimum: 0
       responses:
         '200':
           description: >+

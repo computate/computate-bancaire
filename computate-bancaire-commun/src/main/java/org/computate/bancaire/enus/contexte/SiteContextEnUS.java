@@ -4,13 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.computate.bancaire.enus.config.SiteConfig;
 import org.computate.bancaire.enus.wrap.Wrap;
-import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.vertx.core.Vertx;
 import io.vertx.core.WorkerExecutor;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
+import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory;
@@ -79,6 +78,9 @@ public class SiteContextEnUS extends SiteContextEnUSGen<Object> {
 	protected void _solrClient(Wrap<HttpSolrClient> c) {
 		HttpSolrClient o = new HttpSolrClient.Builder(siteConfig.getSolrUrl()).build();
 		c.o(o);
+	}
+
+	protected void _mailClient(Wrap<MailClient> c) {
 	}
 
 	protected void _solrClientComputate(Wrap<HttpSolrClient> c) {

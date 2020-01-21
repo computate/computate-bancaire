@@ -14,12 +14,12 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.computate.bancaire.enus.writer.ApiWriter;
+import org.computate.bancaire.frfr.vertx.AppliSwagger2Gen;
 import org.computate.bancaire.enus.config.SiteConfig;
 import org.computate.bancaire.enus.contexte.SiteContextEnUS;
-import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.writer.AllWriter;
-import org.computate.bancaire.frfr.vertx.AppliSwagger2Gen;
+import org.computate.bancaire.enus.request.SiteRequestEnUS;
 
 public class AppSwagger2 extends AppSwagger2Gen<Object> {
 

@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.transaction.code;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
@@ -27,6 +28,7 @@ import org.computate.bancaire.frfr.couverture.Couverture;
 import org.apache.solr.client.solrj.SolrQuery;
 import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
 import io.vertx.ext.sql.SQLClient;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -128,47 +130,6 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 		return codeTransactionCle == null ? "" : StringEscapeUtils.escapeHtml4(strCodeTransactionCle());
 	}
 
-	public void htmCodeTransactionCle(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCodeTransaction", strPk(), "CodeTransactionCle\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCodeTransaction", strPk(), "CodeTransactionCle() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCodeTransactionCle\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCodeTransactionCle()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"codeTransactionCle\"");
-							r.s(" value=\"", htmCodeTransactionCle(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCodeTransactionCle());
-			}
-			r.l("</div>");
-		}
-	}
-
 	/////////////////////
 	// transactionCode //
 	/////////////////////
@@ -230,45 +191,58 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 		return transactionCode == null ? "" : StringEscapeUtils.escapeHtml4(strTransactionCode());
 	}
 
-	public void htmTransactionCode(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCodeTransaction", strPk(), "TransactionCode\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCodeTransaction", strPk(), "TransactionCode() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setTransactionCode\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageTransactionCode()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"transactionCode\"");
-							r.s(" value=\"", htmTransactionCode(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputTransactionCode(String classeApiMethodeMethode) {
+		CodeTransaction s = (CodeTransaction)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "code de transaction")
+			.a("id", classeApiMethodeMethode, "_transactionCode");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setTransactionCode inputCodeTransaction", pk, "TransactionCode w3-input w3-border ");
+				a("name", "setTransactionCode");
 			} else {
-				r.s(htmTransactionCode());
+				a("class", "valeurTransactionCode w3-input w3-border inputCodeTransaction", pk, "TransactionCode w3-input w3-border ");
+				a("name", "transactionCode");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchCodeTransactionVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setTransactionCode', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionCode')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionCode')); }); ");
+			}
+			a("value", strTransactionCode())
+		.fg();
+
+	}
+
+	public void htmTransactionCode(String classeApiMethodeMethode) {
+		CodeTransaction s = (CodeTransaction)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereCodeTransactionTransactionCode").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_transactionCode").a("class", "").f().sx("code de transaction").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputTransactionCode(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_transactionCode')); $('#", classeApiMethodeMethode, "_transactionCode').val(null); patchCodeTransactionVal([{ name: 'fq', value: 'pk:' + $('#CodeTransactionForm :input[name=pk]').val() }], 'setTransactionCode', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_transactionCode')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_transactionCode')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	/////////////////////////////////
@@ -332,45 +306,58 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 		return codeTransactionNomAffichage == null ? "" : StringEscapeUtils.escapeHtml4(strCodeTransactionNomAffichage());
 	}
 
-	public void htmCodeTransactionNomAffichage(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCodeTransaction", strPk(), "CodeTransactionNomAffichage\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCodeTransaction", strPk(), "CodeTransactionNomAffichage() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCodeTransactionNomAffichage\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCodeTransactionNomAffichage()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"codeTransactionNomAffichage\"");
-							r.s(" value=\"", htmCodeTransactionNomAffichage(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
+	public void inputCodeTransactionNomAffichage(String classeApiMethodeMethode) {
+		CodeTransaction s = (CodeTransaction)this;
+		e("input")
+			.a("type", "text")
+			.a("placeholder", "nom d'affichage")
+			.a("id", classeApiMethodeMethode, "_codeTransactionNomAffichage");
+			if("Page".equals(classeApiMethodeMethode) || "PATCH".equals(classeApiMethodeMethode)) {
+				a("class", "setCodeTransactionNomAffichage inputCodeTransaction", pk, "CodeTransactionNomAffichage w3-input w3-border ");
+				a("name", "setCodeTransactionNomAffichage");
 			} else {
-				r.s(htmCodeTransactionNomAffichage());
+				a("class", "valeurCodeTransactionNomAffichage w3-input w3-border inputCodeTransaction", pk, "CodeTransactionNomAffichage w3-input w3-border ");
+				a("name", "codeTransactionNomAffichage");
 			}
-			r.l("</div>");
-		}
+			if("Page".equals(classeApiMethodeMethode)) {
+				a("onclick", "enleverLueur($(this)); ");
+				a("onchange", "patchCodeTransactionVal([{ name: 'fq', value: 'pk:", pk, "' }], 'setCodeTransactionNomAffichage', $(this).val(), function() { ajouterLueur($('#", classeApiMethodeMethode, "_codeTransactionNomAffichage')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_codeTransactionNomAffichage')); }); ");
+			}
+			a("value", strCodeTransactionNomAffichage())
+		.fg();
+
+	}
+
+	public void htmCodeTransactionNomAffichage(String classeApiMethodeMethode) {
+		CodeTransaction s = (CodeTransaction)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			{ e("div").a("class", "w3-padding ").f();
+				{ e("div").a("id", "suggereCodeTransactionCodeTransactionNomAffichage").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("for", classeApiMethodeMethode, "_codeTransactionNomAffichage").a("class", "").f().sx("nom d'affichage").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row w3-padding ").f();
+							{ e("div").a("class", "w3-cell ").f();
+
+								inputCodeTransactionNomAffichage(classeApiMethodeMethode);
+							} g("div");
+							if("Page".equals(classeApiMethodeMethode)) {
+								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+									{ e("button")
+										.a("tabindex", "-1")
+										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-yellow ")
+									.a("onclick", "enleverLueur($('#", classeApiMethodeMethode, "_codeTransactionNomAffichage')); $('#", classeApiMethodeMethode, "_codeTransactionNomAffichage').val(null); patchCodeTransactionVal([{ name: 'fq', value: 'pk:' + $('#CodeTransactionForm :input[name=pk]').val() }], 'setCodeTransactionNomAffichage', null, function() { ajouterLueur($('#", classeApiMethodeMethode, "_codeTransactionNomAffichage')); }, function() { ajouterErreur($('#", classeApiMethodeMethode, "_codeTransactionNomAffichage')); }); ")
+										.f();
+										e("i").a("class", "far fa-eraser ").f().g("i");
+									} g("button");
+								} g("div");
+							}
+						} g("div");
+					} g("div");
+				} g("div");
+			} g("div");
+		} g("div");
 	}
 
 	///////////////////////////////
@@ -434,45 +421,27 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 		return codeTransactionNomComplet == null ? "" : StringEscapeUtils.escapeHtml4(strCodeTransactionNomComplet());
 	}
 
-	public void htmCodeTransactionNomComplet(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCodeTransaction", strPk(), "CodeTransactionNomComplet\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCodeTransaction", strPk(), "CodeTransactionNomComplet() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCodeTransactionNomComplet\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCodeTransactionNomComplet()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"codeTransactionNomComplet\"");
-							r.s(" value=\"", htmCodeTransactionNomComplet(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCodeTransactionNomComplet());
+	public void inputCodeTransactionNomComplet(String classeApiMethodeMethode) {
+		CodeTransaction s = (CodeTransaction)this;
+	}
+
+	public void htmCodeTransactionNomComplet(String classeApiMethodeMethode) {
+		CodeTransaction s = (CodeTransaction)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strCodeTransactionNomComplet()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	///////////////////////
@@ -536,45 +505,30 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 		return codeTransactionId == null ? "" : StringEscapeUtils.escapeHtml4(strCodeTransactionId());
 	}
 
-	public void htmCodeTransactionId(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCodeTransaction", strPk(), "CodeTransactionId\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCodeTransaction", strPk(), "CodeTransactionId() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setCodeTransactionId\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageCodeTransactionId()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"codeTransactionId\"");
-							r.s(" value=\"", htmCodeTransactionId(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmCodeTransactionId());
+	public void inputCodeTransactionId(String classeApiMethodeMethode) {
+		CodeTransaction s = (CodeTransaction)this;
+	}
+
+	public void htmCodeTransactionId(String classeApiMethodeMethode) {
+		CodeTransaction s = (CodeTransaction)this;
+		{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
+			if("Page".equals(classeApiMethodeMethode)) {
+				{ e("div").a("class", "w3-padding ").f();
+					{ e("div").a("class", "w3-card ").f();
+						{ e("div").a("class", "w3-cell-row w3-yellow ").f();
+							e("label").a("class", "").f().sx("ID").g("label");
+						} g("div");
+						{ e("div").a("class", "w3-cell-row  ").f();
+							{ e("div").a("class", "w3-cell ").f();
+								{ e("div").a("class", "w3-rest ").f();
+									e("span").f().sx(strCodeTransactionId()).g("span");
+								} g("div");
+							} g("div");
+						} g("div");
+					} g("div");
+				} g("div");
 			}
-			r.l("</div>");
-		}
+		} g("div");
 	}
 
 	/////////////
@@ -638,47 +592,6 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 		return pageUrl == null ? "" : StringEscapeUtils.escapeHtml4(strPageUrl());
 	}
 
-	public void htmPageUrl(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCodeTransaction", strPk(), "PageUrl\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCodeTransaction", strPk(), "PageUrl() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setPageUrl\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichagePageUrl()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"pageUrl\"");
-							r.s(" value=\"", htmPageUrl(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmPageUrl());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////////
 	// objetSuggere //
 	//////////////////
@@ -740,47 +653,6 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 		return objetSuggere == null ? "" : StringEscapeUtils.escapeHtml4(strObjetSuggere());
 	}
 
-	public void htmObjetSuggere(ToutEcrivain r, Boolean patchDroits) {
-		if(pk!= null) {
-			r.s("<div id=\"patchCodeTransaction", strPk(), "ObjetSuggere\">");
-			if(patchDroits) {
-				r.l();
-				r.l("	<script>//<![CDATA[");
-				r.l("		function patchCodeTransaction", strPk(), "ObjetSuggere() {");
-				r.l("			$.ajax({");
-				r.l("				url: '?fq=pk:", strPk(), "',");
-				r.l("				dataType: 'json',");
-				r.l("				type: 'patch',");
-				r.l("				contentType: 'application/json',");
-				r.l("				processData: false,");
-				r.l("				success: function( data, textStatus, jQxhr ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				error: function( jqXhr, textStatus, errorThrown ) {");
-				r.l("					");
-				r.l("				},");
-				r.l("				data: {\"setObjetSuggere\": this.value },");
-				r.l("				");
-				r.l("			});");
-				r.l("		}");
-				r.l("	//]]></script>");
-				r.l("	<div class=\"\">");
-				r.l("		<label class=\"w3-tooltip \">");
-				r.l("			<span>", StringEscapeUtils.escapeHtml4(nomAffichageObjetSuggere()), "</span>");
-				r.s("			<input");
-							r.s(" name=\"objetSuggere\"");
-							r.s(" value=\"", htmObjetSuggere(), "\");");
-							r.s(" onchange=\"\"");
-							r.l("/>");
-				r.l("		</label>");
-				r.l("	</div>");
-			} else {
-				r.s(htmObjetSuggere());
-			}
-			r.l("</div>");
-		}
-	}
-
 	//////////////
 	// initLoin //
 	//////////////
@@ -797,8 +669,8 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 	}
 
 	public void initLoinCodeTransaction() {
-		super.initLoinCluster(requeteSite_);
 		initCodeTransaction();
+		super.initLoinCluster(requeteSite_);
 	}
 
 	public void initCodeTransaction() {
@@ -1031,7 +903,7 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 			SolrInputDocument document = new SolrInputDocument();
 			indexerCodeTransaction(document);
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -1043,7 +915,7 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 			indexerCodeTransaction(document);
 			SolrClient clientSolr = requeteSite_.getSiteContexte_().getClientSolr();
 			clientSolr.add(document);
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
 		}
@@ -1079,7 +951,6 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 		}
 		if(objetSuggere != null) {
 			document.addField("objetSuggere_suggested", objetSuggere);
-			document.addField("objetSuggere_indexed_string", objetSuggere);
 		}
 		super.indexerCluster(document);
 
@@ -1096,9 +967,48 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 			initLoinCodeTransaction(requeteSite);
 			SolrClient clientSolr = siteContexte.getClientSolr();
 			clientSolr.deleteById(id.toString());
-			clientSolr.commit();
+			clientSolr.commit(false, false, true);
 		} catch(Exception e) {
 			ExceptionUtils.rethrow(e);
+		}
+	}
+
+	public static String varIndexeCodeTransaction(String entiteVar) {
+		switch(entiteVar) {
+			case "codeTransactionCle":
+				return "codeTransactionCle_indexed_long";
+			case "transactionCode":
+				return "transactionCode_indexed_string";
+			case "codeTransactionNomAffichage":
+				return "codeTransactionNomAffichage_indexed_string";
+			case "codeTransactionNomComplet":
+				return "codeTransactionNomComplet_indexed_string";
+			case "codeTransactionId":
+				return "codeTransactionId_indexed_string";
+			case "pageUrl":
+				return "pageUrl_indexed_string";
+			case "objetSuggere":
+				return "objetSuggere_indexed_string";
+			default:
+				return Cluster.varIndexeCluster(entiteVar);
+		}
+	}
+
+	public static String varRechercheCodeTransaction(String entiteVar) {
+		switch(entiteVar) {
+			case "objetSuggere":
+				return "objetSuggere_suggested";
+			default:
+				return Cluster.varRechercheCluster(entiteVar);
+		}
+	}
+
+	public static String varSuggereCodeTransaction(String entiteVar) {
+		switch(entiteVar) {
+			case "objetSuggere":
+				return "objetSuggere_suggested";
+			default:
+				return Cluster.varSuggereCluster(entiteVar);
 		}
 	}
 
@@ -1140,6 +1050,22 @@ public abstract class CodeTransactionGen<DEV> extends Cluster {
 		oCodeTransaction.setObjetSuggere(objetSuggere);
 
 		super.stockerCluster(solrDocument);
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchCodeTransaction() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		CodeTransaction original = (CodeTransaction)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
+			if(!Objects.equals(transactionCode, original.getTransactionCode()))
+				requetePatch.addVars("transactionCode");
+			if(!Objects.equals(codeTransactionNomAffichage, original.getCodeTransactionNomAffichage()))
+				requetePatch.addVars("codeTransactionNomAffichage");
+			super.requetePatchCluster();
+		}
 	}
 
 	//////////////

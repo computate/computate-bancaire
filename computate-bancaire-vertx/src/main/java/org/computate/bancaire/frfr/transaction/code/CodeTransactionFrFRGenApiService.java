@@ -21,7 +21,7 @@ import io.vertx.ext.web.api.OperationResponse;
 @ProxyGen
 public interface CodeTransactionFrFRGenApiService {
 	static void enregistrerService(SiteContexteFrFR siteContexte, Vertx vertx) {
-		new ServiceBinder(vertx).setAddress("frFRCodeTransaction").register(CodeTransactionFrFRGenApiService.class, new CodeTransactionFrFRApiServiceImpl(siteContexte));
+		new ServiceBinder(vertx).setAddress("computate-bancaire-commun-frFR-CodeTransaction").register(CodeTransactionFrFRGenApiService.class, new CodeTransactionFrFRApiServiceImpl(siteContexte));
 	}
 
 	static CodeTransactionFrFRGenApiService creer(SiteContexteFrFR siteContexte, Vertx vertx) {

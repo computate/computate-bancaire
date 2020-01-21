@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.compte;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import org.computate.bancaire.frfr.cluster.Cluster;
 import java.math.MathContext;
 import org.apache.commons.text.StringEscapeUtils;
@@ -13,6 +14,7 @@ import org.computate.bancaire.frfr.recherche.ListeRecherche;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.computate.bancaire.frfr.compte.CompteBancaire;
+import java.util.Optional;
 import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 import org.computate.bancaire.frfr.cluster.ClusterPage;
 
@@ -116,8 +118,8 @@ public abstract class CompteGenPageGen<DEV> extends ClusterPage {
 	}
 
 	public void initLoinCompteGenPage() {
-		super.initLoinClusterPage(requeteSite_);
 		initCompteGenPage();
+		super.initLoinClusterPage(requeteSite_);
 	}
 
 	public void initCompteGenPage() {
@@ -307,6 +309,18 @@ public abstract class CompteGenPageGen<DEV> extends ClusterPage {
 	}
 
 	public void htmlStyleCompteGenPage() {
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchCompteGenPage() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		CompteGenPage original = (CompteGenPage)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
+			super.requetePatchClusterPage();
+		}
 	}
 
 	//////////////

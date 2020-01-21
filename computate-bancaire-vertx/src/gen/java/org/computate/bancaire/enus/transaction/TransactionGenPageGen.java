@@ -15,6 +15,8 @@ import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
+import org.computate.bancaire.enus.request.patch.PatchRequest;
 
 /**	
  * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.transaction.TransactionGenPage&fq=classeEtendGen_indexed_boolean:true">Trouver la classe  dans Solr</a>
@@ -55,6 +57,8 @@ public abstract class TransactionGenPageGen<DEV> extends ClusterPage {
 			if(listBankTransaction == null)
 				setListBankTransaction(listBankTransactionWrap.o);
 		}
+		if(listBankTransaction != null)
+			listBankTransaction.initDeepForClass(null);
 		listBankTransactionWrap.alreadyInitialized(true);
 		return (TransactionGenPage)this;
 	}
@@ -92,6 +96,8 @@ public abstract class TransactionGenPageGen<DEV> extends ClusterPage {
 			if(bankTransaction == null)
 				setBankTransaction(bankTransactionWrap.o);
 		}
+		if(bankTransaction != null)
+			bankTransaction.initDeepForClass(null);
 		bankTransactionWrap.alreadyInitialized(true);
 		return (TransactionGenPage)this;
 	}
@@ -111,8 +117,8 @@ public abstract class TransactionGenPageGen<DEV> extends ClusterPage {
 	}
 
 	public void initDeepTransactionGenPage() {
-		super.initDeepClusterPage(siteRequest_);
 		initTransactionGenPage();
+		super.initDeepClusterPage(siteRequest_);
 	}
 
 	public void initTransactionGenPage() {
@@ -286,6 +292,18 @@ public abstract class TransactionGenPageGen<DEV> extends ClusterPage {
 	}
 
 	public void htmlStyleTransactionGenPage() {
+	}
+
+	//////////////////
+	// patchRequest //
+	//////////////////
+
+	public void patchRequestTransactionGenPage() {
+		PatchRequest patchRequest = Optional.ofNullable(siteRequest_).map(SiteRequestEnUS::getPatchRequest_).orElse(null);
+		TransactionGenPage original = (TransactionGenPage)Optional.ofNullable(patchRequest).map(PatchRequest::getOriginal).orElse(null);
+		if(original != null) {
+			super.patchRequestClusterPage();
+		}
 	}
 
 	//////////////

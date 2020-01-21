@@ -29,6 +29,7 @@ import java.util.List;
 
 /**
  * Traduire: false
+ * NomCanonique.enUS: org.computate.bancaire.enus.account.AccountGenPage
  **/
 public class CompteGenPage extends CompteGenPageGen<ClusterPage> {
 
@@ -92,1121 +93,111 @@ public class CompteGenPage extends CompteGenPageGen<ClusterPage> {
 
 	@Override public void htmlScriptCompteGenPage() {
 		l("$(document).ready(function() {");
+		tl(1, "window.eventBus = new EventBus('/eventbus');");
+		tl(1, "var pk = ", requeteSite_.getRequetePk(), ";");
+		tl(1, "websocketCompteBancaire(websocketCompteBancaireInner);");
 		l("});");
 	}
 
 	public void htmlFormPageCompteBancaire(CompteBancaire o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("class", "").f().sx("clé primaire").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strPk()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("class", "").f().sx("crée").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strCree()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("class", "").f().sx("modifié").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strModifie()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("class", "").f().sx("ID").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strCompteId()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
+			o.htmPk("Page");
+			o.htmCree("Page");
+			o.htmModifie("Page");
+			o.htmObjetId("Page");
+			o.htmCompteId("Page");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("class", "").f().sx("transactions").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row  ").f();
-							{ e("div").a("class", "w3-cell ").f();
-								{ e("div").a("class", "w3-rest ").f();
-									e("span").f().sx(o.strTransactionCles()).g("span");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formCompteBancaireCompteNumero").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteNumero").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-gray ").f();
-								e("label").a("for", "Page_compteNumero").a("class", "").f().sx("numéro de compte").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "numéro de compte")
-										.a("class", "setCompteNumero w3-input w3-border ")
-										.a("name", "setCompteNumero")
-										.a("id", "Page_compteNumero")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=\"pk\"]').val() }], 'setCompteNumero', $(this).val(), function() { ajouterLueur($('#Page_compteNumero')); }, function() { ajouterErreur($('#Page_compteNumero')); }); ")
-										.a("value", o.strCompteNumero())
-									.fg();
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
-									.a("onclick", "enleverLueur($('#Page_compteNumero')); $('#Page_compteNumero').val(null); patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=\"pk\"]').val() }], 'setCompteNumero', null, function() { ajouterLueur($('#Page_compteNumero')); }, function() { ajouterErreur($('#Page_compteNumero')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formCompteBancaireCompteAdministrateurNom").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteAdministrateurNom").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-gray ").f();
-								e("label").a("for", "Page_compteAdministrateurNom").a("class", "").f().sx("administrateur de l'école").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "administrateur de l'école")
-										.a("title", "Description.enUS: ")
-										.a("class", "setCompteAdministrateurNom w3-input w3-border ")
-										.a("name", "setCompteAdministrateurNom")
-										.a("id", "Page_compteAdministrateurNom")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=\"pk\"]').val() }], 'setCompteAdministrateurNom', $(this).val(), function() { ajouterLueur($('#Page_compteAdministrateurNom')); }, function() { ajouterErreur($('#Page_compteAdministrateurNom')); }); ")
-										.a("value", o.strCompteAdministrateurNom())
-									.fg();
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
-									.a("onclick", "enleverLueur($('#Page_compteAdministrateurNom')); $('#Page_compteAdministrateurNom').val(null); patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=\"pk\"]').val() }], 'setCompteAdministrateurNom', null, function() { ajouterLueur($('#Page_compteAdministrateurNom')); }, function() { ajouterErreur($('#Page_compteAdministrateurNom')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formCompteBancaireCompteEmplacement").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteEmplacement").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-gray ").f();
-								e("label").a("for", "Page_compteEmplacement").a("class", "").f().sx("l'emplacement").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "l'emplacement")
-										.a("title", "Description.enUS: ")
-										.a("class", "setCompteEmplacement w3-input w3-border ")
-										.a("name", "setCompteEmplacement")
-										.a("id", "Page_compteEmplacement")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=\"pk\"]').val() }], 'setCompteEmplacement', $(this).val(), function() { ajouterLueur($('#Page_compteEmplacement')); }, function() { ajouterErreur($('#Page_compteEmplacement')); }); ")
-										.a("value", o.strCompteEmplacement())
-									.fg();
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
-									.a("onclick", "enleverLueur($('#Page_compteEmplacement')); $('#Page_compteEmplacement').val(null); patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=\"pk\"]').val() }], 'setCompteEmplacement', null, function() { ajouterLueur($('#Page_compteEmplacement')); }, function() { ajouterErreur($('#Page_compteEmplacement')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
+			o.htmArchive("Page");
+			o.htmSupprime("Page");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formCompteBancaireCompteNumeroTelephone").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteNumeroTelephone").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-gray ").f();
-								e("label").a("for", "Page_compteNumeroTelephone").a("class", "").f().sx("numéro de téléphone").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("input")
-										.a("type", "text")
-										.a("placeholder", "numéro de téléphone")
-										.a("title", "Numéro de téléphone de l'école. ")
-										.a("class", "setCompteNumeroTelephone w3-input w3-border ")
-										.a("name", "setCompteNumeroTelephone")
-										.a("id", "Page_compteNumeroTelephone")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=\"pk\"]').val() }], 'setCompteNumeroTelephone', $(this).val(), function() { ajouterLueur($('#Page_compteNumeroTelephone')); }, function() { ajouterErreur($('#Page_compteNumeroTelephone')); }); ")
-										.a("value", o.strCompteNumeroTelephone())
-									.fg();
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
-									.a("onclick", "enleverLueur($('#Page_compteNumeroTelephone')); $('#Page_compteNumeroTelephone').val(null); patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=\"pk\"]').val() }], 'setCompteNumeroTelephone', null, function() { ajouterLueur($('#Page_compteNumeroTelephone')); }, function() { ajouterErreur($('#Page_compteNumeroTelephone')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-				{ e("div").a("class", "w3-padding ").f();
-					{ e("form").a("action", "").a("id", "formCompteBancaireCompteAddresse").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
-							.a("type", "hidden")
-							.a("name", "valeur")
-							.a("class", "valeur ")
-							.a("value", requeteSite_.getRequetePk())
-							.fg();
-					} g("form");
-					{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteAddresse").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						{ e("div").a("class", "w3-card ").f();
-							{ e("div").a("class", "w3-cell-row w3-gray ").f();
-								e("label").a("for", "Page_compteAddresse").a("class", "").f().sx("addresse").g("label");
-							} g("div");
-							{ e("div").a("class", "w3-cell-row w3-padding ").f();
-								{ e("div").a("class", "w3-cell ").f();
-
-									e("textarea")
-										.a("placeholder", "addresse")
-										.a("title", "Description.enUS: ")
-										.a("class", "setCompteAddresse w3-input w3-border ")
-										.a("name", "setCompteAddresse")
-										.a("id", "Page_compteAddresse")
-										.a("onclick", "enleverLueur($(this)); ")
-										.a("onchange", "patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=\"pk\"]').val() }], 'setCompteAddresse', $(this).val(), function() { ajouterLueur($('#Page_compteAddresse')); }, function() { ajouterErreur($('#Page_compteAddresse')); }); ")
-									.f().sx(o.strCompteAddresse()).g("textarea");
-
-								} g("div");
-								{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-									{ e("button")
-										.a("tabindex", "-1")
-										.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-bar-item w3-gray ")
-									.a("onclick", "enleverLueur($('#Page_compteAddresse')); $('#Page_compteAddresse').val(null); patchCompteBancaireVal([{ name: 'fq', value: 'pk:' + $('#CompteBancaireForm :input[name=\"pk\"]').val() }], 'setCompteAddresse', null, function() { ajouterLueur($('#Page_compteAddresse')); }, function() { ajouterErreur($('#Page_compteAddresse')); }); ")
-										.f();
-										e("i").a("class", "far fa-eraser ").f().g("i");
-									} g("button");
-								} g("div");
-							} g("div");
-						} g("div");
-					} g("form");
-				} g("div");
-			} g("div");
+			o.htmTransactionCles("Page");
+			o.htmCompteNumero("Page");
+			o.htmCompteAdministrateurNom("Page");
+			o.htmCompteEmplacement("Page");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmCompteNumeroTelephone("Page");
+			o.htmCompteAddresse("Page");
 		} g("div");
 	}
 
 	public void htmlFormPOSTCompteBancaire(CompteBancaire o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("ID").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCompteId()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("POST");
+			o.htmCree("POST");
+			o.htmModifie("POST");
+			o.htmObjetId("POST");
+			o.htmCompteId("POST");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("transactions").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strTransactionCles()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteNumero").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteNumero").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "POST_compteNumero").a("class", "").f().sx("numéro de compte").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "numéro de compte")
-									.a("class", "valeurCompteNumero w3-input w3-border ")
-									.a("name", "compteNumero")
-									.a("id", "POST_compteNumero")
-									.a("value", o.strCompteNumero())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteAdministrateurNom").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteAdministrateurNom").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "POST_compteAdministrateurNom").a("class", "").f().sx("administrateur de l'école").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "administrateur de l'école")
-									.a("title", "Description.enUS: ")
-									.a("class", "valeurCompteAdministrateurNom w3-input w3-border ")
-									.a("name", "compteAdministrateurNom")
-									.a("id", "POST_compteAdministrateurNom")
-									.a("value", o.strCompteAdministrateurNom())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteEmplacement").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteEmplacement").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "POST_compteEmplacement").a("class", "").f().sx("l'emplacement").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "l'emplacement")
-									.a("title", "Description.enUS: ")
-									.a("class", "valeurCompteEmplacement w3-input w3-border ")
-									.a("name", "compteEmplacement")
-									.a("id", "POST_compteEmplacement")
-									.a("value", o.strCompteEmplacement())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmArchive("POST");
+			o.htmSupprime("POST");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteNumeroTelephone").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteNumeroTelephone").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "POST_compteNumeroTelephone").a("class", "").f().sx("numéro de téléphone").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "numéro de téléphone")
-									.a("title", "Numéro de téléphone de l'école. ")
-									.a("class", "valeurCompteNumeroTelephone w3-input w3-border ")
-									.a("name", "compteNumeroTelephone")
-									.a("id", "POST_compteNumeroTelephone")
-									.a("value", o.strCompteNumeroTelephone())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteAddresse").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteAddresse").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "POST_compteAddresse").a("class", "").f().sx("addresse").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("textarea")
-									.a("placeholder", "addresse")
-									.a("title", "Description.enUS: ")
-									.a("class", "valeurCompteAddresse w3-input w3-border ")
-									.a("name", "compteAddresse")
-									.a("id", "POST_compteAddresse")
-								.f().sx(o.strCompteAddresse()).g("textarea");
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmTransactionCles("POST");
+			o.htmCompteNumero("POST");
+			o.htmCompteAdministrateurNom("POST");
+			o.htmCompteEmplacement("POST");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmCompteNumeroTelephone("POST");
+			o.htmCompteAddresse("POST");
 		} g("div");
 	}
 
 	public void htmlFormPATCHCompteBancaire(CompteBancaire o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("ID").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCompteId()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("PATCH");
+			o.htmCree("PATCH");
+			o.htmModifie("PATCH");
+			o.htmObjetId("PATCH");
+			o.htmCompteId("PATCH");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("transactions").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strTransactionCles()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteNumero").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteNumero").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "PATCH_compteNumero").a("class", "").f().sx("numéro de compte").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "numéro de compte")
-									.a("class", "setCompteNumero w3-input w3-border ")
-									.a("name", "setCompteNumero")
-									.a("id", "PATCH_compteNumero")
-									.a("value", o.strCompteNumero())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteAdministrateurNom").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteAdministrateurNom").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "PATCH_compteAdministrateurNom").a("class", "").f().sx("administrateur de l'école").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "administrateur de l'école")
-									.a("title", "Description.enUS: ")
-									.a("class", "setCompteAdministrateurNom w3-input w3-border ")
-									.a("name", "setCompteAdministrateurNom")
-									.a("id", "PATCH_compteAdministrateurNom")
-									.a("value", o.strCompteAdministrateurNom())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteEmplacement").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteEmplacement").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "PATCH_compteEmplacement").a("class", "").f().sx("l'emplacement").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "l'emplacement")
-									.a("title", "Description.enUS: ")
-									.a("class", "setCompteEmplacement w3-input w3-border ")
-									.a("name", "setCompteEmplacement")
-									.a("id", "PATCH_compteEmplacement")
-									.a("value", o.strCompteEmplacement())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmArchive("PATCH");
+			o.htmSupprime("PATCH");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteNumeroTelephone").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteNumeroTelephone").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "PATCH_compteNumeroTelephone").a("class", "").f().sx("numéro de téléphone").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "numéro de téléphone")
-									.a("title", "Numéro de téléphone de l'école. ")
-									.a("class", "setCompteNumeroTelephone w3-input w3-border ")
-									.a("name", "setCompteNumeroTelephone")
-									.a("id", "PATCH_compteNumeroTelephone")
-									.a("value", o.strCompteNumeroTelephone())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteAddresse").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteAddresse").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "PATCH_compteAddresse").a("class", "").f().sx("addresse").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("textarea")
-									.a("placeholder", "addresse")
-									.a("title", "Description.enUS: ")
-									.a("class", "setCompteAddresse w3-input w3-border ")
-									.a("name", "setCompteAddresse")
-									.a("id", "PATCH_compteAddresse")
-								.f().sx(o.strCompteAddresse()).g("textarea");
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmTransactionCles("PATCH");
+			o.htmCompteNumero("PATCH");
+			o.htmCompteAdministrateurNom("PATCH");
+			o.htmCompteEmplacement("PATCH");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("nom").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCompteNomComplet()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmCompteNumeroTelephone("PATCH");
+			o.htmCompteAddresse("PATCH");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmCompteNomComplet("PATCH");
 		} g("div");
 	}
 
 	public void htmlFormRechercheCompteBancaire(CompteBancaire o) {
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("clé primaire").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strPk()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("crée").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCree()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("modifié").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strModifie()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("ID").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCompteId()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmPk("Recherche");
+			o.htmCree("Recherche");
+			o.htmModifie("Recherche");
+			o.htmObjetId("Recherche");
+			o.htmCompteId("Recherche");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("transactions").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strTransactionCles()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteNumero").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteNumero").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "Recherche_compteNumero").a("class", "").f().sx("numéro de compte").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "numéro de compte")
-									.a("class", "valeurCompteNumero w3-input w3-border ")
-									.a("name", "compteNumero")
-									.a("id", "Recherche_compteNumero")
-									.a("value", o.strCompteNumero())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteAdministrateurNom").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteAdministrateurNom").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "Recherche_compteAdministrateurNom").a("class", "").f().sx("administrateur de l'école").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "administrateur de l'école")
-									.a("title", "Description.enUS: ")
-									.a("class", "valeurCompteAdministrateurNom w3-input w3-border ")
-									.a("name", "compteAdministrateurNom")
-									.a("id", "Recherche_compteAdministrateurNom")
-									.a("value", o.strCompteAdministrateurNom())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteEmplacement").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteEmplacement").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "Recherche_compteEmplacement").a("class", "").f().sx("l'emplacement").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "l'emplacement")
-									.a("title", "Description.enUS: ")
-									.a("class", "valeurCompteEmplacement w3-input w3-border ")
-									.a("name", "compteEmplacement")
-									.a("id", "Recherche_compteEmplacement")
-									.a("value", o.strCompteEmplacement())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmArchive("Recherche");
+			o.htmSupprime("Recherche");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteNumeroTelephone").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteNumeroTelephone").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "Recherche_compteNumeroTelephone").a("class", "").f().sx("numéro de téléphone").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("input")
-									.a("type", "text")
-									.a("placeholder", "numéro de téléphone")
-									.a("title", "Numéro de téléphone de l'école. ")
-									.a("class", "valeurCompteNumeroTelephone w3-input w3-border ")
-									.a("name", "compteNumeroTelephone")
-									.a("id", "Recherche_compteNumeroTelephone")
-									.a("value", o.strCompteNumeroTelephone())
-								.fg();
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("form").a("action", "").a("id", "formCompteBancaireCompteAddresse").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					e("input")
-						.a("type", "hidden")
-						.a("name", "valeur")
-						.a("class", "valeur ")
-						.a("value", requeteSite_.getRequetePk())
-						.fg();
-				} g("form");
-				{ e("form").a("action", "").a("id", "suggereCompteBancaireCompteAddresse").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-					{ e("div").a("class", "w3-card ").f();
-						{ e("div").a("class", "w3-cell-row w3-gray ").f();
-							e("label").a("for", "Recherche_compteAddresse").a("class", "").f().sx("addresse").g("label");
-						} g("div");
-						{ e("div").a("class", "w3-cell-row w3-padding ").f();
-							{ e("div").a("class", "w3-cell ").f();
-
-								e("textarea")
-									.a("placeholder", "addresse")
-									.a("title", "Description.enUS: ")
-									.a("class", "valeurCompteAddresse w3-input w3-border ")
-									.a("name", "compteAddresse")
-									.a("id", "Recherche_compteAddresse")
-								.f().sx(o.strCompteAddresse()).g("textarea");
-
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("form");
-			} g("div");
-			} g("div");
+			o.htmTransactionCles("Recherche");
+			o.htmCompteNumero("Recherche");
+			o.htmCompteAdministrateurNom("Recherche");
+			o.htmCompteEmplacement("Recherche");
 		} g("div");
 		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell w3-cell-middle w3-center w3-mobile ").f();
-			{ e("div").a("class", "w3-padding ").f();
-				{ e("div").a("class", "w3-card ").f();
-					{ e("div").a("class", "w3-cell-row w3-gray ").f();
-						e("label").a("class", "").f().sx("nom").g("label");
-					} g("div");
-					{ e("div").a("class", "w3-cell-row  ").f();
-						{ e("div").a("class", "w3-cell ").f();
-							{ e("div").a("class", "w3-rest ").f();
-								e("span").f().sx(o.strCompteNomComplet()).g("span");
-							} g("div");
-						} g("div");
-					} g("div");
-				} g("div");
-			} g("div");
-			} g("div");
+			o.htmCompteNumeroTelephone("Recherche");
+			o.htmCompteAddresse("Recherche");
+		} g("div");
+		{ e("div").a("class", "w3-cell-row ").f();
+			o.htmCompteNomComplet("Recherche");
 		} g("div");
 	}
 
@@ -1260,16 +251,59 @@ public class CompteGenPage extends CompteGenPageGen<ClusterPage> {
 			}
 		} else {
 
-			{ e("h1").f();
-				if(contexteIconeClassesCss != null)
-					e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
-				e("span").a("class", " ").f().sx("comptes").g("span");
-			} g("h1");
-			e("div").a("class", "w3-padding-16 w3-card-4 w3-light-grey ").f();
+				{ e("h1").f();
+					{ e("a").a("href", "/compte").a("class", "w3-bar-item w3-btn w3-center w3-block w3-gray w3-hover-gray ").f();
+						if(contexteIconeClassesCss != null)
+							e("i").a("class", contexteIconeClassesCss + " site-menu-icon ").f().g("i");
+						e("span").a("class", " ").f().sx(pageH1).g("span");
+					} g("a");
+				} g("h1");
+			e("div").a("class", "").f();
+				{ e("div").f();
+					Long num = listeCompteBancaire.getQueryResponse().getResults().getNumFound();
+					String query = StringUtils.replace(listeCompteBancaire.getQuery(), "_suggested", "");
+					Integer rows1 = listeCompteBancaire.getRows();
+					Integer start1 = listeCompteBancaire.getStart();
+					Integer start2 = start1 - rows1;
+					Integer start3 = start1 + rows1;
+					Integer rows2 = rows1 / 2;
+					Integer rows3 = rows1 * 2;
+					start2 = start2 < 0 ? 0 : start2;
+
+					if(start1 == 0) {
+						e("i").a("class", "fas fa-arrow-square-left w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/compte?q=", query, "&start=", start2, "&rows=", rows1).f();
+							e("i").a("class", "fas fa-arrow-square-left ").f().g("i");
+						} g("a");
+					}
+
+					if(rows1 <= 1) {
+						e("i").a("class", "fas fa-minus-square w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/compte?q=", query, "&start=", start1, "&rows=", rows2).f();
+							e("i").a("class", "fas fa-minus-square ").f().g("i");
+						} g("a");
+					}
+
+					{ e("a").a("href", "/compte?q=", query, "&start=", start1, "&rows=", rows3).f();
+						e("i").a("class", "fas fa-plus-square ").f().g("i");
+					} g("a");
+
+					if(start3 >= num) {
+						e("i").a("class", "fas fa-arrow-square-right w3-opacity ").f().g("i");
+					} else {
+						{ e("a").a("href", "/compte?q=", query, "&start=", start3, "&rows=", rows1).f();
+							e("i").a("class", "fas fa-arrow-square-right ").f().g("i");
+						} g("a");
+					}
+						e("span").f().sx((start1 + 1), " - ", (start1 + rows1), " de ", num).g("span");
+				} g("div");
 			{ e("table").a("class", "w3-table w3-bordered w3-striped w3-border w3-hoverable ").f();
-				{ e("thead").f();
+				{ e("thead").a("class", "w3-gray w3-hover-gray ").f();
 					{ e("tr").f();
 						e("th").f().sx("nom").g("th");
+						e("th").f().sx("crée").g("th");
 					} g("tr");
 				} g("thead");
 				{ e("tbody").f();
@@ -1284,7 +318,14 @@ public class CompteGenPage extends CompteGenPageGen<ClusterPage> {
 								{ e("a").a("href", uri).f();
 									e("i").a("class", "fad fa-money-check w3-padding-small ").f().g("i");
 									{ e("span").f();
-										sx(o.getCompteNomComplet());
+										sx(o.strCompteNomComplet());
+									} g("span");
+								} g("a");
+							} g("td");
+							{ e("td").f();
+								{ e("a").a("href", uri).f();
+									{ e("span").f();
+										sx(o.strCree());
 									} g("span");
 								} g("a");
 							} g("td");
@@ -1307,6 +348,10 @@ public class CompteGenPage extends CompteGenPageGen<ClusterPage> {
 						.a("type", "hidden")
 						.a("value", o.getPk())
 						.fg();
+						e("input")
+						.a("name", "focusId")
+						.a("type", "hidden")
+						.fg();
 					} g("form");
 					htmlFormPageCompteBancaire(o);
 				}
@@ -1318,13 +363,20 @@ public class CompteGenPage extends CompteGenPageGen<ClusterPage> {
 
 		}
 		htmlBodyFormsCompteGenPage();
-		htmlSuggereCompteGenPage();
+		htmlSuggereCompteGenPage(this, null);
 		g("div");
 	}
 
 	public void htmlBodyFormsCompteGenPage() {
-		e("div").f();
+		e("div").a("class", "w3-margin-top ").f();
 
+		{ e("button")
+			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
+				.a("id", "rechargerCeCompteGenPage")
+				.a("onclick", "patchCompteBancaireVals( [ {name: 'fq', value: 'pk:' + " + requeteSite_.getRequetePk() + " } ], {}, function() { ajouterLueur($('#rechargerCeCompteGenPage')); }, function() { ajouterErreur($('#rechargerCeCompteGenPage')); }); return false; ").f();
+				e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
+			sx("recharger ce compte");
+		} g("button");
 
 		e("button")
 			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
@@ -1335,15 +387,16 @@ public class CompteGenPage extends CompteGenPageGen<ClusterPage> {
 			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
 				{ e("header").a("class", "w3-container w3-gray ").f();
 					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#postCompteBancaireModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Créer un compte").g("h2");
+					e("h2").a("class", "w3-padding ").f().sx("Créer un compte").g("h2");
 				} g("header");
 				{ e("div").a("class", "w3-container ").f();
 					CompteBancaire o = new CompteBancaire();
+					o.setRequeteSite_(requeteSite_);
 
 					// Form POST
-					{ e("form").a("action", "").a("id", "postCompteBancaireForm").a("onsubmit", "event.preventDefault(); return false; ").f();
+					{ e("div").a("id", "postCompteBancaireForm").f();
 						htmlFormPOSTCompteBancaire(o);
-					} g("form");
+					} g("div");
 					e("button")
 						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
 						.a("onclick", "postCompteBancaire($('#postCompteBancaireForm')); ")
@@ -1364,10 +417,11 @@ public class CompteGenPage extends CompteGenPageGen<ClusterPage> {
 			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
 				{ e("header").a("class", "w3-container w3-gray ").f();
 					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#patchCompteBancaireModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Modifier des comptes").g("h2");
+					e("h2").a("class", "w3-padding ").f().sx("Modifier des comptes").g("h2");
 				} g("header");
 				{ e("div").a("class", "w3-container ").f();
 					CompteBancaire o = new CompteBancaire();
+					o.setRequeteSite_(requeteSite_);
 
 					// FormulaireFiltres PATCH
 					{ e("form").a("action", "").a("id", "patchCompteBancaireFormulaireFiltres").a("onsubmit", "event.preventDefault(); return false; ").f();
@@ -1395,34 +449,37 @@ public class CompteGenPage extends CompteGenPageGen<ClusterPage> {
 		} g("div");
 
 
-		e("button")
-			.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
-			.a("onclick", "$('#deleteCompteBancaireModale').show(); ")
-			.f().sx("Supprimer des comptes")
-		.g("button");
-		{ e("div").a("id", "deleteCompteBancaireModale").a("class", "w3-modal ").f();
-			{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
-				{ e("header").a("class", "w3-container w3-gray ").f();
-					e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#deleteCompteBancaireModale').hide(); ").f().sx("×").g("span");
-					e("h2").a("class", "").f().sx("Supprimer des comptes").g("h2");
-				} g("header");
-				{ e("div").a("class", "w3-container ").f();
-					CompteBancaire o = new CompteBancaire();
+		if(listeCompteBancaire != null && listeCompteBancaire.size() == 1) {
+			e("button")
+				.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
+				.a("onclick", "$('#deleteCompteBancaireModale').show(); ")
+				.f().sx("Supprimer des comptes")
+			.g("button");
+			{ e("div").a("id", "deleteCompteBancaireModale").a("class", "w3-modal ").f();
+				{ e("div").a("class", "w3-modal-content w3-card-4 ").f();
+					{ e("header").a("class", "w3-container w3-gray ").f();
+						e("span").a("class", "w3-button w3-display-topright ").a("onclick", "$('#deleteCompteBancaireModale').hide(); ").f().sx("×").g("span");
+						e("h2").a("class", "w3-padding ").f().sx("Supprimer des comptes").g("h2");
+					} g("header");
+					{ e("div").a("class", "w3-container ").f();
+						CompteBancaire o = new CompteBancaire();
+						o.setRequeteSite_(requeteSite_);
 
-					// Form DELETE
-					{ e("form").a("action", "").a("id", "deleteCompteBancaireForm").a("onsubmit", "event.preventDefault(); return false; ").f();
-						htmlFormPATCHCompteBancaire(o);
-					} g("form");
-					e("button")
-						.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
-						.a("onclick", "deleteCompteBancaire(); ")
-						.f().sx("Supprimer des comptes")
-					.g("button");
+						// Form DELETE
+						{ e("div").a("id", "deleteCompteBancaireForm").f();
+							htmlFormPATCHCompteBancaire(o);
+						} g("div");
+						e("button")
+							.a("class", "w3-btn w3-round w3-border w3-border-black w3-ripple w3-padding w3-gray ")
+							.a("onclick", "deleteCompteBancaire(", o.getPk(), "); ")
+							.f().sx("Supprimer des comptes")
+						.g("button");
 
+					} g("div");
 				} g("div");
 			} g("div");
-		} g("div");
 
+		}
 		g("div");
 	}
 
@@ -1463,54 +520,54 @@ public class CompteGenPage extends CompteGenPageGen<ClusterPage> {
 	 * r: "suggereListCompteBancaire"
 	 * r.enUS: "suggestListBankAccount"
 	**/
-	public void htmlSuggereCompteGenPage() {
-		{ e("div").a("class", "w3-cell-row ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("href", "/compte").a("class", "").f();
-					e("i").a("class", "fad fa-money-check w3-padding-small ").f().g("i");
-					sx("voir tous les comptes");
-				} g("a");
-			} g("div");
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("a").a("id", "rechargerCompteGenPage").a("href", "/compte").a("class", "").a("onclick", "patchCompteBancaireVals([], {}, function() { ajouterLueur($('#rechargerCompteGenPage')); }, function() { ajouterErreur($('#rechargerCompteGenPage')); }); return false; ").f();
-					e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
-					sx("recharger tous les comptes");
-				} g("a");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("span").f();
-					sx("rechercher comptes : ");
-				} g("span");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell ").f();
-				{ e("div").a("class", "w3-cell-row ").f();
+	public static void htmlSuggereCompteGenPage(MiseEnPage p, String id) {
+		{ p.e("div").a("class", "w3-cell-row ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("a").a("href", "/compte").a("class", "").f();
+					p.e("i").a("class", "fad fa-money-check w3-padding-small ").f().g("i");
+					p.sx("voir tous les comptes");
+				} p.g("a");
+			} p.g("div");
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("a").a("id", "rechargerTousCompteGenPage", id).a("href", "/compte").a("class", "").a("onclick", "patchCompteBancaireVals([], {}, function() { ajouterLueur($('#rechargerTousCompteGenPage", id, "')); }, function() { ajouterErreur($('#rechargerTousCompteGenPage", id, "')); }); return false; ").f();
+					p.e("i").a("class", "fas fa-sync-alt w3-padding-small ").f().g("i");
+					p.sx("recharger tous les comptes");
+				} p.g("a");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("span").f();
+					p.sx("rechercher comptes : ");
+				} p.g("span");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell ").f();
+				{ p.e("div").a("class", "w3-cell-row ").f();
 
-					e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
-					{ e("form").a("action", "").a("id", "suggereFormCompteBancaire").a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); return false; ").f();
-						e("input")
+					p.e("i").a("class", "far fa-search w3-xxlarge w3-cell w3-cell-middle ").f().g("i");
+					{ p.e("form").a("action", "").a("id", "suggereFormCompteBancaire", id).a("style", "display: inline-block; width: 100%; ").a("onsubmit", "event.preventDefault(); window.location.href='/compte?q=objetSuggere:' + encodeURIComponent($('#suggereCompteBancaire", id, "').val()); return false; ").f();
+						p.e("input")
 							.a("type", "text")
 							.a("placeholder", "rechercher comptes")
 							.a("class", "suggereCompteBancaire w3-input w3-border w3-cell w3-cell-middle ")
 							.a("name", "suggereCompteBancaire")
-							.a("id", "suggereCompteBancaire")
+							.a("id", "suggereCompteBancaire", id)
 							.a("autocomplete", "off")
-							.a("oninput", "suggereCompteBancaireObjetSuggere( [ { 'name': 'q', 'value': 'objetSuggere:' + $(this).val() } ], $('#suggereListCompteBancaire')); ")
+							.a("oninput", "suggereCompteBancaireObjetSuggere( [ { 'name': 'q', 'value': 'objetSuggere:' + $(this).val() } ], $('#suggereListCompteBancaire", id, "'), ", p.getRequeteSite_().getRequetePk(), "); ")
 							.fg();
 
-					} g("form");
-				} g("div");
-			} g("div");
-		} g("div");
-		{ e("div").a("class", "w3-cell-row w3-padding ").f();
-			{ e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
-				{ e("ul").a("class", "w3-ul w3-hoverable ").a("id", "suggereListCompteBancaire").f();
-				} g("ul");
-			} g("div");
-		} g("div");
+					} p.g("form");
+				} p.g("div");
+			} p.g("div");
+		} p.g("div");
+		{ p.e("div").a("class", "w3-cell-row w3-padding ").f();
+			{ p.e("div").a("class", "w3-cell w3-left-align w3-cell-top ").f();
+				{ p.e("ul").a("class", "w3-ul w3-hoverable ").a("id", "suggereListCompteBancaire", id).f();
+				} p.g("ul");
+			} p.g("div");
+		} p.g("div");
 	}
 
 }

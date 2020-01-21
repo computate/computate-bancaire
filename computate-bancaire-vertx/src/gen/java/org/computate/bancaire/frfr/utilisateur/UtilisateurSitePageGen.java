@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.utilisateur;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import org.computate.bancaire.frfr.cluster.Cluster;
 import java.math.MathContext;
 import org.apache.commons.text.StringEscapeUtils;
@@ -12,6 +13,7 @@ import org.computate.bancaire.frfr.utilisateur.UtilisateurSiteGenPage;
 import org.computate.bancaire.frfr.couverture.Couverture;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
+import java.util.Optional;
 import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 
 /**	
@@ -36,8 +38,8 @@ public abstract class UtilisateurSitePageGen<DEV> extends UtilisateurSiteGenPage
 	}
 
 	public void initLoinUtilisateurSitePage() {
-		super.initLoinUtilisateurSiteGenPage(requeteSite_);
 		initUtilisateurSitePage();
+		super.initLoinUtilisateurSiteGenPage(requeteSite_);
 	}
 
 	public void initUtilisateurSitePage() {
@@ -217,6 +219,18 @@ public abstract class UtilisateurSitePageGen<DEV> extends UtilisateurSiteGenPage
 	}
 
 	public void htmlStyleUtilisateurSitePage() {
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchUtilisateurSitePage() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		UtilisateurSitePage original = (UtilisateurSitePage)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
+			super.requetePatchUtilisateurSiteGenPage();
+		}
 	}
 
 	//////////////

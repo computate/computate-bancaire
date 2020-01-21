@@ -10,10 +10,17 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-config/*.config
+computate-bancaire-vertx/config/*.config
+computate-bancaire-vertx/config/*.crt
+computate-bancaire-vertx/config/*.key
+computate-bancaire-vertx/config/*.jks
+computate-bancaire-vertx/config/*.p12
+computate-bancaire-vertx/config/*.jceks
+computate-bancaire-vertx/config/*.properties
 computate-bancaire-commun/config/*.config
 computate-bancaire-vertx/config/*.config
 .vertx
 
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
 !/.mvn/wrapper/maven-wrapper.jar
+

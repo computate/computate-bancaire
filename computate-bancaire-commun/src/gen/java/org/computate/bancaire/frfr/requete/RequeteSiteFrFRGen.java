@@ -1,5 +1,6 @@
 package org.computate.bancaire.frfr.requete;
 
+import org.computate.bancaire.frfr.requete.patch.RequetePatch;
 import org.apache.solr.common.SolrDocumentList;
 import java.security.MessageDigest;
 import javax.crypto.spec.SecretKeySpec;
@@ -16,6 +17,7 @@ import java.lang.Boolean;
 import io.vertx.core.json.JsonObject;
 import org.computate.bancaire.frfr.ecrivain.ToutEcrivain;
 import java.lang.String;
+import io.vertx.core.http.CaseInsensitiveHeaders;
 import org.computate.bancaire.frfr.utilisateur.UtilisateurSite;
 import org.computate.bancaire.frfr.cluster.Cluster;
 import java.math.MathContext;
@@ -31,6 +33,7 @@ import io.vertx.ext.web.api.OperationRequest;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.commons.lang3.math.NumberUtils;
 import io.vertx.ext.sql.SQLConnection;
+import java.util.Optional;
 import java.lang.Object;
 import org.computate.bancaire.frfr.config.ConfigSite;
 
@@ -148,6 +151,43 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 				setRequeteSite_(requeteSite_Couverture.o);
 		}
 		requeteSite_Couverture.dejaInitialise(true);
+		return (RequeteSiteFrFR)this;
+	}
+
+	///////////////////
+	// requetePatch_ //
+	///////////////////
+
+	/**	L'entité « requetePatch_ »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected RequetePatch requetePatch_;
+	@JsonIgnore
+	public Couverture<RequetePatch> requetePatch_Couverture = new Couverture<RequetePatch>().p(this).c(RequetePatch.class).var("requetePatch_").o(requetePatch_);
+
+	/**	<br/>L'entité « requetePatch_ »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.requete.RequeteSiteFrFR&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:requetePatch_">Trouver l'entité requetePatch_ dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _requetePatch_(Couverture<RequetePatch> c);
+
+	public RequetePatch getRequetePatch_() {
+		return requetePatch_;
+	}
+
+	public void setRequetePatch_(RequetePatch requetePatch_) {
+		this.requetePatch_ = requetePatch_;
+		this.requetePatch_Couverture.dejaInitialise = true;
+	}
+	protected RequeteSiteFrFR requetePatch_Init() {
+		if(!requetePatch_Couverture.dejaInitialise) {
+			_requetePatch_(requetePatch_Couverture);
+			if(requetePatch_ == null)
+				setRequetePatch_(requetePatch_Couverture.o);
+		}
+		requetePatch_Couverture.dejaInitialise(true);
 		return (RequeteSiteFrFR)this;
 	}
 
@@ -547,6 +587,67 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 		return utilisateurId == null ? "" : StringEscapeUtils.escapeHtml4(strUtilisateurId());
 	}
 
+	///////////////
+	// sessionId //
+	///////////////
+
+	/**	L'entité « sessionId »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected String sessionId;
+	@JsonIgnore
+	public Couverture<String> sessionIdCouverture = new Couverture<String>().p(this).c(String.class).var("sessionId").o(sessionId);
+
+	/**	<br/>L'entité « sessionId »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.requete.RequeteSiteFrFR&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:sessionId">Trouver l'entité sessionId dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _sessionId(Couverture<String> c);
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+		this.sessionIdCouverture.dejaInitialise = true;
+	}
+	protected RequeteSiteFrFR sessionIdInit() {
+		if(!sessionIdCouverture.dejaInitialise) {
+			_sessionId(sessionIdCouverture);
+			if(sessionId == null)
+				setSessionId(sessionIdCouverture.o);
+		}
+		sessionIdCouverture.dejaInitialise(true);
+		return (RequeteSiteFrFR)this;
+	}
+
+	public String solrSessionId() {
+		return sessionId;
+	}
+
+	public String strSessionId() {
+		return sessionId == null ? "" : sessionId;
+	}
+
+	public String jsonSessionId() {
+		return sessionId == null ? "" : sessionId;
+	}
+
+	public String nomAffichageSessionId() {
+		return null;
+	}
+
+	public String htmTooltipSessionId() {
+		return null;
+	}
+
+	public String htmSessionId() {
+		return sessionId == null ? "" : StringEscapeUtils.escapeHtml4(strSessionId());
+	}
+
 	////////////////////
 	// utilisateurNom //
 	////////////////////
@@ -906,6 +1007,84 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 		return (RequeteSiteFrFR)this;
 	}
 
+	///////////////////////////////
+	// utilisateurRolesRessource //
+	///////////////////////////////
+
+	/**	L'entité « utilisateurRolesRessource »
+	 *	Il est construit avant d'être initialisé avec le constructeur par défaut List<String>(). 
+	 */
+	protected List<String> utilisateurRolesRessource = new java.util.ArrayList<java.lang.String>();
+	@JsonIgnore
+	public Couverture<List<String>> utilisateurRolesRessourceCouverture = new Couverture<List<String>>().p(this).c(List.class).var("utilisateurRolesRessource").o(utilisateurRolesRessource);
+
+	/**	<br/>L'entité « utilisateurRolesRessource »
+	 * Il est construit avant d'être initialisé avec le constructeur par défaut List<String>(). 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.requete.RequeteSiteFrFR&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:utilisateurRolesRessource">Trouver l'entité utilisateurRolesRessource dans Solr</a>
+	 * <br/>
+	 * @param utilisateurRolesRessource est l'entité déjà construit. 
+	 **/
+	protected abstract void _utilisateurRolesRessource(List<String> o);
+
+	public List<String> getUtilisateurRolesRessource() {
+		return utilisateurRolesRessource;
+	}
+
+	public void setUtilisateurRolesRessource(List<String> utilisateurRolesRessource) {
+		this.utilisateurRolesRessource = utilisateurRolesRessource;
+		this.utilisateurRolesRessourceCouverture.dejaInitialise = true;
+	}
+	public RequeteSiteFrFR addUtilisateurRolesRessource(String...objets) {
+		for(String o : objets) {
+			addUtilisateurRolesRessource(o);
+		}
+		return (RequeteSiteFrFR)this;
+	}
+	public RequeteSiteFrFR addUtilisateurRolesRessource(String o) {
+		if(o != null && !utilisateurRolesRessource.contains(o))
+			this.utilisateurRolesRessource.add(o);
+		return (RequeteSiteFrFR)this;
+	}
+	public RequeteSiteFrFR setUtilisateurRolesRessource(JsonArray objets) {
+		utilisateurRolesRessource.clear();
+		for(int i = 0; i < objets.size(); i++) {
+			String o = objets.getString(i);
+			addUtilisateurRolesRessource(o);
+		}
+		return (RequeteSiteFrFR)this;
+	}
+	protected RequeteSiteFrFR utilisateurRolesRessourceInit() {
+		if(!utilisateurRolesRessourceCouverture.dejaInitialise) {
+			_utilisateurRolesRessource(utilisateurRolesRessource);
+		}
+		utilisateurRolesRessourceCouverture.dejaInitialise(true);
+		return (RequeteSiteFrFR)this;
+	}
+
+	public List<String> solrUtilisateurRolesRessource() {
+		return utilisateurRolesRessource;
+	}
+
+	public String strUtilisateurRolesRessource() {
+		return utilisateurRolesRessource == null ? "" : utilisateurRolesRessource.toString();
+	}
+
+	public String jsonUtilisateurRolesRessource() {
+		return utilisateurRolesRessource == null ? "" : utilisateurRolesRessource.toString();
+	}
+
+	public String nomAffichageUtilisateurRolesRessource() {
+		return null;
+	}
+
+	public String htmTooltipUtilisateurRolesRessource() {
+		return null;
+	}
+
+	public String htmUtilisateurRolesRessource() {
+		return utilisateurRolesRessource == null ? "" : StringEscapeUtils.escapeHtml4(strUtilisateurRolesRessource());
+	}
+
 	/////////////////////
 	// utilisateurSite //
 	/////////////////////
@@ -1184,6 +1363,43 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 				setConnexionSql(connexionSqlCouverture.o);
 		}
 		connexionSqlCouverture.dejaInitialise(true);
+		return (RequeteSiteFrFR)this;
+	}
+
+	////////////////////
+	// requeteEnTetes //
+	////////////////////
+
+	/**	L'entité « requeteEnTetes »
+	 *	 is defined as null before being initialized. 
+	 */
+	protected CaseInsensitiveHeaders requeteEnTetes;
+	@JsonIgnore
+	public Couverture<CaseInsensitiveHeaders> requeteEnTetesCouverture = new Couverture<CaseInsensitiveHeaders>().p(this).c(CaseInsensitiveHeaders.class).var("requeteEnTetes").o(requeteEnTetes);
+
+	/**	<br/>L'entité « requeteEnTetes »
+	 *  est défini comme null avant d'être initialisé. 
+	 * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstEntite_indexed_boolean:true&fq=classeNomCanonique_frFR_indexed_string:org.computate.bancaire.frfr.requete.RequeteSiteFrFR&fq=classeEtendGen_indexed_boolean:true&fq=entiteVar_frFR_indexed_string:requeteEnTetes">Trouver l'entité requeteEnTetes dans Solr</a>
+	 * <br/>
+	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
+	 **/
+	protected abstract void _requeteEnTetes(Couverture<CaseInsensitiveHeaders> c);
+
+	public CaseInsensitiveHeaders getRequeteEnTetes() {
+		return requeteEnTetes;
+	}
+
+	public void setRequeteEnTetes(CaseInsensitiveHeaders requeteEnTetes) {
+		this.requeteEnTetes = requeteEnTetes;
+		this.requeteEnTetesCouverture.dejaInitialise = true;
+	}
+	protected RequeteSiteFrFR requeteEnTetesInit() {
+		if(!requeteEnTetesCouverture.dejaInitialise) {
+			_requeteEnTetes(requeteEnTetesCouverture);
+			if(requeteEnTetes == null)
+				setRequeteEnTetes(requeteEnTetesCouverture.o);
+		}
+		requeteEnTetesCouverture.dejaInitialise(true);
 		return (RequeteSiteFrFR)this;
 	}
 
@@ -1491,6 +1707,7 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 		siteContexte_Init();
 		configSite_Init();
 		requeteSite_Init();
+		requetePatch_Init();
 		vertxInit();
 		objetJsonInit();
 		rechercheSolrInit();
@@ -1501,18 +1718,21 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 		utilisateurVertxInit();
 		principalJsonInit();
 		utilisateurIdInit();
+		sessionIdInit();
 		utilisateurNomInit();
 		utilisateurNomFamilleInit();
 		utilisateurPrenomInit();
 		utilisateurNomCompletInit();
 		utilisateurRolesRoyaumeInit();
 		utilisateurRessourceInit();
+		utilisateurRolesRessourceInit();
 		utilisateurSiteInit();
 		xmlPileInit();
 		documentSolrInit();
 		pageAdminInit();
 		requetePkInit();
 		connexionSqlInit();
+		requeteEnTetesInit();
 		cryptageMotDePasseInit();
 		cryptageChiffreCrypterInit();
 		cryptageChiffreDecrypterInit();
@@ -1567,6 +1787,8 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 				return oRequeteSiteFrFR.configSite_;
 			case "requeteSite_":
 				return oRequeteSiteFrFR.requeteSite_;
+			case "requetePatch_":
+				return oRequeteSiteFrFR.requetePatch_;
 			case "vertx":
 				return oRequeteSiteFrFR.vertx;
 			case "objetJson":
@@ -1587,6 +1809,8 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 				return oRequeteSiteFrFR.principalJson;
 			case "utilisateurId":
 				return oRequeteSiteFrFR.utilisateurId;
+			case "sessionId":
+				return oRequeteSiteFrFR.sessionId;
 			case "utilisateurNom":
 				return oRequeteSiteFrFR.utilisateurNom;
 			case "utilisateurNomFamille":
@@ -1599,6 +1823,8 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 				return oRequeteSiteFrFR.utilisateurRolesRoyaume;
 			case "utilisateurRessource":
 				return oRequeteSiteFrFR.utilisateurRessource;
+			case "utilisateurRolesRessource":
+				return oRequeteSiteFrFR.utilisateurRolesRessource;
 			case "utilisateurSite":
 				return oRequeteSiteFrFR.utilisateurSite;
 			case "xmlPile":
@@ -1611,6 +1837,8 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 				return oRequeteSiteFrFR.requetePk;
 			case "connexionSql":
 				return oRequeteSiteFrFR.connexionSql;
+			case "requeteEnTetes":
+				return oRequeteSiteFrFR.requeteEnTetes;
 			case "cryptageMotDePasse":
 				return oRequeteSiteFrFR.cryptageMotDePasse;
 			case "cryptageChiffreCrypter":
@@ -1678,6 +1906,17 @@ public abstract class RequeteSiteFrFRGen<DEV> extends Object {
 		switch(var) {
 			default:
 				return null;
+		}
+	}
+
+	//////////////////
+	// requetePatch //
+	//////////////////
+
+	public void requetePatchRequeteSiteFrFR() {
+		RequetePatch requetePatch = Optional.ofNullable(requeteSite_).map(RequeteSiteFrFR::getRequetePatch_).orElse(null);
+		RequeteSiteFrFR original = (RequeteSiteFrFR)Optional.ofNullable(requetePatch).map(RequetePatch::getOriginal).orElse(null);
+		if(original != null) {
 		}
 	}
 

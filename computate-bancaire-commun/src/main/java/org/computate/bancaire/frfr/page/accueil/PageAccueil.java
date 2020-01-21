@@ -1,11 +1,11 @@
-package org.computate.bancaire.frfr.page.accueil;   
+package org.computate.bancaire.frfr.page.accueil;    
 
 
 import org.computate.bancaire.frfr.couverture.Couverture;
 import org.computate.bancaire.frfr.page.MiseEnPage;
 
 
-public class PageAccueil extends PageAccueilGen<MiseEnPage> { 
+public class PageAccueil extends PageAccueilGen<MiseEnPage> {
 //	
 //	public PageAccueil() {
 //		pageClasseNomCanoniqueCouverture.valeurIndexéStocké(true);

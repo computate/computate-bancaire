@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -12,13 +13,14 @@ import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.computate.bancaire.frfr.couverture.Couverture;
-
 import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
+import org.computate.bancaire.frfr.utilisateur.UtilisateurSite;
 
 /**
  * NomCanonique.enUS: org.computate.bancaire.enus.search.SearchList
@@ -75,14 +77,22 @@ public class ListeRecherche<DEV> extends ListeRechercheGen<DEV> {
 	 * r.enUS: Wrap
 	 * r: modifie_
 	 * r.enUS: modified_
+	 * r: requeteSite
+	 * r.enUS: siteRequest
+	 * r: SiteContexte
+	 * r.enUS: SiteContext
+	 * r: ClientSolr
+	 * r.enUS: SolrClient
 	 */
 	public boolean next(String dt) {
 		boolean next = false;
-		long numFound = getSolrDocumentList().getNumFound();
+		Long numFound = Optional.ofNullable(getSolrDocumentList()).map(l -> l.getNumFound()).orElse(0L);
 		if(numFound > 0) {
-			addFilterQuery(String.format("modifie_indexed_date:[* TO %s]", dt));
-			_queryResponse(queryResponseCouverture);
-			setQueryResponse(queryResponseCouverture.o);
+			try {
+				setQueryResponse(requeteSite_.getSiteContexte_().getClientSolr().query(solrQuery));
+			} catch (SolrServerException | IOException e) {
+				ExceptionUtils.rethrow(e);
+			}
 			_solrDocumentList(solrDocumentListCouverture);
 			setSolrDocumentList(solrDocumentListCouverture.o);
 			list.clear();
@@ -100,8 +110,29 @@ public class ListeRecherche<DEV> extends ListeRechercheGen<DEV> {
 	 * r.enUS: SiteContext
 	 * r: ClientSolr
 	 * r.enUS: SolrClient
+	 * r: UtilisateurSite
+	 * r.enUS: SiteUser
+	 * r: utilisateurSite
+	 * r.enUS: siteUser
+	 * r: supprime_
+	 * r.enUS: deleted_
+	 * r: archive_
+	 * r.enUS: archived_
+	 * r: VoirSupprime
+	 * r.enUS: SeeDeleted
+	 * r: VoirArchive
+	 * r.enUS: SeeArchived
+	 * r: classeNomsCanoniques
+	 * r.enUS: classCanonicalNames
 	 **/
 	protected void _queryResponse(Couverture<QueryResponse> c) {
+		if(this.c != null)
+			solrQuery.addFilterQuery("classeNomsCanoniques_indexed_strings:" + ClientUtils.escapeQueryChars(this.c.getCanonicalName()));
+		UtilisateurSite utilisateurSite = requeteSite_.getUtilisateurSite();
+		if(utilisateurSite == null || !utilisateurSite.getVoirSupprime())
+			solrQuery.addFilterQuery("supprime_indexed_boolean:false");
+		if(utilisateurSite == null || !utilisateurSite.getVoirArchive())
+			solrQuery.addFilterQuery("archive_indexed_boolean:false");
 		if(solrQuery.getQuery() != null) {
 			try {
 				QueryResponse o = requeteSite_.getSiteContexte_().getClientSolr().query(solrQuery);
@@ -143,14 +174,16 @@ public class ListeRecherche<DEV> extends ListeRechercheGen<DEV> {
 		if(solrQuery.getQuery() != null) {
 			for(SolrDocument solrDocument : solrDocumentList) {
 				try {
-					DEV o = c.newInstance();
-					MethodUtils.invokeMethod(o, "setRequeteSite_", requeteSite_);
-					if(peupler)
-						MethodUtils.invokeMethod(o, "peuplerPourClasse", solrDocument);
-					if(stocker)
-						MethodUtils.invokeMethod(o, "stockerPourClasse", solrDocument);
-	//				MethodUtils.invokeMethod(o, "initLoinPourClasse", requeteSite_);
-					l.add(o);
+					if(solrDocument != null) {
+						DEV o = c.newInstance();
+						MethodUtils.invokeMethod(o, "setRequeteSite_", requeteSite_);
+						if(peupler)
+							MethodUtils.invokeMethod(o, "peuplerPourClasse", solrDocument);
+						if(stocker)
+							MethodUtils.invokeMethod(o, "stockerPourClasse", solrDocument);
+		//				MethodUtils.invokeMethod(o, "initLoinPourClasse", requeteSite_);
+						l.add(o);
+					}
 				} catch (InstantiationException | IllegalAccessException | NoSuchMethodException
 						| InvocationTargetException e) {
 					ExceptionUtils.rethrow(e);
@@ -1090,5 +1123,16 @@ public class ListeRecherche<DEV> extends ListeRechercheGen<DEV> {
 	 */
 	public Integer getTimeAllowed() {
 		return solrQuery.getTimeAllowed();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("ListeRecherche { ");
+		list.stream().forEach(o -> {
+			sb.append(o);
+		});
+		sb.append(" }");
+		return sb.toString();
 	}
 }

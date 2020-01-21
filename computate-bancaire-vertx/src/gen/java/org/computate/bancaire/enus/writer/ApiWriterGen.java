@@ -1,30 +1,27 @@
 package org.computate.bancaire.enus.writer;
 
+import org.computate.bancaire.enus.writer.AllWriters;
+import org.computate.bancaire.enus.cluster.Cluster;
 import java.math.MathContext;
-
 import org.apache.commons.text.StringEscapeUtils;
 import org.computate.bancaire.enus.vertx.AppSwagger2;
 import org.apache.commons.lang3.StringUtils;
 import java.lang.Integer;
+import org.computate.bancaire.enus.request.SiteRequestEnUS;
 import java.text.NumberFormat;
+import org.computate.bancaire.enus.contexte.SiteContextEnUS;
 import java.util.Objects;
 import io.vertx.core.json.JsonArray;
 import org.apache.solr.common.SolrDocument;
-
 import java.util.List;
+import org.computate.bancaire.enus.wrap.Wrap;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.math.NumberUtils;
 import java.lang.Boolean;
 import java.lang.Object;
-import java.lang.String;
-
-import org.computate.bancaire.enus.cluster.Cluster;
-import org.computate.bancaire.enus.config.SiteConfig;
-import org.computate.bancaire.enus.contexte.SiteContextEnUS;
-import org.computate.bancaire.enus.request.SiteRequestEnUS;
-import org.computate.bancaire.enus.wrap.Wrap;
 import org.computate.bancaire.enus.writer.AllWriter;
-import org.computate.bancaire.enus.writer.AllWriters;
+import java.lang.String;
+import org.computate.bancaire.enus.config.SiteConfig;
 
 /**	
  * <br/><a href="http://localhost:10383/solr/computate/select?q=*:*&fq=partEstClasse_indexed_boolean:true&fq=classeNomCanonique_enUS_indexed_string:org.computate.bancaire.enus.writer.ApiWriter&fq=classeEtendGen_indexed_boolean:true">Trouver la classe  dans Solr</a>

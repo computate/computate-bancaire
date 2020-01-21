@@ -6,6 +6,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.computate.bancaire.frfr.requete.RequeteSiteFrFR;
 import java.text.NumberFormat;
+import java.lang.Exception;
 import java.util.Objects;
 import io.vertx.core.json.JsonArray;
 import org.apache.solr.common.SolrDocument;
@@ -40,7 +41,7 @@ public abstract class ResultatRechercheGen<DEV> extends Object {
 	 * <br/>
 	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
 	 **/
-	protected abstract void _requeteSite_(Couverture<RequeteSiteFrFR> c);
+	protected abstract void _requeteSite_(Couverture<RequeteSiteFrFR> c) throws Exception, Exception;
 
 	public RequeteSiteFrFR getRequeteSite_() {
 		return requeteSite_;
@@ -50,7 +51,7 @@ public abstract class ResultatRechercheGen<DEV> extends Object {
 		this.requeteSite_ = requeteSite_;
 		this.requeteSite_Couverture.dejaInitialise = true;
 	}
-	protected ResultatRecherche requeteSite_Init() {
+	protected ResultatRecherche requeteSite_Init() throws Exception {
 		if(!requeteSite_Couverture.dejaInitialise) {
 			_requeteSite_(requeteSite_Couverture);
 			if(requeteSite_ == null)
@@ -77,7 +78,7 @@ public abstract class ResultatRechercheGen<DEV> extends Object {
 	 * <br/>
 	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
 	 **/
-	protected abstract void _documentSolr(Couverture<SolrDocument> c);
+	protected abstract void _documentSolr(Couverture<SolrDocument> c) throws Exception, Exception;
 
 	public SolrDocument getDocumentSolr() {
 		return documentSolr;
@@ -87,7 +88,7 @@ public abstract class ResultatRechercheGen<DEV> extends Object {
 		this.documentSolr = documentSolr;
 		this.documentSolrCouverture.dejaInitialise = true;
 	}
-	protected ResultatRecherche documentSolrInit() {
+	protected ResultatRecherche documentSolrInit() throws Exception {
 		if(!documentSolrCouverture.dejaInitialise) {
 			_documentSolr(documentSolrCouverture);
 			if(documentSolr == null)
@@ -114,7 +115,7 @@ public abstract class ResultatRechercheGen<DEV> extends Object {
 	 * <br/>
 	 * @param c est pour envelopper une valeur à assigner à cette entité lors de l'initialisation. 
 	 **/
-	protected abstract void _resultatIndice(Couverture<Long> c);
+	protected abstract void _resultatIndice(Couverture<Long> c) throws Exception, Exception;
 
 	public Long getResultatIndice() {
 		return resultatIndice;
@@ -130,7 +131,7 @@ public abstract class ResultatRechercheGen<DEV> extends Object {
 		this.resultatIndiceCouverture.dejaInitialise = true;
 		return (ResultatRecherche)this;
 	}
-	protected ResultatRecherche resultatIndiceInit() {
+	protected ResultatRecherche resultatIndiceInit() throws Exception {
 		if(!resultatIndiceCouverture.dejaInitialise) {
 			_resultatIndice(resultatIndiceCouverture);
 			if(resultatIndice == null)
@@ -170,7 +171,7 @@ public abstract class ResultatRechercheGen<DEV> extends Object {
 
 	protected boolean dejaInitialiseResultatRecherche = false;
 
-	public ResultatRecherche initLoinResultatRecherche(RequeteSiteFrFR requeteSite_) {
+	public ResultatRecherche initLoinResultatRecherche(RequeteSiteFrFR requeteSite_) throws Exception {
 		setRequeteSite_(requeteSite_);
 		if(!dejaInitialiseResultatRecherche) {
 			dejaInitialiseResultatRecherche = true;
@@ -179,17 +180,17 @@ public abstract class ResultatRechercheGen<DEV> extends Object {
 		return (ResultatRecherche)this;
 	}
 
-	public void initLoinResultatRecherche() {
+	public void initLoinResultatRecherche() throws Exception {
 		initResultatRecherche();
 	}
 
-	public void initResultatRecherche() {
+	public void initResultatRecherche() throws Exception {
 		requeteSite_Init();
 		documentSolrInit();
 		resultatIndiceInit();
 	}
 
-	public void initLoinPourClasse(RequeteSiteFrFR requeteSite_) {
+	public void initLoinPourClasse(RequeteSiteFrFR requeteSite_) throws Exception {
 		initLoinResultatRecherche(requeteSite_);
 	}
 
@@ -239,7 +240,7 @@ public abstract class ResultatRechercheGen<DEV> extends Object {
 	// attribuer //
 	///////////////
 
-	public boolean attribuerPourClasse(String var, Object val) {
+	public boolean attribuerPourClasse(String var, Object val) throws Exception {
 		String[] vars = StringUtils.split(var, ".");
 		Object o = null;
 		for(String v : vars) {
@@ -264,7 +265,7 @@ public abstract class ResultatRechercheGen<DEV> extends Object {
 	// definir //
 	/////////////
 
-	public boolean definirPourClasse(String var, String val) {
+	public boolean definirPourClasse(String var, String val) throws Exception {
 		String[] vars = StringUtils.split(var, ".");
 		Object o = null;
 		if(val != null) {
